@@ -20,7 +20,16 @@ exports.userRegister = async (req, res) => {
             return res.status(400).json({ messege: "Email is already registered" })
         }
 
-        // Hash password
+        // Hash password         
+        //10 --salt  Salt ke benefits
+        // Rainbow table attack se protection
+        // Same password → different hash
+        // Password cracking mushkil
+        // Industry standard security
+
+        //10 matlab:
+        // “Password ko hash karne ke liye 2¹⁰ = 1024 times internal processing hogi”
+        // Ye batata hai hashing kitni slow aur strong hogi
         const hashpsaaword = await bcrypt.hash(password, 10);
         //new user
         const user = await User.create({
@@ -71,7 +80,7 @@ exports.userLogin = async (req, res) => {
                 name: user.name,
                 email: user.email,
             },
-        });     
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
