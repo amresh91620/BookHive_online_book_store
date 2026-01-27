@@ -16,21 +16,14 @@ const bookSchema = new mongoose.Schema(
 
     description: {
       type: String,
+      required: true,
       trim: true,
     },
 
-    genre: {
+
+    categories: {
       type: String,
       required: true,
-      enum: [
-        "Fiction",
-        "Non-Fiction",
-        "Biography",
-        "History",
-        "Technology",
-        "Science",
-        "Other",
-      ],
     },
 
     price: {
@@ -39,13 +32,20 @@ const bookSchema = new mongoose.Schema(
       min: 0,
     },
 
-    publishedYear: {
-      type: Number,
+    publishedDate: {
+      type: Date,
       required: true,
     },
 
+    pages: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+
+    // store image URL / filename (Cloudinary / local upload)
     coverImage: {
-      type: String, 
+      type: String,
       required: true,
     },
   },

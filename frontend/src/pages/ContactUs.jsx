@@ -7,7 +7,7 @@ const ContactUs = () => {
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-extrabold text-gray-800 mb-3">
-          Contact <span className="text-green-600">Us</span>
+          Contact <span className="text-blue-500">Us</span>
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto text-lg">
           Have questions, feedback, or suggestions?  
@@ -24,7 +24,7 @@ const ContactUs = () => {
           </h2>
 
           <div className="flex items-center gap-4">
-            <Mail className="text-green-600" />
+            <Mail className="text-blue-500" />
             <div>
               <p className="font-semibold">Email</p>
               <p className="text-gray-600">support@bookhive.com</p>
@@ -32,7 +32,7 @@ const ContactUs = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <Phone className="text-green-600" />
+            <Phone className="text-blue-500" />
             <div>
               <p className="font-semibold">Phone</p>
               <p className="text-gray-600">+91 98765 43210</p>
@@ -40,7 +40,7 @@ const ContactUs = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <MapPin className="text-green-600" />
+            <MapPin className="text-blue-500" />
             <div>
               <p className="font-semibold">Address</p>
               <p className="text-gray-600">
@@ -98,7 +98,7 @@ const ContactUs = () => {
 
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition"
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
             >
               <Send size={18} /> Send Message
             </button>

@@ -7,17 +7,17 @@ exports.userRegister = async (req, res) => {
     try {
         const { name, email, password } = req.body;
         if (!name || name.length < 3) {
-            return res.status(400).json({ messege: "Name must be at least 3 characters" });
+            return res.status(400).json({ msg: "Name must be at least 3 characters" });
         }
         if (!email || !/\S+@\S+\.\S+/.test(email)) {
-            return res.status(400).json({ messege: "Invalid email" });
+            return res.status(400).json({ msg: "Invalid email" });
         }
         if (!password || password.length < 6) {
-            return res.status(400).json({ messege: "Password must be at least 6 characters" });
+            return res.status(400).json({ msg: "Password must be at least 6 characters" });
         }
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ messege: "Email is already registered" })
+            return res.status(400).json({ msg: "Email is already registered" })
         }
 
         // Hash password         
@@ -63,14 +63,14 @@ exports.userLogin = async (req, res) => {
         if (!user) {
             return res.status(404).json({ msg: "User not found" });
         }
-        const isMatch = await bcrypt.compare(password, user.password);
 
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ msg: "Invalid email or password" });
         }
 
-        //jwt generate
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+        // JWT generate
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
         res.status(200).json({
             msg: "Login successful",
@@ -79,6 +79,7 @@ exports.userLogin = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                role: user.role 
             },
         });
     } catch (error) {

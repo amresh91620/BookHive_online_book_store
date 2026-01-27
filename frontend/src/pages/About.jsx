@@ -7,7 +7,7 @@ const About = () => {
       {/* Hero Section */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-extrabold text-gray-800 mb-4">
-          About <span className="text-green-600">BookHive</span>
+          About <span className="text-blue-500">BookHive</span>
         </h1>
         <p className="text-gray-600 max-w-3xl mx-auto text-lg">
           BookHive is an online book review and rating platform where readers
@@ -45,7 +45,7 @@ const About = () => {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Feature Card */}
           <div className="p-6 border rounded-xl shadow-sm hover:shadow-md transition">
-            <BookOpen className="w-10 h-10 text-green-600 mb-4" />
+            <BookOpen className="w-10 h-10 text-blue-500 mb-4" />
             <h3 className="font-semibold text-lg mb-2">Book Discovery</h3>
             <p className="text-gray-600 text-sm">
               Explore books by title, author, genre, and popularity.

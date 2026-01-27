@@ -1,13 +1,26 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
 const auth = require('../middleware/authMiddleware');
 const isAdmin = require('../middleware/adminMiddleware');
-const {getAllBooks,addBook,updateBook,deleteBook} =require("../controller/bookController");
+const { getAllBooks, addBook, updateBook, deleteBook } = require("../controller/bookController");
 
+// Multer Cloudinary Storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "book_covers",  
+    allowed_formats: ["jpg", "png", "jpeg"],
+  },
+});
 
-router.get('/',auth,isAdmin,getAllBooks);
-router.post('/add-book',auth,isAdmin,addBook );
-router.put('/update-book/:id',auth,isAdmin,updateBook);
-router.delete('/delete-book/:id',auth,isAdmin,deleteBook)
+const parser = multer({ storage });
 
-module.exports = router; 
+router.get('/', getAllBooks);
+router.post('/add-book', auth, isAdmin, parser.single("coverImage"), addBook);
+router.put('/update-book/:id', auth, isAdmin, parser.single("coverImage"), updateBook);
+router.delete('/delete-book/:id', auth, isAdmin, deleteBook);
+
+module.exports = router;
