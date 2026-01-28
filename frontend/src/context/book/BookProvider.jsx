@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { addBook, getAllBooks, deleteBook, updateBook } from "../services/bookApi";
+import { useEffect, useState } from "react";
+import { addBook, getAllBooks, deleteBook, updateBook } from "../../services/bookApi";
 import toast from "react-hot-toast";
+import { BookContext } from "./BookContext";
 
-const BookContext = createContext(null);
 
 
 export const BookProvider = ({ children }) => {
@@ -86,9 +86,4 @@ const createBook = async (bookData) => {
       {children}
     </BookContext.Provider>
   );
-};
-
-
-export const useBooks = () => {
-  return useContext(BookContext);
 };

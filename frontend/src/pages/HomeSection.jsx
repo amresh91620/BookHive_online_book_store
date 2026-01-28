@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Star, Search, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useBooks } from "../context/BookContext"; // ✅ Import the hook
+import { useBooks } from "../hooks/useBooks";
 
 const HomeSection = () => {
-  const { books, loading } = useBooks(); // ✅ Get dynamic data and loading state
+  const { books, loading } = useBooks();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 

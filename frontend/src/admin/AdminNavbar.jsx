@@ -1,11 +1,11 @@
 import { Menu, LogOut, Bell, UserCircle } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 const AdminNavbar = ({ toggleSidebar }) => {
   const { logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 md:px-8 py-4 flex justify-between items-center">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-400 px-4 md:px-8 py-4 flex justify-between items-center">
       <div className="flex items-center gap-4">
         {/* Hamburger Menu for Mobile */}
         <button 

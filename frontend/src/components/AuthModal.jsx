@@ -8,7 +8,7 @@ import {
   ArrowRight,
   Loader2,
 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -34,33 +34,35 @@ const AuthModal = ({ isOpen, onClose, type, setType }) => {
     setLoading(true);
 
     try {
-      let data;
-
       if (type === "login") {
-        data = await login({ email: form.email, password: form.password });
+        // --- LOGIN LOGIC ---
+        const data = await login({ email: form.email, password: form.password });
+
+        toast.success(`Welcome back, ${data.user.name}!`);
+        onClose(); // Modal close karein
+        setForm({ email: "", password: "", name: "" });
+
+        // Role ke basis par redirect
+        if (data.user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       } else {
-        data = await register({
+        // --- REGISTER LOGIC ---
+        await register({
           name: form.name,
           email: form.email,
           password: form.password,
         });
-      }
 
-      // Success Toast
-      toast.success(
-        type === "login"
-          ? `Welcome back, ${data.user.name}!`
-          : "Registration Successful!",
-      );
-
-      onClose(); // Close modal
-      setForm({ email: "", password: "", name: "" });
-
-      // Redirect based on role
-      if (data.user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
+        toast.success("Registration Successful! Please login to continue.");
+        
+        // Form reset karein (Email rehne de sakte hain user ki aasani ke liye)
+        setForm({ ...form, password: "" }); 
+        
+        // Redirect nahi karenge, bas Login page par switch karenge
+        setType("login"); 
       }
     } catch (err) {
       console.error(err);
@@ -94,7 +96,7 @@ const AuthModal = ({ isOpen, onClose, type, setType }) => {
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-8">
               <div className="bg-white/20 p-2 rounded-xl backdrop-blur-sm">
-                <BookOpenCheck className="text-white" size={28} />
+                < BookOpenCheck className="text-white" size={28} />
               </div>
               <span className="text-2xl font-bold tracking-tight">
                 BookHive

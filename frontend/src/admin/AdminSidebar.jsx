@@ -1,11 +1,11 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom"; // useLocation add kiya
 import { LayoutDashboard, BookText, Users, MessageSquare, BookOpenCheck, X } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const { user } = useAuth();
-  const location = useLocation(); // Current path check karne ke liye
+  const location = useLocation(); 
 
   const links = [
     { 
@@ -16,7 +16,6 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
     { 
       name: "Manage Books", 
       path: "/admin/books", 
-      // In paths par bhi highlight rahega
       subPaths: ["/admin/books", "/admin/add-book", "/admin/edit-book"], 
       icon: <BookText size={20} /> 
     },
@@ -45,13 +44,13 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
         ></div>
       )}
 
-      <aside className={`fixed left-0 top-0 h-screen w-72 bg-white border-r border-slate-100 z-[70] flex flex-col transition-transform duration-300 lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <aside className={`fixed left-0 top-0 h-screen w-72 bg-white border-r border-slate-400 z-[70] flex flex-col transition-transform duration-300 lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
         
         {/* Brand Logo */}
-        <div className="p-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-600 p-2.5 rounded-2xl shadow-lg shadow-blue-100">
-              <BookOpenCheck size={24} className="text-white" />
+        <div className="p-4 flex items-center justify-between border-b border-slate-400">
+          <div className="flex items-center gap-4">
+            <div className="bg-blue-600 p-3 rounded-2xl shadow-lg shadow-blue-100">
+              <BookOpenCheck size={21} className="text-white" />
             </div>
             <h1 className="text-xl font-bold text-slate-900 tracking-tight">BookHive</h1>
           </div>

@@ -8,7 +8,7 @@ const {getDashboardStats,getAllUser,deleteUser} = require("../controller/adminCo
 
 router.get("/Dashboard",auth,isAdmin,getDashboardStats);
 router.get("/users",auth,isAdmin,getAllUser);
-router.get("/users/:id",auth,isAdmin,deleteUser);
+router.delete("/users/:id",auth,isAdmin,deleteUser);
 
 
 module.exports = router;

@@ -1,198 +1,205 @@
-import React, { useState } from "react";
-import { Star, ChevronLeft, ChevronRight, Send } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Star, Send, ArrowLeft, Loader2, Trash2, Edit3, Calendar, BookOpen, Tag, DollarSign } from "lucide-react";
+import { useBooks } from "../hooks/useBooks";
+import { useAuth } from "../hooks/useAuth";
+import { useReview } from "../hooks/useReview";
+import AuthModal from "../components/AuthModal";
+import toast from "react-hot-toast";
 
 const BookRatingPage = () => {
-  // --- Form State ---
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { books } = useBooks();
+  const { user } = useAuth();
+  const { addNewReview, fetchReviews, reviews, removeReview, editReview, loading: reviewLoading } = useReview();
+
+  const book = books.find((b) => b._id === id);
+
   const [isReviewing, setIsReviewing] = useState(false);
   const [userRating, setUserRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
   const [userComment, setUserComment] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [editContent, setEditContent] = useState("");
+  const [editRating, setEditRating] = useState(0);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authType, setAuthType] = useState("login");
 
-  // Dummy reviews (15)
-  const [allReviews] = useState([
-    { id: 1, user: "Alice Johnson", avatar: "https://i.pravatar.cc/150?u=1", message: "A timeless classic! Loved the depth of characters.", rating: 5, date: "Jan 12, 2024" },
-    { id: 2, user: "Bob Smith", avatar: "https://i.pravatar.cc/150?u=2", message: "Beautiful story but a bit slow in the middle chapters.", rating: 4, date: "Jan 10, 2024" },
-    { id: 15, user: "Olivia Pope", avatar: "https://i.pravatar.cc/150?u=15", message: "Highly atmospheric and dark.", rating: 4, date: "Nov 05, 2023" },
-  ]);
+  useEffect(() => { if (id) fetchReviews(id); }, [id]);
 
-  // Pagination Logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const reviewsPerPage = 5;
-  const totalPages = Math.ceil(allReviews.length / reviewsPerPage);
-  const startIndex = (currentPage - 1) * reviewsPerPage;
-  const currentReviews = allReviews.slice(startIndex, startIndex + reviewsPerPage);
+  const { avgRating, ratingDistribution, totalRatings } = useMemo(() => {
+    const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    if (reviews.length === 0) return { avgRating: "0.0", ratingDistribution: distribution, totalRatings: 0 };
+    let total = 0;
+    reviews.forEach(r => { distribution[r.rating]++; total += r.rating; });
+    return { avgRating: (total / reviews.length).toFixed(1), ratingDistribution: distribution, totalRatings: reviews.length };
+  }, [reviews]);
 
-  const ratingData = [
-    { label: "5 stars", count: "1,090,501", percentage: 46 },
-    { label: "4 stars", count: "723,584", percentage: 31 },
-    { label: "3 stars", count: "354,216", percentage: 15 },
-    { label: "2 stars", count: "102,298", percentage: 4 },
-    { label: "1 star", count: "54,813", percentage: 2 },
-  ];
-
-  const handleSubmit = () => {
-    if (userRating === 0) return alert("Please select a rating!");
-    console.log({ rating: userRating, comment: userComment });
-    alert("Review Submitted Successfully!");
-    setIsReviewing(false);
-    setUserRating(0);
-    setUserComment("");
+  const handleSubmit = async () => {
+    if (userRating === 0 || !userComment.trim()) return toast.error("Rating and comment required!");
+    const success = await addNewReview({ bookId: id, rating: userRating, comment: userComment });
+    if (success) { setIsReviewing(false); setUserRating(0); setUserComment(""); }
   };
 
+  const handleUpdate = async (reviewId) => {
+    const success = await editReview(reviewId, id, { rating: editRating, comment: editContent });
+    if (success) setEditingId(null);
+  };
+
+  const isOwner = (rev) => {
+    const rId = (rev.user?._id || rev.user?.id || rev.user)?.toString();
+    const uId = (user?._id || user?.id)?.toString();
+    return rId === uId;
+  };
+
+  if (!book) return <div className="p-20 text-center text-gray-400">Loading Book Details...</div>;
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-10 sm:py-12">
-      {/* TOP SECTION */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
+    <div className="max-w-6xl mx-auto px-4 py-8 font-sans bg-white min-h-screen">
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} type={authType} setType={setAuthType} />
+
+      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-500 hover:text-black mb-8 border-none bg-transparent cursor-pointer font-medium transition-colors">
+        <ArrowLeft size={18} /> Back to Library
+      </button>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         
-        {/* BOOK INFO */}
-        <div className="lg:col-span-2 flex flex-col sm:flex-row gap-6">
-          <img
-            src="https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1557343311i/10210.jpg"
-            alt="Jane Eyre"
-            className="w-full sm:w-48 h-72 object-cover rounded-lg shadow-lg mx-auto sm:mx-0"
-          />
-
-          <div className="flex-1 flex flex-col gap-2">
-            <h1 className="text-2xl sm:text-3xl font-serif font-bold">Jane Eyre</h1>
-            <p className="text-gray-700 text-sm sm:text-lg">
-              Charlotte Brontë, Michael Mason <span className="italic text-gray-400">(Introduction)</span>
-            </p>
-
-            <div className="flex flex-wrap items-center gap-2 mt-1">
-              <div className="flex text-orange-500">
-                {[1, 2, 3, 4].map((i) => (<Star key={i} fill="currentColor" className="w-5 h-5" />))}
-                <Star className="text-gray-300 w-5 h-5" />
-              </div>
-              <span className="text-xl sm:text-2xl font-bold">4.16</span>
-              <span className="text-gray-500 text-xs sm:text-sm">2,325,412 ratings · 80,164 reviews</span>
-            </div>
-
-            <p className="text-gray-600 text-sm mt-2">532 pages · Paperback</p>
-            <p className="text-gray-600 text-sm">First published October 19, 1847</p>
-
-            {/* --- CONDITIONAL RATING FORM --- */}
-            <div className="mt-6">
-              {!isReviewing ? (
-                <button 
-                  onClick={() => setIsReviewing(true)}
-                  className="w-fit bg-[#387844] text-white px-6 py-2.5 rounded-md hover:bg-green-800 transition font-semibold"
-                >
-                  Write a Review
-                </button>
-              ) : (
-                <div className="bg-gray-50 p-5 rounded-xl border border-gray-200 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <p className="text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Your Rating</p>
-                  
-                  {/* Interactive Stars */}
-                  <div className="flex gap-1 mb-4">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        onMouseEnter={() => setHoverRating(star)}
-                        onMouseLeave={() => setHoverRating(0)}
-                        onClick={() => setUserRating(star)}
-                        className="transition-transform active:scale-90"
-                      >
-                        <Star
-                          size={28}
-                          fill={(hoverRating || userRating) >= star ? "#f97316" : "none"}
-                          className={(hoverRating || userRating) >= star ? "text-orange-500" : "text-gray-300"}
-                        />
-                      </button>
-                    ))}
-                  </div>
-
-                  <p className="text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Your Review</p>
-                  <textarea
-                    rows="3"
-                    value={userComment}
-                    onChange={(e) => setUserComment(e.target.value)}
-                    placeholder="Tell us what you thought about this book..."
-                    className="w-full p-3 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-green-100 focus:border-[#387844] transition-all bg-white"
-                  />
-                  
-                  <div className="flex gap-3 mt-4">
-                    <button 
-                      onClick={handleSubmit}
-                      className="flex items-center gap-2 bg-[#387844] text-white px-5 py-2 rounded-md hover:bg-green-800 transition font-bold text-sm"
-                    >
-                      <Send size={16} /> Submit Review
-                    </button>
-                    <button 
-                      onClick={() => setIsReviewing(false)}
-                      className="text-gray-500 hover:text-gray-800 text-sm font-medium px-4"
-                    >
-                      Cancel
-                    </button>
-                  </div>
+        {/* LEFT & CENTER: Book Info & Reviews (8 Columns) */}
+        <div className="lg:col-span-8">
+          <div className="flex flex-col md:flex-row gap-8 mb-12">
+            <img src={book.coverImage} className="w-48 h-64 object-cover rounded-lg shadow-md border" alt={book.title} />
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">{book.title}</h1>
+              <p className="text-xl text-gray-500 mb-4 italic">by {book.author}</p>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-4xl font-black text-gray-900">{avgRating}</span>
+                <div className="flex text-amber-400">
+                  {[...Array(5)].map((_, i) => <Star key={i} size={20} fill={i < Math.round(avgRating) ? "currentColor" : "none"} />)}
                 </div>
-              )}
+                <span className="text-gray-400 text-sm">({totalRatings} reviews)</span>
+              </div>
+              <h3 className="text-xs font-bold uppercase text-gray-400 mb-2 tracking-widest">Description</h3>
+              <p className="text-gray-600 leading-relaxed max-w-xl">{book.description}</p>
             </div>
           </div>
-        </div>
 
-        {/* RATING BREAKDOWN (Right Side) */}
-        <div className="border-t lg:border-t-0 lg:border-l pt-8 lg:pt-0 lg:pl-8 border-gray-100">
-          <h2 className="text-xl font-serif mb-4">Community Reviews</h2>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex text-orange-500">
-              {[1, 2, 3, 4].map((i) => (<Star key={i} fill="currentColor" className="w-6 h-6" />))}
-              <Star className="text-gray-300 w-6 h-6" />
-            </div>
-            <span className="text-3xl sm:text-4xl font-light text-gray-800">4.16</span>
-          </div>
-          <div className="space-y-3">
-            {ratingData.map((item, index) => (
-              <div key={index} className="flex items-center gap-4 text-sm">
-                <span className="w-14 underline cursor-pointer hover:text-orange-600 font-medium">{item.label}</span>
-                <div className="flex-1 h-3 bg-gray-100 rounded-sm overflow-hidden">
-                  <div className="h-full bg-orange-500" style={{ width: `${item.percentage}%` }} />
-                </div>
-                <span className="w-28 text-gray-500 text-xs">{item.count}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* USER REVIEWS LIST */}
-      <div className="mt-16 pt-8 border-t border-gray-200">
-        <h2 className="text-2xl font-semibold mb-8">Ratings & Reviews</h2>
-        <div className="flex flex-col gap-8 min-h-[400px]">
-          {currentReviews.map((review) => (
-            <div key={review.id} className="flex gap-4 pb-8 border-b last:border-0">
-              <img src={review.avatar} alt={review.user} className="w-11 h-11 rounded-full object-cover border" />
-              <div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="font-bold text-gray-900">{review.user}</span>
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} fill={i < review.rating ? "#f97316" : "none"} className={i < review.rating ? "text-orange-500" : "text-gray-200"} />
-                    ))}
-                  </div>
-                </div>
-                <p className="text-gray-400 text-xs mb-2">{review.date}</p>
-                <p className="text-gray-700 leading-relaxed max-w-2xl">{review.message}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* PAGINATION (Keep same) */}
-        <div className="mt-12 flex flex-wrap justify-center items-center gap-4">
-          <button onClick={() => setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage === 1} className="flex items-center gap-1 px-4 py-2 border rounded-md disabled:opacity-30">
-            <ChevronLeft size={18} /> Previous
-          </button>
-          <div className="flex gap-2">
-            {[...Array(totalPages)].map((_, i) => (
-              <button key={i} onClick={() => setCurrentPage(i+1)} className={`w-9 h-9 rounded-md border ${currentPage === i+1 ? "bg-[#387844] text-white" : "hover:bg-gray-50"}`}>
-                {i+1}
+          {/* Write Review Section */}
+          <div className="mb-12">
+            {!isReviewing ? (
+              <button onClick={() => user ? setIsReviewing(true) : setIsAuthModalOpen(true)} className="px-8 py-3 bg-black text-white rounded-lg font-bold hover:bg-gray-800 transition-all">
+                Write a Review
               </button>
-            ))}
+            ) : (
+              <div className="p-6 border rounded-xl bg-gray-50">
+                <h3 className="font-bold mb-4">Your Rating</h3>
+                <div className="flex gap-2 mb-4">
+                  {[1,2,3,4,5].map(s => (
+                    <Star key={s} size={28} className={`cursor-pointer ${userRating >= s ? 'text-amber-400' : 'text-gray-300'}`} fill={userRating >= s ? "currentColor" : "none"} onClick={() => setUserRating(s)} />
+                  ))}
+                </div>
+                <textarea className="w-full p-4 border rounded-lg outline-none mb-4 bg-white" placeholder="What did you think?" rows="3" value={userComment} onChange={(e) => setUserComment(e.target.value)} />
+                <div className="flex gap-4">
+                  <button onClick={handleSubmit} disabled={reviewLoading} className="bg-black text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2">
+                    {reviewLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} Post
+                  </button>
+                  <button onClick={() => setIsReviewing(false)} className="text-gray-500">Cancel</button>
+                </div>
+              </div>
+            )}
           </div>
-          <button onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} disabled={currentPage === totalPages} className="flex items-center gap-1 px-4 py-2 border rounded-md disabled:opacity-30">
-            Next <ChevronRight size={18} />
-          </button>
+
+          {/* Reviews List */}
+          <div className="space-y-8">
+            <h2 className="text-2xl font-bold border-b pb-4">Customer Feedback</h2>
+            {reviews.length === 0 ? (
+              <p className="text-gray-400 italic">No reviews yet.</p>
+            ) : (
+              reviews.map((rev) => (
+                <div key={rev._id} className="group border-b border-gray-100 pb-8 last:border-0">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center text-xs font-bold">{rev.user?.name?.charAt(0).toUpperCase()}</div>
+                      <div>
+                        <p className="font-bold text-sm">{rev.user?.name || "Anonymous"}</p>
+                        <div className="flex text-amber-400">
+                          {[...Array(5)].map((_, i) => <Star key={i} size={12} fill={i < rev.rating ? "currentColor" : "none"} />)}
+                        </div>
+                      </div>
+                    </div>
+                    {isOwner(rev) && (
+                      <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => { setEditingId(rev._id); setEditContent(rev.comment); setEditRating(rev.rating); }} className="text-gray-400 hover:text-blue-600"><Edit3 size={16}/></button>
+                        <button onClick={() => window.confirm("Delete?") && removeReview(rev._id, id)} className="text-gray-400 hover:text-red-600"><Trash2 size={16}/></button>
+                      </div>
+                    )}
+                  </div>
+                  {editingId === rev._id ? (
+                    <div className="mt-2 p-4 bg-blue-50 rounded-lg">
+                      <div className="flex gap-1 mb-3">
+                        {[1,2,3,4,5].map(s => <Star key={s} size={18} className={`cursor-pointer ${editRating >= s ? 'text-amber-400' : 'text-gray-300'}`} fill={editRating >= s ? "currentColor" : "none"} onClick={() => setEditRating(s)} />)}
+                      </div>
+                      <textarea className="w-full p-2 border rounded bg-white text-sm" value={editContent} onChange={e => setEditContent(e.target.value)} />
+                      <div className="flex gap-2 mt-2"><button onClick={() => handleUpdate(rev._id)} className="bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold">Save</button><button onClick={() => setEditingId(null)} className="text-gray-400 text-xs">Cancel</button></div>
+                    </div>
+                  ) : (
+                    <p className="text-gray-600 text-sm leading-relaxed">{rev.comment}</p>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT SIDEBAR: Stats & Details (4 Columns) */}
+        <div className="lg:col-span-4 space-y-6">
+          
+          {/* 1. Rating Distribution Card */}
+          <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+            <h3 className="text-sm font-bold uppercase text-gray-400 mb-6 tracking-widest">Rating Stats</h3>
+            <div className="space-y-3">
+              {[5, 4, 3, 2, 1].map((star) => (
+                <div key={star} className="flex items-center gap-4 text-sm">
+                  <span className="w-12 text-gray-500 font-medium">{star} Star</span>
+                  <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-amber-400 rounded-full" 
+                      style={{ width: `${totalRatings ? (ratingDistribution[star] / totalRatings) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <span className="w-8 text-right text-gray-400 text-xs">
+                    {totalRatings ? Math.round((ratingDistribution[star] / totalRatings) * 100) : 0}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 2. Technical Details Card */}
+          <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+            <h3 className="text-sm font-bold uppercase text-gray-400 mb-6 tracking-widest">Specifications</h3>
+            <div className="space-y-5">
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-white rounded-lg shadow-sm"><DollarSign size={18} className="text-green-600" /></div>
+                <div><p className="text-[10px] uppercase font-bold text-gray-400">Price</p><p className="font-bold text-gray-900">₹{book.price}</p></div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-white rounded-lg shadow-sm"><BookOpen size={18} className="text-blue-500" /></div>
+                <div><p className="text-[10px] uppercase font-bold text-gray-400">Length</p><p className="font-bold text-gray-900">{book.pages} Pages</p></div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-white rounded-lg shadow-sm"><Tag size={18} className="text-purple-500" /></div>
+                <div><p className="text-[10px] uppercase font-bold text-gray-400">Category</p><p className="font-bold text-gray-900 capitalize">{book.categories}</p></div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-white rounded-lg shadow-sm"><Calendar size={18} className="text-orange-500" /></div>
+                <div>
+                  <p className="text-[10px] uppercase font-bold text-gray-400">Published Date</p>
+                  <p className="font-bold text-gray-900">{new Date(book.publishedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

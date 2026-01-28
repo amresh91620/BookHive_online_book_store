@@ -1,8 +1,8 @@
 import { useState } from "react";
 import AuthModal from "./AuthModal";
-import { NavLink, Link, useNavigate } from "react-router-dom"; // useNavigate add kiya
+import { NavLink, Link} from "react-router-dom"; // useNavigate add kiya
 import { BookOpenCheck, Menu, X, LogOut } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast"; // toast import karein
 
 const Navbar = () => {
@@ -11,8 +11,6 @@ const Navbar = () => {
   const [modalType, setModalType] = useState("login");
   
   const { user, logout } = useAuth();
-  const navigate = useNavigate(); // Navigation ke liye
-
   // Logout Handler with Toast and Refresh
   const handleLogout = () => {
     logout(); // Context se logout call kiya

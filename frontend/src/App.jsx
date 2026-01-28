@@ -9,9 +9,8 @@ import BookRatingPage from "./pages/BookRatingPage";
 import About from "./pages/About";
 import ContactUs from "./pages/ContactUs";
 
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import { BookProvider } from "./context/BookContext";
-
+import { useAuth } from "./hooks/useAuth";
+ 
 // admin
 import AdminRoute from "./admin/AdminRoute";
 import AdminLayout from "./admin/AdminLayout";
@@ -20,7 +19,11 @@ import ManageBooks from "./admin/ManageBooks";
 import ManageUsers from "./admin/ManageUsers";
 import ManageReviews from "./admin/ManageReviews";
 import AddBook from "./admin/AddBook";
-import { AdminProvider } from "./context/AdminContext";
+import AdminProvider from "./context/admin/AdminProvider";
+import AuthProvider from "./context/auth/AuthProvider";
+import { BookProvider } from "./context/book/BookProvider";
+import { ReviewProvider } from "./context/review/ReviewProvider";
+
 
 function AppWrapper() {
   const location = useLocation();
@@ -37,7 +40,7 @@ function AppWrapper() {
       <Routes>
         {/* ===== PUBLIC ROUTES ===== */}
         <Route path="/" element={<HomeSection />} />
-        <Route path="/book-rating" element={<BookRatingPage />} />
+        <Route path="/book-rating/:id" element={<BookRatingPage />}/>
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactUs />} />
 
@@ -118,9 +121,11 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <BookProvider>
+          <ReviewProvider>
           <AdminProvider>
             <AppWrapper />
           </AdminProvider>
+          </ReviewProvider>
         </BookProvider>
       </AuthProvider>
     </BrowserRouter>

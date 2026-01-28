@@ -38,7 +38,6 @@ const AdminDashboard = () => {
     { title: "Atomic Habits", author: "James Clear", time: "2 hours ago", category: "Self-Help" },
     { title: "Deep Work", author: "Cal Newport", time: "5 hours ago", category: "Productivity" },
     { title: "The Alchemist", author: "Paulo Coelho", time: "Yesterday", category: "Fiction" },
-    { title: "Thinking, Fast and Slow", author: "Daniel Kahneman", time: "2 days ago", category: "Psychology" },
   ];
 
   return (
@@ -49,13 +48,6 @@ const AdminDashboard = () => {
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Dashboard Overview</h1>
           <p className="text-gray-500 mt-1">Welcome back! Here's your library at a glance</p>
         </div>
-        <Link 
-          to="/admin/books/add" 
-          className="inline-flex items-center gap-2 px-5 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200"
-        >
-          <PlusCircle size={18} />
-          Add New Book
-        </Link>
       </div>
 
       {/* Stats Grid */}
@@ -68,10 +60,6 @@ const AdminDashboard = () => {
             <div className="flex items-center justify-between mb-4">
               <div className={`${item.color} p-3 rounded-lg text-white`}>
                 {React.cloneElement(item.icon, { size: 22 })}
-              </div>
-              <div className="flex items-center gap-1 text-green-600 text-sm font-medium bg-green-50 px-2 py-1 rounded">
-                <ArrowUpRight size={14} />
-                {item.grow}
               </div>
             </div>
             <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">{item.title}</h3>
@@ -132,32 +120,12 @@ const AdminDashboard = () => {
         </div>
 
         {/* Quick Actions Sidebar */}
-        <div className="space-y-6">
-          {/* Quick Stats */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Library Health</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Available Books</span>
-                <span className="font-semibold text-gray-900">98</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Borrowed</span>
-                <span className="font-semibold text-gray-900">26</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Reserved</span>
-                <span className="font-semibold text-gray-900">14</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
+        <div className="space-y-6">         
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
             <div className="space-y-3">
               <Link 
-                to="/admin/books/add" 
+                to="/admin/add-book" 
                 className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <div className="flex items-center gap-3">
@@ -194,35 +162,6 @@ const AdminDashboard = () => {
                 </div>
                 <ChevronRight className="text-gray-400" size={18} />
               </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Monthly Visitors</h3>
-              <p className="text-3xl font-bold text-gray-900 mt-2">2,847</p>
-              <p className="text-sm text-gray-600 mt-1">+24% from last month</p>
-            </div>
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <ShoppingBag className="text-blue-600" size={24} />
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-xl border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Avg. Rating</h3>
-              <p className="text-3xl font-bold text-gray-900 mt-2">4.2★</p>
-              <p className="text-sm text-gray-600 mt-1">Based on 982 reviews</p>
-            </div>
-            <div className="p-3 bg-gray-100 rounded-lg">
-              <Star className="text-gray-600" size={24} />
             </div>
           </div>
         </div>

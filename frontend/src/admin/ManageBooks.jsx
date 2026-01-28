@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Plus, Edit, Trash2, Search, Book } from "lucide-react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
-import { useBooks } from "../context/BookContext";
+import { useBooks } from "../hooks/useBooks";
 
 const ManageBooks = () => {
   const navigate = useNavigate();
