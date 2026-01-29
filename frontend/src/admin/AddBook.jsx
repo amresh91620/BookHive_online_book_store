@@ -96,7 +96,7 @@ const AddBook = () => {
   };
 
   return (
-    <div className="p-6 md:p-10 bg-gradient-to-b from-slate-50 to-white min-h-screen">
+    <div className="p-1 from-slate-50 to-white min-h-screen">
       <div className="max-w-7xl mx-auto mb-10">
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-all mb-6 group">
           <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
@@ -104,11 +104,11 @@ const AddBook = () => {
         </button>
 
         <div className="flex items-center gap-4">
-          <div className="p-4 bg-blue-600 rounded-2xl shadow-lg shadow-blue-100">
-            {isEditMode ? <Edit className="text-white" size={28} /> : <Plus className="text-white" size={28} />}
+          <div className="p-2 bg-blue-600 rounded-sm shadow-lg shadow-blue-100">
+            {isEditMode ? <Edit className="text-white" size={20} /> : <Plus className="text-white" size={20} />}
           </div>
           <div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-xl font-black text-slate-900 tracking-tight">
               {isEditMode ? "Update Book" : "Add New Book"}
             </h1>
             <p className="text-slate-500 font-medium">
@@ -122,12 +122,12 @@ const AddBook = () => {
         
         {/* Left: Image Upload */}
         <div className="lg:col-span-4 order-2 lg:order-1">
-          <div className="bg-white p-6 rounded-[2rem] shadow-xl border border-slate-100 sticky top-24">
+          <div className="bg-white p-6  shadow-xl border border-slate-300 sticky top-24">
             <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
               <Upload size={20} className="text-blue-600" /> {isEditMode ? "Update Cover" : "Cover Image"}
             </h2>
 
-            <div className={`relative aspect-[3/4] rounded-2xl border-2 flex flex-col items-center justify-center overflow-hidden group ${preview ? "border-blue-100" : "border-dashed border-slate-200 hover:border-blue-300"}`}>
+            <div className={`relative aspect-[3/4] rounded-xl border-2 flex flex-col items-center justify-center overflow-hidden group ${preview ? "border-blue-100" : "border-dashed border-slate-200 hover:border-blue-300"}`}>
               {preview ? (
                 <>
                   <img src={preview} alt="Preview" className="w-full h-full object-cover" />
@@ -150,8 +150,8 @@ const AddBook = () => {
 
         {/* Right: Form Details */}
         <div className="lg:col-span-8 order-1 lg:order-2">
-          <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
-            <div className="p-8 border-b border-slate-50">
+          <div className="bg-white  shadow-xl border border-slate-300 overflow-hidden">
+            <div className="p-8 border-b border-slate-300">
               <h2 className="text-xl font-bold text-slate-900">Book Information</h2>
             </div>
 
@@ -161,7 +161,7 @@ const AddBook = () => {
                   <label className="text-sm font-bold text-slate-700 ml-1">Book Title</label>
                   <div className="relative">
                     <Book className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input name="title" value={formData.title} type="text" placeholder="Title" className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-none rounded-2xl outline-none font-medium" onChange={handleChange} />
+                    <input name="title" value={formData.title} type="text" placeholder="Title" className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-none rounded-sm outline-none font-medium" onChange={handleChange} />
                   </div>
                 </div>
 
@@ -169,7 +169,7 @@ const AddBook = () => {
                   <label className="text-sm font-bold text-slate-700 ml-1">Author Name</label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input name="author" value={formData.author} type="text" placeholder="Author" className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-none rounded-2xl outline-none font-medium" onChange={handleChange} />
+                    <input name="author" value={formData.author} type="text" placeholder="Author" className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-none rounded-sm outline-none font-medium" onChange={handleChange} />
                   </div>
                 </div>
               </div>
@@ -178,30 +178,30 @@ const AddBook = () => {
                 <label className="text-sm font-bold text-slate-700 ml-1">Category</label>
                 <div className="relative">
                   <Tag className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                  <input name="categories" value={formData.categories} type="text" placeholder="Category" className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-none rounded-2xl outline-none font-medium" onChange={handleChange} />
+                  <input name="categories" value={formData.categories} type="text" placeholder="Category" className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-none rounded-sm outline-none font-medium" onChange={handleChange} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-700 ml-1">Release Date</label>
-                  <input name="publishedDate" value={formData.publishedDate} type="date" className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-2xl outline-none font-medium" onChange={handleChange} />
+                  <input name="publishedDate" value={formData.publishedDate} type="date" className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-sm outline-none font-medium" onChange={handleChange} />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-700 ml-1">Price (₹)</label>
-                  <input name="price" value={formData.price} type="number" className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-2xl outline-none font-medium" onChange={handleChange} />
+                  <input name="price" value={formData.price} type="number" className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-sm outline-none font-medium" onChange={handleChange} />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-700 ml-1">Total Pages</label>
-                  <input name="pages" value={formData.pages} type="number" className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-2xl outline-none font-medium" onChange={handleChange} />
+                  <input name="pages" value={formData.pages} type="number" className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-sm outline-none font-medium" onChange={handleChange} />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-700 ml-1">About the Book</label>
-                <textarea name="description" value={formData.description} rows="5" className="w-full p-5 bg-slate-50 border-none rounded-[2rem] outline-none resize-none font-medium" onChange={handleChange}></textarea>
+                <textarea name="description" value={formData.description} rows="5" className="w-full p-5 bg-slate-50 border-none rounded-sm outline-none resize-none font-medium" onChange={handleChange}></textarea>
               </div>
             </div>
 
@@ -209,11 +209,11 @@ const AddBook = () => {
                <button type="button" onClick={() => navigate(-1)} className="px-8 py-4 text-slate-500 font-bold hover:text-slate-800 transition-colors">
                 Discard
               </button>
-              <button type="submit" disabled={loading} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-2xl font-bold transition-all shadow-xl active:scale-95">
+              <button type="submit" disabled={loading} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-sm font-bold transition-all shadow-xl active:scale-95">
                 {loading ? "Processing..." : (
                   <>
                     {isEditMode ? <Save size={20} /> : <Plus size={20} />}
-                    {isEditMode ? "Update Book" : "Add to Library"}
+                    {isEditMode ? "Update Book" : "Add Book"}
                   </>
                 )}
               </button>

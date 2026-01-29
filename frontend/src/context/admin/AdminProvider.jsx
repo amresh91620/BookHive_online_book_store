@@ -1,11 +1,28 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { getAllUser, deleteUser } from "../../services/adminApi";
+import { getAllUser, deleteUser,dashboardData } from "../../services/adminApi";
 import { AdminContext } from "./AdminContext";
 
 export const AdminProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [statsData, setStatsData] = useState({
+  totalUsers: 0,
+  totalBooks: 0,
+  totalReviews: 0
+});
+
+  const fetchDashboardStats = async () => {
+  try {
+    setLoading(true);
+    const data = await dashboardData(); 
+    setStatsData(data); 
+  } catch (error) {
+    console.error("Fetch Error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Users fetch karne ka function
   const fetchUsers = async () => {
@@ -48,6 +65,7 @@ export const AdminProvider = ({ children }) => {
 
   if (token && user?.role === "admin") {
     fetchUsers();
+    fetchDashboardStats();
   }
 }, []);
 
@@ -58,6 +76,8 @@ export const AdminProvider = ({ children }) => {
         loading,
         fetchUsers,
         removeUser,
+        fetchDashboardStats,
+        statsData
       }}
     >
       {children}

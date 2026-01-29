@@ -21,17 +21,12 @@ const AdminNavbar = ({ toggleSidebar }) => {
         </div>
       </div>
 
-      <div className="flex items-center gap-3 md:gap-6">
-        <button className="relative p-2 text-slate-400 hover:text-blue-600 transition-colors">
-          <Bell size={20} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-        </button>
-        
+      <div className="flex items-center gap-3 md:gap-6">        
         <div className="h-6 w-[1px] bg-slate-200 hidden md:block"></div>
 
         <button
           onClick={logout}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-5 py-2.5 rounded-2xl text-sm font-bold transition-all shadow-lg shadow-blue-100 active:scale-95"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-5 py-2.5 rounded-sm text-sm font-bold transition-all shadow-lg shadow-blue-100 active:scale-95"
         >
           <LogOut size={16} />
           <span className="hidden sm:inline">Logout</span>

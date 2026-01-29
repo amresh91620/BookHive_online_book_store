@@ -6,6 +6,19 @@ const authHeader = () => {
     return { Authorization: `Bearer ${token}` };
 };
 
+
+export const getAllReviews = async () => {
+  try {
+    const res = await axios.get(`${API}/`, {
+      headers: { ...authHeader() },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Get all review error:", error);
+    throw error;
+  }
+};
+
 // 1. Add New Review
 export const addReview = async (data) => {
     try {
@@ -23,7 +36,6 @@ export const addReview = async (data) => {
 export const getReviewsByBook = async (bookId) => {
     try {
         const res = await axios.get(`${API}/book/${bookId}`);
-        console.log("API Response - Reviews:", res.data); // ✅ Debug log
         return res.data;
     } catch (error) {
         console.error("API error fetching reviews:", error);
@@ -55,4 +67,16 @@ export const deleteReviewApi = async (reviewId) => {
         console.error("Delete review error:", error);
         throw error;
     }
+};
+
+export const deleteUserReview = async (reviewId) => {
+  try {
+    const res = await axios.delete(`${API}/delete/${reviewId}`, {
+      headers: { ...authHeader() },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Delete review error:", error);
+    throw error;
+  }
 };

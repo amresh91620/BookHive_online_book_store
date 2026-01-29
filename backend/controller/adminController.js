@@ -37,8 +37,17 @@ exports.getAllUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id);
-        res.json({ msg: "User deleted successfully" });
+        const userId = req.params.id;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+        await Review.deleteMany({ user: userId }); 
+
+        await User.findByIdAndDelete(userId);
+
+        res.json({ msg: "User and all their reviews deleted successfully" });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }

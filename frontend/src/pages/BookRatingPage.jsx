@@ -55,11 +55,11 @@ const BookRatingPage = () => {
   if (!book) return <div className="p-20 text-center text-gray-400">Loading Book Details...</div>;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 font-sans bg-white min-h-screen">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 bg-white min-h-screen">
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} type={authType} setType={setAuthType} />
 
-      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-500 hover:text-black mb-8 border-none bg-transparent cursor-pointer font-medium transition-colors">
-        <ArrowLeft size={18} /> Back to Library
+      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-600 hover:text-black mb-8 border-none bg-transparent cursor-pointer font-medium transition-colors">
+        <ArrowLeft size={18} /> Back to Home
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -67,7 +67,7 @@ const BookRatingPage = () => {
         {/* LEFT & CENTER: Book Info & Reviews (8 Columns) */}
         <div className="lg:col-span-8">
           <div className="flex flex-col md:flex-row gap-8 mb-12">
-            <img src={book.coverImage} className="w-48 h-64 object-cover rounded-lg shadow-md border" alt={book.title} />
+            <img src={book.coverImage} className="w-48 h-64 object-cover shadow-md border" alt={book.title} />
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">{book.title}</h1>
               <p className="text-xl text-gray-500 mb-4 italic">by {book.author}</p>
@@ -90,14 +90,14 @@ const BookRatingPage = () => {
                 Write a Review
               </button>
             ) : (
-              <div className="p-6 border rounded-xl bg-gray-50">
+              <div className="p-6 border  bg-gray-50">
                 <h3 className="font-bold mb-4">Your Rating</h3>
                 <div className="flex gap-2 mb-4">
                   {[1,2,3,4,5].map(s => (
                     <Star key={s} size={28} className={`cursor-pointer ${userRating >= s ? 'text-amber-400' : 'text-gray-300'}`} fill={userRating >= s ? "currentColor" : "none"} onClick={() => setUserRating(s)} />
                   ))}
                 </div>
-                <textarea className="w-full p-4 border rounded-lg outline-none mb-4 bg-white" placeholder="What did you think?" rows="3" value={userComment} onChange={(e) => setUserComment(e.target.value)} />
+                <textarea className="w-full p-4 border  outline-none mb-4 bg-white" placeholder="What did you think?" rows="3" value={userComment} onChange={(e) => setUserComment(e.target.value)} />
                 <div className="flex gap-4">
                   <button onClick={handleSubmit} disabled={reviewLoading} className="bg-black text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2">
                     {reviewLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} Post
@@ -115,8 +115,8 @@ const BookRatingPage = () => {
               <p className="text-gray-400 italic">No reviews yet.</p>
             ) : (
               reviews.map((rev) => (
-                <div key={rev._id} className="group border-b border-gray-100 pb-8 last:border-0">
-                  <div className="flex justify-between items-start mb-3">
+                <div key={rev._id} className="group border-b border-gray-300 pb-2 last:border-0">
+                  <div className="flex justify-between items-start mb-1">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center text-xs font-bold">{rev.user?.name?.charAt(0).toUpperCase()}</div>
                       <div>
@@ -127,9 +127,9 @@ const BookRatingPage = () => {
                       </div>
                     </div>
                     {isOwner(rev) && (
-                      <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => { setEditingId(rev._id); setEditContent(rev.comment); setEditRating(rev.rating); }} className="text-gray-400 hover:text-blue-600"><Edit3 size={16}/></button>
-                        <button onClick={() => window.confirm("Delete?") && removeReview(rev._id, id)} className="text-gray-400 hover:text-red-600"><Trash2 size={16}/></button>
+                      <div className="flex gap-3">
+                        <button onClick={() => { setEditingId(rev._id); setEditContent(rev.comment); setEditRating(rev.rating); }} className="text-blue-600"><Edit3 size={16}/></button>
+                        <button onClick={() => window.confirm("Delete?") && removeReview(rev._id, id)} className=" text-red-600"><Trash2 size={16}/></button>
                       </div>
                     )}
                   </div>
@@ -154,8 +154,8 @@ const BookRatingPage = () => {
         <div className="lg:col-span-4 space-y-6">
           
           {/* 1. Rating Distribution Card */}
-          <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-            <h3 className="text-sm font-bold uppercase text-gray-400 mb-6 tracking-widest">Rating Stats</h3>
+          <div className="bg-gray-30 p-6  border border-gray-300">
+            <h3 className="text-sm font-bold uppercase text-gray-800 mb-6 tracking-widest">Rating Stats</h3>
             <div className="space-y-3">
               {[5, 4, 3, 2, 1].map((star) => (
                 <div key={star} className="flex items-center gap-4 text-sm">
@@ -175,8 +175,8 @@ const BookRatingPage = () => {
           </div>
 
           {/* 2. Technical Details Card */}
-          <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-            <h3 className="text-sm font-bold uppercase text-gray-400 mb-6 tracking-widest">Specifications</h3>
+          <div className="bg-gray-30 p-6 border border-gray-300">
+            <h3 className="text-sm font-bold uppercase text-gray-800 mb-6 tracking-widest">Specifications</h3>
             <div className="space-y-5">
               <div className="flex items-center gap-4">
                 <div className="p-2 bg-white rounded-lg shadow-sm"><DollarSign size={18} className="text-green-600" /></div>

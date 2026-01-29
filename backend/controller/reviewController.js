@@ -115,10 +115,22 @@ exports.getAllReviews = async (req, res) => {
       .populate("user", "name email")
       .populate("book", "title author")
       .sort({ createdAt: -1 });
-
     res.json(reviews);
   } catch (error) {
     console.error("Get all reviews error:", error);
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+exports.deleteUserReview = async (req, res) => {
+  try {
+    const review = await Review.findByIdAndDelete(req.params.id);
+    if (!review) {
+      return res.status(404).json({ msg: "Review not found" });
+    }
+    res.json({ msg: "Review deleted successfully" });
+  } catch (error) {
+    console.error("Delete review error:", error);
     res.status(500).json({ msg: error.message });
   }
 };

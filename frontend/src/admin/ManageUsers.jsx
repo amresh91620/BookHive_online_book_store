@@ -53,10 +53,10 @@ const ManageUsers = () => {
       </div>
 
       {/* Table Section */}
-      <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+      <div className="bg-white shadow-xl shadow-slate-200/50 border border-slate-300 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-slate-50/50 text-slate-400 uppercase text-[11px] font-black tracking-widest border-b border-slate-50">
+            <thead className="bg-slate-50/50 text-slate-400 uppercase text-[11px] font-black tracking-widest border-b border-slate-200">
               <tr>
                 <th className="px-8 py-5">User Details</th>
                 <th className="px-8 py-5">Role</th>
@@ -81,7 +81,7 @@ const ManageUsers = () => {
                   >
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 group-hover:bg-white transition-colors border border-slate-100">
+                        <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 group-hover:bg-white transition-colors border border-slate-100">
                           <User size={20} />
                         </div>
                         <div>
@@ -96,7 +96,7 @@ const ManageUsers = () => {
                     </td>
                     <td className="px-8 py-5">
                       <span
-                        className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight flex items-center gap-1 w-fit ${
+                        className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-tight flex items-center gap-1 w-fit ${
                           user.role === "admin"
                             ? "bg-amber-50 text-amber-600"
                             : "bg-blue-50 text-blue-600"
@@ -109,7 +109,7 @@ const ManageUsers = () => {
                     <td className="px-8 py-5 text-right">
                       <button
                         onClick={() => handleDeleteUser(user._id)}
-                        className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-white rounded-xl transition-all shadow-sm active:scale-90"
+                        className="p-2.5 text-red-600 hover:bg-white rounded-xl transition-all shadow-sm active:scale-90"
                       >
                         <Trash2 size={18} />
                       </button>

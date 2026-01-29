@@ -31,8 +31,8 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
     },
   ];
 
-  const activeLink = "flex items-center gap-3 bg-blue-600 text-white py-3.5 px-6 mx-3 rounded-2xl transition-all duration-300 font-bold shadow-lg shadow-blue-200";
-  const normalLink = "flex items-center gap-3 text-slate-500 hover:text-blue-600 hover:bg-blue-50 py-3.5 px-6 mx-3 rounded-2xl transition-all duration-300 font-medium";
+  const activeLink = "flex items-center gap-3 bg-blue-500 text-white py-3.5 px-6 mx-3 transition-all duration-300 font-bold shadow-lg shadow-blue-200";
+  const normalLink = "flex items-center gap-3 text-slate-500 hover:text-blue-600 hover:bg-blue-50 py-3.5 px-6 mx-3 transition-all duration-300 font-medium";
 
   return (
     <>
@@ -83,7 +83,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
 
         {/* User Card at Bottom */}
         <div className="mt-auto p-6">
-          <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 flex items-center gap-3">
+          <div className="bg-slate-30 p-4  border border-slate-300 flex items-center gap-3">
             {/* Dynamic Initial */}
             <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm">
               {user?.name?.charAt(0).toUpperCase() || "A"}

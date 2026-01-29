@@ -21,3 +21,14 @@ export const registerApi = async (data) => {
         throw error;
     }
 };
+
+
+export const sendMessageApi = async (formData) => {
+  try {
+    const res = await axios.post(`${API}/send`, formData);
+    return res.data;
+  } catch (error) {
+    const msg = error.response?.data?.msg || "Server Error";
+    throw new Error(msg);
+  }
+};

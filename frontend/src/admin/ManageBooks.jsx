@@ -50,7 +50,7 @@ const ManageBooks = () => {
         </div>
         <Link
           to="/admin/add-book"
-          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-xl shadow-blue-100 active:scale-95"
+          className="flex items-center rounded-sm justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3  font-bold transition-all shadow-xl shadow-blue-100 active:scale-95"
         >
           <Plus size={20} strokeWidth={3} />
           Add New Book
@@ -58,14 +58,14 @@ const ManageBooks = () => {
       </div>
 
       {/* Table Section */}
-      <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-        <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-white">
+      <div className="bg-white  shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+        <div className="p-6 border-b border-slate-300 flex items-center justify-between bg-white">
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input
               type="text"
               placeholder="Search by title or author..."
-              className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-100 outline-none transition-all text-sm font-medium"
+              className="w-full pl-12 pr-4 py-3 bg-slate-200 border-none rounded-sm focus:ring-4 focus:ring-blue-100 outline-none transition-all text-sm font-medium"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -80,7 +80,7 @@ const ManageBooks = () => {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-slate-50/50 text-slate-400 uppercase text-[11px] font-black tracking-widest border-b border-slate-50">
+            <thead className="bg-slate-50/50 text-slate-400 uppercase text-[11px] font-black tracking-widest border-b border-slate-300">
               <tr>
                 <th className="px-8 py-5">Book Info</th>
                 <th className="px-8 py-5">Category</th>
@@ -94,7 +94,7 @@ const ManageBooks = () => {
                   <tr key={book._id} className="hover:bg-blue-50/30 transition-colors group">
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-16 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 shadow-sm overflow-hidden group-hover:bg-white transition-colors">
+                        <div className="w-12 h-16 bg-slate-100  flex items-center justify-center text-slate-400 shadow-sm overflow-hidden group-hover:bg-white transition-colors">
                           {book.coverImage ? (
                             <img 
                                 src={book.coverImage} 
@@ -113,7 +113,7 @@ const ManageBooks = () => {
                       </div>
                     </td>
                     <td className="px-8 py-5">
-                      <span className="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase tracking-tight">
+                      <span className="px-4 py-1.5 bg-blue-50 text-blue-600  text-xs font-black uppercase tracking-tight">
                         {book.categories || "Uncategorized"}
                       </span>
                     </td>
@@ -125,13 +125,13 @@ const ManageBooks = () => {
                         {/* ✅ NAVIGATE TO EDIT PATH */}
                         <button 
                           onClick={() => navigate(`/admin/edit-book/${book._id}`)}
-                          className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl transition-all shadow-sm active:scale-90"
+                          className="p-2.5 text-blue-600 hover:bg-white rounded-xl transition-all shadow-sm active:scale-90"
                         >
                           <Edit size={18} />
                         </button>
                         <button 
                           onClick={() => handleDelete(book._id)}
-                          className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-white rounded-xl transition-all shadow-sm active:scale-90"
+                          className="p-2.5 text-red-600 hover:bg-white rounded-xl transition-all shadow-sm active:scale-90"
                         >
                           <Trash2 size={18} />
                         </button>

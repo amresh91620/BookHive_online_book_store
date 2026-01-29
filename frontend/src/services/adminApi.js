@@ -8,6 +8,17 @@ const authHeader = () => {
     };
 };
 
+export const dashboardData = async () => {
+    try {
+        const res = await axios.get(`${API}/Dashboard`, {
+            headers: authHeader(),
+        });
+        return res.data;
+    } catch (error) {
+        console.error("Get Dashboard Data API error:", error);
+        throw error;
+    }
+};
 
 export const getAllUser = async () => {
     try {
@@ -16,7 +27,7 @@ export const getAllUser = async () => {
         });
         return res.data;
     } catch (error) {
-        console.error("Get Books API error:", error);
+        console.error("Get users API error:", error);
         throw error;
     }
 };
