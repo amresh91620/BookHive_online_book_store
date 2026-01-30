@@ -52,7 +52,7 @@ const BookRatingPage = () => {
     return rId === uId;
   };
 
-  if (!book) return <div className="p-20 text-center text-gray-400">Loading Book Details...</div>;
+  if (!book) return <div className="p-20 text-center text-gray-400">Loading...</div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 bg-white min-h-screen">
@@ -62,146 +62,145 @@ const BookRatingPage = () => {
         <ArrowLeft size={18} /> Back to Home
       </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        
-        {/* LEFT & CENTER: Book Info & Reviews (8 Columns) */}
-        <div className="lg:col-span-8">
-          <div className="flex flex-col md:flex-row gap-8 mb-12">
-            <img src={book.coverImage} className="w-48 h-64 object-cover shadow-md border" alt={book.title} />
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">{book.title}</h1>
-              <p className="text-xl text-gray-500 mb-4 italic">by {book.author}</p>
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-4xl font-black text-gray-900">{avgRating}</span>
-                <div className="flex text-amber-400">
-                  {[...Array(5)].map((_, i) => <Star key={i} size={20} fill={i < Math.round(avgRating) ? "currentColor" : "none"} />)}
-                </div>
-                <span className="text-gray-400 text-sm">({totalRatings} reviews)</span>
-              </div>
-              <h3 className="text-xs font-bold uppercase text-gray-400 mb-2 tracking-widest">Description</h3>
-              <p className="text-gray-600 leading-relaxed max-w-xl">{book.description}</p>
+      {/* 1. BOOK MAIN DETAILS */}
+      <div className="flex flex-col md:flex-row gap-8 mb-12">
+        <img src={book.coverImage} className="w-48 h-64 object-cover shadow-xl border  mx-auto md:mx-0" alt={book.title} />
+        <div className="flex-1 text-center md:text-left">
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-2">{book.title}</h1>
+          <p className="text-xl text-gray-500 mb-6 italic">by {book.author}</p>
+          <div className="flex items-center justify-center md:justify-start gap-4 mb-6 bg-gray-50 w-fit px-4 py-2 rounded-full mx-auto md:mx-0">
+            <span className="text-3xl font-black text-gray-900">{avgRating}</span>
+            <div className="flex text-amber-400">
+              {[...Array(5)].map((_, i) => <Star key={i} size={20} fill={i < Math.round(avgRating) ? "currentColor" : "none"} />)}
             </div>
+            <span className="text-gray-400 text-sm font-medium">({totalRatings} reviews)</span>
           </div>
-
-          {/* Write Review Section */}
-          <div className="mb-12">
-            {!isReviewing ? (
-              <button onClick={() => user ? setIsReviewing(true) : setIsAuthModalOpen(true)} className="px-8 py-3 bg-black text-white rounded-lg font-bold hover:bg-gray-800 transition-all">
-                Write a Review
-              </button>
-            ) : (
-              <div className="p-6 border  bg-gray-50">
-                <h3 className="font-bold mb-4">Your Rating</h3>
-                <div className="flex gap-2 mb-4">
-                  {[1,2,3,4,5].map(s => (
-                    <Star key={s} size={28} className={`cursor-pointer ${userRating >= s ? 'text-amber-400' : 'text-gray-300'}`} fill={userRating >= s ? "currentColor" : "none"} onClick={() => setUserRating(s)} />
-                  ))}
-                </div>
-                <textarea className="w-full p-4 border  outline-none mb-4 bg-white" placeholder="What did you think?" rows="3" value={userComment} onChange={(e) => setUserComment(e.target.value)} />
-                <div className="flex gap-4">
-                  <button onClick={handleSubmit} disabled={reviewLoading} className="bg-black text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2">
-                    {reviewLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} Post
-                  </button>
-                  <button onClick={() => setIsReviewing(false)} className="text-gray-500">Cancel</button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Reviews List */}
-          <div className="space-y-8">
-            <h2 className="text-2xl font-bold border-b pb-4">Customer Feedback</h2>
-            {reviews.length === 0 ? (
-              <p className="text-gray-400 italic">No reviews yet.</p>
-            ) : (
-              reviews.map((rev) => (
-                <div key={rev._id} className="group border-b border-gray-300 pb-2 last:border-0">
-                  <div className="flex justify-between items-start mb-1">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center text-xs font-bold">{rev.user?.name?.charAt(0).toUpperCase()}</div>
-                      <div>
-                        <p className="font-bold text-sm">{rev.user?.name || "Anonymous"}</p>
-                        <div className="flex text-amber-400">
-                          {[...Array(5)].map((_, i) => <Star key={i} size={12} fill={i < rev.rating ? "currentColor" : "none"} />)}
-                        </div>
-                      </div>
-                    </div>
-                    {isOwner(rev) && (
-                      <div className="flex gap-3">
-                        <button onClick={() => { setEditingId(rev._id); setEditContent(rev.comment); setEditRating(rev.rating); }} className="text-blue-600"><Edit3 size={16}/></button>
-                        <button onClick={() => window.confirm("Delete?") && removeReview(rev._id, id)} className=" text-red-600"><Trash2 size={16}/></button>
-                      </div>
-                    )}
-                  </div>
-                  {editingId === rev._id ? (
-                    <div className="mt-2 p-4 bg-blue-50 rounded-lg">
-                      <div className="flex gap-1 mb-3">
-                        {[1,2,3,4,5].map(s => <Star key={s} size={18} className={`cursor-pointer ${editRating >= s ? 'text-amber-400' : 'text-gray-300'}`} fill={editRating >= s ? "currentColor" : "none"} onClick={() => setEditRating(s)} />)}
-                      </div>
-                      <textarea className="w-full p-2 border rounded bg-white text-sm" value={editContent} onChange={e => setEditContent(e.target.value)} />
-                      <div className="flex gap-2 mt-2"><button onClick={() => handleUpdate(rev._id)} className="bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold">Save</button><button onClick={() => setEditingId(null)} className="text-gray-400 text-xs">Cancel</button></div>
-                    </div>
-                  ) : (
-                    <p className="text-gray-600 text-sm leading-relaxed">{rev.comment}</p>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* RIGHT SIDEBAR: Stats & Details (4 Columns) */}
-        <div className="lg:col-span-4 space-y-6">
-          
-          {/* 1. Rating Distribution Card */}
-          <div className="bg-gray-30 p-6  border border-gray-300">
-            <h3 className="text-sm font-bold uppercase text-gray-800 mb-6 tracking-widest">Rating Stats</h3>
-            <div className="space-y-3">
-              {[5, 4, 3, 2, 1].map((star) => (
-                <div key={star} className="flex items-center gap-4 text-sm">
-                  <span className="w-12 text-gray-500 font-medium">{star} Star</span>
-                  <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-amber-400 rounded-full" 
-                      style={{ width: `${totalRatings ? (ratingDistribution[star] / totalRatings) * 100 : 0}%` }}
-                    />
-                  </div>
-                  <span className="w-8 text-right text-gray-400 text-xs">
-                    {totalRatings ? Math.round((ratingDistribution[star] / totalRatings) * 100) : 0}%
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 2. Technical Details Card */}
-          <div className="bg-gray-30 p-6 border border-gray-300">
-            <h3 className="text-sm font-bold uppercase text-gray-800 mb-6 tracking-widest">Specifications</h3>
-            <div className="space-y-5">
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-white rounded-lg shadow-sm"><DollarSign size={18} className="text-green-600" /></div>
-                <div><p className="text-[10px] uppercase font-bold text-gray-400">Price</p><p className="font-bold text-gray-900">₹{book.price}</p></div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-white rounded-lg shadow-sm"><BookOpen size={18} className="text-blue-500" /></div>
-                <div><p className="text-[10px] uppercase font-bold text-gray-400">Length</p><p className="font-bold text-gray-900">{book.pages} Pages</p></div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-white rounded-lg shadow-sm"><Tag size={18} className="text-purple-500" /></div>
-                <div><p className="text-[10px] uppercase font-bold text-gray-400">Category</p><p className="font-bold text-gray-900 capitalize">{book.categories}</p></div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-white rounded-lg shadow-sm"><Calendar size={18} className="text-orange-500" /></div>
-                <div>
-                  <p className="text-[10px] uppercase font-bold text-gray-400">Published Date</p>
-                  <p className="font-bold text-gray-900">{new Date(book.publishedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
+          <h3 className="text-xs font-bold uppercase text-gray-400 mb-2 tracking-widest">Description</h3>
+          <p className="text-gray-600 leading-relaxed max-w-3xl">{book.description}</p>
         </div>
       </div>
+
+      {/* 2. STATS & SPECS (The "One Line" Responsive Row) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+        {/* Specifications */}
+        <div className="bg-gray-50 p-6 border border-gray-200 rounded-sm">
+          <h3 className="text-xs font-bold uppercase text-gray-500 mb-6 tracking-widest">Specifications</h3>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white rounded-lg shadow-sm"><DollarSign size={18} className="text-green-600" /></div>
+              <div><p className="text-[10px] uppercase font-bold text-gray-400">Price</p><p className="font-bold text-gray-900">₹{book.price}</p></div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white rounded-lg shadow-sm"><BookOpen size={18} className="text-blue-500" /></div>
+              <div><p className="text-[10px] uppercase font-bold text-gray-400">Pages</p><p className="font-bold text-gray-900">{book.pages}</p></div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white rounded-lg shadow-sm"><Tag size={18} className="text-purple-500" /></div>
+              <div><p className="text-[10px] uppercase font-bold text-gray-400">Category</p><p className="font-bold text-gray-900 capitalize">{book.categories}</p></div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white rounded-lg shadow-sm"><Calendar size={18} className="text-orange-500" /></div>
+              <div><p className="text-[10px] uppercase font-bold text-gray-400">Published</p><p className="font-bold text-gray-900">{new Date(book.publishedDate).getFullYear()}</p></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Rating Distribution */}
+        <div className="bg-gray-50 p-6 border border-gray-200 rounded-sm">
+          <h3 className="text-xs font-bold uppercase text-gray-500 mb-6 tracking-widest">Rating Stats</h3>
+          <div className="space-y-2.5">
+            {[5, 4, 3, 2, 1].map((star) => (
+              <div key={star} className="flex items-center gap-4 text-xs">
+                <span className="w-10 text-gray-500 font-bold">{star} Star</span>
+                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-amber-400 rounded-full" style={{ width: `${totalRatings ? (ratingDistribution[star] / totalRatings) * 100 : 0}%` }} />
+                </div>
+                <span className="w-8 text-right text-gray-400">{totalRatings ? Math.round((ratingDistribution[star] / totalRatings) * 100) : 0}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <hr className="mb-12 border-gray-100" />
+
+      {/* 3. REVIEWS SECTION */}
+      <div className="max-w-4xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+          <h2 className="text-3xl font-bold text-gray-900">Customer Feedback</h2>
+          {!isReviewing && (
+            <button onClick={() => user ? setIsReviewing(true) : setIsAuthModalOpen(true)} className="px-6 py-2.5 bg-black text-white rounded-full font-bold hover:bg-gray-800 transition-all text-sm">
+              Write a Review
+            </button>
+          )}
+        </div>
+
+        {isReviewing && (
+          <div className="mb-12 p-6 border-2 border-dashed border-gray-200 rounded-2xl bg-white">
+            <h3 className="font-bold mb-4">Share your experience</h3>
+            <div className="flex gap-2 mb-6">
+              {[1,2,3,4,5].map(s => (
+                <Star key={s} size={32} className={`cursor-pointer transition-transform active:scale-90 ${userRating >= s ? 'text-amber-400' : 'text-gray-200'}`} fill={userRating >= s ? "currentColor" : "none"} onClick={() => setUserRating(s)} />
+              ))}
+            </div>
+            <textarea className="w-full p-4 border border-gray-200 rounded-xl outline-none mb-4 focus:border-black transition-colors" placeholder="What did you like or dislike?" rows="4" value={userComment} onChange={(e) => setUserComment(e.target.value)} />
+            <div className="flex gap-4">
+              <button onClick={handleSubmit} disabled={reviewLoading} className="bg-black text-white px-8 py-2.5 rounded-full font-bold flex items-center gap-2 hover:bg-gray-800 transition-all">
+                {reviewLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />} Post Review
+              </button>
+              <button onClick={() => setIsReviewing(false)} className="text-gray-400 font-medium hover:text-black transition-colors">Cancel</button>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-10">
+          {reviews.length === 0 ? (
+            <div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+              <p className="text-gray-400 italic">No reviews yet. Be the first to rate this book!</p>
+            </div>
+          ) : (
+            reviews.map((rev) => (
+              <div key={rev._id} className="group animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-lg font-bold border border-indigo-100">
+                      {rev.user?.name?.charAt(0).toUpperCase() || "?"}
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900">{rev.user?.name || "Anonymous"}</p>
+                      <div className="flex text-amber-400 mt-0.5">
+                        {[...Array(5)].map((_, i) => <Star key={i} size={14} fill={i < rev.rating ? "currentColor" : "none"} />)}
+                      </div>
+                    </div>
+                  </div>
+                  {isOwner(rev) && (
+                    <div className="flex gap-2">
+                      <button onClick={() => { setEditingId(rev._id); setEditContent(rev.comment); setEditRating(rev.rating); }} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><Edit3 size={18}/></button>
+                      <button onClick={() => window.confirm("Delete review?") && removeReview(rev._id, id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={18}/></button>
+                    </div>
+                  )}
+                </div>
+
+                {editingId === rev._id ? (
+                  <div className="ml-16 p-5 bg-blue-50 rounded-2xl border border-blue-100">
+                    <div className="flex gap-1 mb-4">
+                      {[1,2,3,4,5].map(s => <Star key={s} size={20} className={`cursor-pointer ${editRating >= s ? 'text-amber-400' : 'text-gray-200'}`} fill={editRating >= s ? "currentColor" : "none"} onClick={() => setEditRating(s)} />)}
+                    </div>
+                    <textarea className="w-full p-3 border border-blue-200 rounded-xl bg-white text-sm focus:ring-2 ring-blue-500 outline-none" value={editContent} onChange={e => setEditContent(e.target.value)} />
+                    <div className="flex gap-3 mt-4">
+                      <button onClick={() => handleUpdate(rev._id)} className="bg-blue-600 text-white px-5 py-2 rounded-full text-xs font-bold shadow-md">Save Changes</button>
+                      <button onClick={() => setEditingId(null)} className="text-gray-500 text-xs font-bold px-2">Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-gray-600 leading-relaxed ml-16 bg-white">{rev.comment}</p>
+                )}
+                <div className="mt-3 border-b border-gray-400"></div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>  
     </div>
   );
 };

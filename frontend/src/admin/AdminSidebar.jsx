@@ -29,6 +29,11 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
       path: "/admin/reviews", 
       icon: <MessageSquare size={20} /> 
     },
+      { 
+      name: "Manage Messege", 
+      path: "/admin/messsge", 
+      icon: <MessageSquare size={20} /> 
+    },
   ];
 
   const activeLink = "flex items-center gap-3 bg-blue-500 text-white py-3.5 px-6 mx-3 transition-all duration-300 font-bold shadow-lg shadow-blue-200";

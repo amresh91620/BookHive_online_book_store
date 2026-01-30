@@ -1,5 +1,13 @@
 import axios from "axios";
-const API = "http://localhost:5000/api/users";
+const API = "/api/users";
+
+
+const authHeader = () => {
+    const token = localStorage.getItem("token");
+    return {
+        Authorization: `Bearer ${token}`,
+    };
+};
 
 export const loginApi = async (data) => {
     try {
@@ -31,4 +39,29 @@ export const sendMessageApi = async (formData) => {
     const msg = error.response?.data?.msg || "Server Error";
     throw new Error(msg);
   }
+};
+
+
+export const getUserAllMessages = async () => {
+    try {
+        const res = await axios.get(`${API}/messages`, {
+            headers: authHeader(),
+        });
+        return res.data; 
+    } catch (error) {
+        console.error("Get Messages Data API error:", error);
+        throw error;
+    }
+};
+
+export const deleteUserMessage = async (id) => {
+    try {
+        const res = await axios.delete(`${API}/messages/${id}`, {
+            headers: authHeader(),
+        });
+        return res.data;
+    } catch (error) {
+        console.error("Delete Message Data API error:", error);
+        throw error;
+    }
 };

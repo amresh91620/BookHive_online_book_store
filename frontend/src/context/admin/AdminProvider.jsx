@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getAllUser, deleteUser,dashboardData } from "../../services/adminApi";
+import { getUserAllMessages,deleteUserMessage } from "../../services/authApi";
 import { AdminContext } from "./AdminContext";
 
 export const AdminProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [statsData, setStatsData] = useState({
   totalUsers: 0,
@@ -34,7 +36,6 @@ export const AdminProvider = ({ children }) => {
       setUsers(userData);
     } catch (error) {
       console.error("Fetch Users Error:", error);
-      toast.error("Failed to load users");
     } finally {
       setLoading(false);
     }
@@ -58,6 +59,33 @@ export const AdminProvider = ({ children }) => {
       setLoading(false);
     }
   };
+  
+  const fetchAllMessages = async () => {
+  try {
+    setLoading(true);
+    const res = await getUserAllMessages();
+    const messagesData = res?.messages || res?.data?.messages || res?.data || [];
+    setMessages(messagesData);
+  } catch (error) {
+    console.error("Fetch Messages Error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const removeMessage = async(id) => {
+  try {
+    setLoading(true);
+    await deleteUserMessage(id);
+    setMessages(prev => prev.filter(msg => msg._id !== id));
+    toast.success("Message deleted successfully");
+  } catch (error) {
+    console.error("Delete Message Error:", error);
+    toast.error(error?.response?.data?.msg || "Failed to delete message");
+  } finally {
+    setLoading(false);
+  }
+};
 
  useEffect(() => {
   const token = localStorage.getItem("token");
@@ -77,7 +105,10 @@ export const AdminProvider = ({ children }) => {
         fetchUsers,
         removeUser,
         fetchDashboardStats,
-        statsData
+        statsData,
+        fetchAllMessages,
+        removeMessage,
+        messages
       }}
     >
       {children}

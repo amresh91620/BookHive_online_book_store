@@ -16,7 +16,7 @@ const HomeSection = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { getAvgRatingByBook, fetchAllReviews } = useReview(); 
 
-  const booksPerPage = 5;
+ 
 
   // Filter books based on search term
   const filteredBooks = books.filter(
@@ -26,6 +26,7 @@ const HomeSection = () => {
   );
 
   // Pagination Logic
+  const booksPerPage = 5;
   const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
   const startIndex = (currentPage - 1) * booksPerPage;
   const currentBooks = filteredBooks.slice(

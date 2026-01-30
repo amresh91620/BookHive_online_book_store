@@ -23,6 +23,7 @@ import AdminProvider from "./context/admin/AdminProvider";
 import AuthProvider from "./context/auth/AuthProvider";
 import { BookProvider } from "./context/book/BookProvider";
 import { ReviewProvider } from "./context/review/ReviewProvider";
+import ManageMessages from "./admin/ManageMessage";
 
 
 function AppWrapper() {
@@ -81,6 +82,16 @@ function AppWrapper() {
             <AdminRoute>
               <AdminLayout>
                 <ManageReviews />
+              </AdminLayout>
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/messsge"
+          element={
+            <AdminRoute>
+              <AdminLayout>
+                <ManageMessages />
               </AdminLayout>
             </AdminRoute>
           }

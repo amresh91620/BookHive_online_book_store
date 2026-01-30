@@ -1,5 +1,5 @@
 import axios from "axios";
-const API = "http://localhost:5000/api/reviews";
+const API = "/api/reviews";
 
 const authHeader = () => {
     const token = localStorage.getItem("token");

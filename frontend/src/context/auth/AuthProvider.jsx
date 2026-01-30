@@ -1,5 +1,9 @@
-import { useState } from "react";
-import { loginApi, registerApi,sendMessageApi } from "../../services/authApi";
+import { useState} from "react";
+import { 
+  loginApi, 
+  registerApi, 
+  sendMessageApi, 
+} from "../../services/authApi";
 import { AuthContext } from "./AuthContext";
 
 const getInitialUser = () => {
@@ -32,7 +36,15 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout,sendMessge }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        login, 
+        register, 
+        logout, 
+        sendMessge, 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
