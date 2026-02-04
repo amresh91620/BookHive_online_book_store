@@ -33,9 +33,9 @@ export const addReview = async (data) => {
 };
 
 // 2. Get Reviews by Book ID
-export const getReviewsByBook = async (bookId) => {
+export const getReviewsByBook = async (bookId, params = {}) => {
     try {
-        const res = await axios.get(`${API}/book/${bookId}`);
+        const res = await axios.get(`${API}/book/${bookId}`, { params });
         return res.data;
     } catch (error) {
         console.error("API error fetching reviews:", error);

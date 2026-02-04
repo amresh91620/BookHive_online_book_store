@@ -1,6 +1,6 @@
-const User = require("../model/User");
-const Book = require("../model/Book");
-const Review = require("../model/Review");
+const User = require("../models/User");
+const Book = require("../models/Book");
+const Review = require("../models/Review");
 
 
 exports.getDashboardStats = async (req, res) => {

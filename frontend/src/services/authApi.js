@@ -3,7 +3,7 @@ const API = "/api/users";
 
 
 const authHeader = () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     return {
         Authorization: `Bearer ${token}`,
     };
@@ -30,6 +30,45 @@ export const registerApi = async (data) => {
     }
 };
 
+export const sendRegisterOtpApi = async (email) => {
+    try {
+        const res = await axios.post(`${API}/send-otp`, { email });
+        return res.data;
+    } catch (error) {
+        console.error("Send-otp API error:", error);
+        throw error;
+    }
+};
+
+export const verifyRegisterOtpApi = async (email, otp) => {
+    try {
+        const res = await axios.post(`${API}/verify-otp`, { email, otp });
+        return res.data;
+    } catch (error) {
+        console.error("Verify-otp API error:", error);
+        throw error;  
+    }
+};
+
+export const sendForgotPasswordOtpApi = async (email) => {
+    try {
+        const res = await axios.post(`${API}/forgot-password/send-otp`, { email });
+        return res.data;
+    } catch (error) {
+        console.error("Forgot-password send-otp API error:", error);
+        throw error;
+    }
+};
+
+export const resetPasswordApi = async (payload) => {
+    try {
+        const res = await axios.post(`${API}/forgot-password/reset`, payload);
+        return res.data;
+    } catch (error) {
+        console.error("Reset-password API error:", error);
+        throw error;
+    }
+};
 
 export const sendMessageApi = async (formData) => {
   try {

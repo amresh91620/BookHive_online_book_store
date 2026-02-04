@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Star, Send, ArrowLeft, Loader2, Trash2, Edit3, Calendar, BookOpen, Tag, DollarSign } from "lucide-react";
 import { useBooks } from "../hooks/useBooks";
 import { useAuth } from "../hooks/useAuth";
@@ -12,7 +12,7 @@ const BookRatingPage = () => {
   const navigate = useNavigate();
   const { books } = useBooks();
   const { user } = useAuth();
-  const { addNewReview, fetchReviews, reviews, removeReview, editReview, loading: reviewLoading } = useReview();
+  const { addNewReview, fetchReviewsPage, removeReview, editReview, loading: reviewLoading } = useReview();
 
   const book = books.find((b) => b._id === id);
 
@@ -24,26 +24,114 @@ const BookRatingPage = () => {
   const [editRating, setEditRating] = useState(0);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authType, setAuthType] = useState("login");
+  const [reviews, setReviews] = useState([]);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [stats, setStats] = useState({
+    avgRating: "0.0",
+    ratingDistribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+    totalRatings: 0,
+  });
 
-  useEffect(() => { if (id) fetchReviews(id); }, [id]);
+  const loadFirstPage = async () => {
+    if (!id) return;
+    setPageLoading(true);
+    try {
+      const res = await fetchReviewsPage(id, { limit: 5 });
+      setReviews(res?.reviews || []);
+      setNextCursor(res?.nextCursor || null);
+      setHasMore(Boolean(res?.hasMore));
+      setStats({
+        avgRating: res?.avgRating || "0.0",
+        ratingDistribution: res?.ratingDistribution || {
+          5: 0,
+          4: 0,
+          3: 0,
+          2: 0,
+          1: 0,
+        },
+        totalRatings: res?.totalRatings || 0,
+      });
+    } catch (error) {
+      setReviews([]);
+      setNextCursor(null);
+      setHasMore(false);
+      setStats({
+        avgRating: "0.0",
+        ratingDistribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+        totalRatings: 0,
+      });
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
+  const loadMore = async () => {
+    if (!id || !hasMore || pageLoading) return;
+    setPageLoading(true);
+    try {
+      const res = await fetchReviewsPage(id, {
+        cursor: nextCursor,
+        limit: 5,
+      });
+      setReviews((prev) => [...prev, ...(res?.reviews || [])]);
+      setNextCursor(res?.nextCursor || null);
+      setHasMore(Boolean(res?.hasMore));
+    } catch (error) {
+      // no-op
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadFirstPage();
+  }, [id, fetchReviewsPage]);
 
   const { avgRating, ratingDistribution, totalRatings } = useMemo(() => {
-    const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    if (reviews.length === 0) return { avgRating: "0.0", ratingDistribution: distribution, totalRatings: 0 };
-    let total = 0;
-    reviews.forEach(r => { distribution[r.rating]++; total += r.rating; });
-    return { avgRating: (total / reviews.length).toFixed(1), ratingDistribution: distribution, totalRatings: reviews.length };
-  }, [reviews]);
+    return {
+      avgRating: stats.avgRating,
+      ratingDistribution: stats.ratingDistribution,
+      totalRatings: stats.totalRatings,
+    };
+  }, [stats]);
 
   const handleSubmit = async () => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      setAuthType("login");
+      return;
+    }
     if (userRating === 0 || !userComment.trim()) return toast.error("Rating and comment required!");
-    const success = await addNewReview({ bookId: id, rating: userRating, comment: userComment });
-    if (success) { setIsReviewing(false); setUserRating(0); setUserComment(""); }
+    const result = await addNewReview({ bookId: id, rating: userRating, comment: userComment });
+    if (result?.ok) {
+      setIsReviewing(false);
+      setUserRating(0);
+      setUserComment("");
+      await loadFirstPage();
+    } else if (result?.errorMsg?.toLowerCase().includes("already reviewed")) {
+      await loadFirstPage();
+      const myReview = reviews.find((r) => {
+        const rId = (r.user?._id || r.user?.id || r.user)?.toString();
+        const uId = (user?._id || user?.id)?.toString();
+        return rId === uId;
+      });
+      if (myReview) {
+        setEditingId(myReview._id);
+        setEditContent(myReview.comment);
+        setEditRating(myReview.rating);
+        setIsReviewing(false);
+      }
+    }
   };
 
   const handleUpdate = async (reviewId) => {
     const success = await editReview(reviewId, id, { rating: editRating, comment: editContent });
-    if (success) setEditingId(null);
+    if (success) {
+      setEditingId(null);
+      await loadFirstPage();
+    }
   };
 
   const isOwner = (rev) => {
@@ -58,9 +146,11 @@ const BookRatingPage = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 bg-white min-h-screen">
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} type={authType} setType={setAuthType} />
 
-      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-600 hover:text-black mb-8 border-none bg-transparent cursor-pointer font-medium transition-colors">
-        <ArrowLeft size={18} /> Back to Home
-      </button>
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-600 hover:text-black border-none bg-transparent cursor-pointer font-medium transition-colors">
+          <ArrowLeft size={18} /> Back to Home
+        </button>
+      </div>
 
       {/* 1. BOOK MAIN DETAILS */}
       <div className="flex flex-col md:flex-row gap-8 mb-12">
@@ -76,7 +166,15 @@ const BookRatingPage = () => {
             <span className="text-gray-400 text-sm font-medium">({totalRatings} reviews)</span>
           </div>
           <h3 className="text-xs font-bold uppercase text-gray-400 mb-2 tracking-widest">Description</h3>
-          <p className="text-gray-600 leading-relaxed max-w-3xl">{book.description}</p>
+          <p className="text-gray-600 leading-relaxed max-w-3xl">{book.description}</p> 
+        </div>
+        <div>
+                  <Link
+          to="/cart"
+          className="inline-flex items-center justify-center bg-amber-300 text-gray-900 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-amber-200 transition"
+        >
+          Buy Now
+        </Link>
         </div>
       </div>
 
@@ -176,7 +274,16 @@ const BookRatingPage = () => {
                   {isOwner(rev) && (
                     <div className="flex gap-2">
                       <button onClick={() => { setEditingId(rev._id); setEditContent(rev.comment); setEditRating(rev.rating); }} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><Edit3 size={18}/></button>
-                      <button onClick={() => window.confirm("Delete review?") && removeReview(rev._id, id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={18}/></button>
+                      <button
+                        onClick={async () => {
+                          if (!window.confirm("Delete review?")) return;
+                          const ok = await removeReview(rev._id, id);
+                          if (ok) await loadFirstPage();
+                        }}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                      >
+                        <Trash2 size={18}/>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -200,6 +307,18 @@ const BookRatingPage = () => {
             ))
           )}
         </div>
+
+        {hasMore && (
+          <div className="mt-10">
+            <button
+              onClick={loadMore}
+              disabled={pageLoading}
+              className="px-6 py-2.5 rounded-full border border-gray-300 text-gray-700 font-bold text-sm hover:bg-gray-50 transition-all"
+            >
+              {pageLoading ? "Loading..." : "See more"}
+            </button>
+          </div>
+        )}
       </div>  
     </div>
   );

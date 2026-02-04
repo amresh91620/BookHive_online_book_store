@@ -1,206 +1,294 @@
 import React, { useState, useEffect } from "react";
-import {
-  Star,
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  BookOpen,
-} from "lucide-react";
+import { Star, BookOpen, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useBooks } from "../hooks/useBooks";
 import { useReview } from "../hooks/useReview";
 
 const HomeSection = () => {
-  const { books, loading } = useBooks();
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const { getAvgRatingByBook, fetchAllReviews } = useReview(); 
+  const { books, fetchBooksPage } = useBooks();
+  const [coverStep, setCoverStep] = useState(0);
+  const [pageBooks, setPageBooks] = useState([]);
+  const [pageLoading, setPageLoading] = useState(false);
+  const { getAvgRatingByBook, fetchAllReviews } = useReview();
 
- 
+  const coverBooks = books.filter((book) => book.coverImage).slice(0, 11);
+  const coverIndex =
+    coverBooks.length > 0 ? coverStep % coverBooks.length : 0;
+  const ringBooks = coverBooks;
 
-  // Filter books based on search term
-  const filteredBooks = books.filter(
-    (book) =>
-      book.title.toLowerCase().includes(search.toLowerCase()) ||
-      book.author.toLowerCase().includes(search.toLowerCase()),
-  );
-
-  // Pagination Logic
   const booksPerPage = 5;
-  const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
-  const startIndex = (currentPage - 1) * booksPerPage;
-  const currentBooks = filteredBooks.slice(
-    startIndex,
-    startIndex + booksPerPage,
-  );
+  const startIndex = 0;
+  const currentBooks = pageBooks;
 
   useEffect(() => {
-    if (books.length > 0) {
-      const bookIds = books.map(book => book._id);
+    if (pageBooks.length > 0) {
+      const bookIds = pageBooks.map((book) => book._id);
       fetchAllReviews(bookIds);
     }
-  }, [books.length]);
+  }, [pageBooks, fetchAllReviews]);
+
+  useEffect(() => {
+    const loadPage = async () => {
+      try {
+        setPageLoading(true);
+        const res = await fetchBooksPage({
+          offset: startIndex,
+          limit: booksPerPage,
+        });
+        setPageBooks(res?.books || []);
+      } catch (error) {
+        setPageBooks([]);
+      } finally {
+        setPageLoading(false);
+      }
+    };
+
+    loadPage();
+  }, [fetchBooksPage, startIndex, booksPerPage]);
+
+  useEffect(() => {
+    if (coverBooks.length <= 1) return;
+    const timer = setInterval(() => {
+      setCoverStep((prev) => prev + 1);
+    }, 2200);
+    return () => clearInterval(timer);
+  }, [coverBooks.length]);
+
+  // Removed sync setState on mount to avoid cascading renders.
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14 bg-white text-slate-800"> 
-      {/* HEADER */}
-      <div className="text-center mb-10 sm:mb-14">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 mb-3 tracking-tight">
-          Let's find your favorite book
-        </h1>
-        <p className="text-gray-500 italic text-sm sm:text-base">
-          Discover, review, and rate titles from our digital library
-        </p>
-
-        {/* SEARCH */}
-        <div className="relative max-w-xl mx-auto mt-6 sm:mt-8">
-          <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-800"
-            size={20}
-          />
-          <input
-            type="text"
-            placeholder="Search by title or author..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="w-full border-2 border-gray-400 rounded-sm py-4 pl-12 pr-4 text-sm sm:text-base"
-          />
-        </div>
-      </div>
-
-      {/* BOOK LIST */}
-      <div className="flex flex-col gap-8">
-        {loading ? (
-          <div className="flex flex-col items-center py-20 gap-4 ">
-            <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
-            <p className="font-bold text-gray-400 uppercase tracking-widest text-xs">
-              Fetching Books...
-            </p>
-          </div>
-        ) : currentBooks.length > 0 ? (
-          currentBooks.map((book, index) => (
-            <div
-              key={book._id}
-              className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-start border-b border-black pb-4 group"
-            >
-              {/* IMAGE */}
-              <div className="w-full sm:w-32 shrink-0 flex justify-center sm:justify-start">
-                <div className="relative w-28 sm:w-full  overflow-hidden shadow-lg">
-                  <img
-                    src={
-                      book.coverImage ||
-                      "https://via.placeholder.com/150?text=No+Cover"
-                    }
-                    alt={book.title}
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-              </div>
-
-              {/* DETAILS */}
-              <div className="flex-1 w-full">
-                <div className="flex flex-col lg:flex-row justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-black font-semibold">
-                        {startIndex + index + 1}.
-                      </span>
-                      <span className="px-2 py-0.5 bg-gray-100 text-[10px] font-bold uppercase text-gray-500">
-                        {book.categories || "General"}
-                      </span>
-                    </div>
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-900">
-                      {book.title}
-                    </h2>
-                    <p className="text-gray-500 mt-1 text-sm font-medium">
-                      by{" "}
-                      <span className="text-gray-900 underline decoration-gray-400">
-                        {book.author}
-                      </span>
-                    </p>
-                  </div>
-
-                  <Link
-                    to={`/book-rating/${book._id}`}
-                    className="flex items-center justify-center bg-black text-white  h-10 rounded-lg p-4 uppercase"
-                  >
-                    Rate & Review
-                  </Link>
-                </div>
-
-                {/* RATING & STATS */}
-                <div className="flex flex-wrap items-center gap-4 mt-4">
-                  <div className="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full text-yellow-500">
-                    <Star size={16} fill="currentColor" />
-                    <span className="font-black text-sm">
-                      {getAvgRatingByBook(book._id)}
-                    </span>
-                  </div>
-                  <span className="text-gray-400 text-xs font-bold uppercase tracking-tighter">
-                    {book.pages || "N/A"} Pages
-                  </span>
-                  <div className="h-1 w-1 bg-gray-300 rounded-full"></div>
-                  <span className="text-gray-400 text-xs font-bold uppercase tracking-tighter">
-                    ₹{book.price}
-                  </span>
-                </div>
-
-                <p className="mt-4 text-gray-500 text-sm line-clamp-2 leading-relaxed">
-                  {book.description ||
-                    "No description available for this title."}
-                </p>
+    <div className="bg-white text-slate-900 overflow-x-hidden">
+      {/* HERO */}
+      <section className="border-b border-slate-200 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-6 py-12 sm:py-16">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-8 min-w-0">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                Trusted Bookstore
+              </p>
+              <h1 className="mt-4 text-3xl sm:text-4xl font-black tracking-tight">
+                Discover your next great read
+              </h1>
+              <p className="mt-3 text-slate-600 text-sm sm:text-base max-w-xl">
+                Curated titles, honest reviews, and a smooth shopping
+                experience for every kind of reader.
+              </p>
+              <div className="mt-6 flex flex-wrap items-center gap-4">
+                <Link
+                  to="/books"
+                  className="inline-flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold uppercase tracking-wider hover:bg-slate-800 transition"
+                >
+                  Browse Books <ArrowRight size={16} />
+                </Link>
+                <a
+                  href="#browse"
+                  className="text-slate-700 hover:text-slate-900 text-xs sm:text-sm font-semibold uppercase tracking-wider"
+                >
+                  View Collection
+                </a>
               </div>
             </div>
-          ))
-        ) : (
-          <div className="py-20 text-center border-2 border-dashed border-gray-100 rounded-[3rem]">
-            <BookOpen className="mx-auto text-gray-200 mb-4" size={48} />
-            <p className="text-gray-400 font-bold">
-              No books match your search.
-            </p>
+
+            <div className="w-full lg:w-[400px] flex justify-center lg:justify-end mt-8 mr-0 lg:mr-20 min-w-0">
+              <div className="mt-6 lg:mt-0">
+                <div className="relative h-56 w-56 sm:h-64 sm:w-64 lg:h-72 lg:w-72 max-w-full">
+                  <div className="absolute inset-8 rounded-full border border-slate-200 bg-slate-50"></div>
+                  {coverBooks.length > 0 && (
+                    <div className="absolute left-1/2 top-1/2 z-30 h-[180px] w-[120px] sm:h-[200px] sm:w-[140px] lg:h-[200px] lg:w-[140px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border-4 border-white bg-white shadow-2xl transition-all duration-500">
+                      <img
+                        src={coverBooks[coverIndex]?.coverImage}
+                        alt={coverBooks[coverIndex]?.title}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  )}
+
+                  {ringBooks.length > 0 && (
+                    <div
+                      className="absolute inset-0 z-10 transition-transform duration-1000 ease-in-out"
+                      style={{
+                        transform: `rotate(-${
+                          (360 / ringBooks.length) * coverStep
+                        }deg)`,
+                      }}
+                    >
+                      {ringBooks.map((book, i) => {
+                        const angle = (360 / ringBooks.length) * i;
+                        const radius = 140;
+                        const isCenter = i === coverIndex;
+                        const counterRotate =
+                          (360 / ringBooks.length) * coverStep;
+
+                        return (
+                          <div
+                            key={book._id}
+                            className="absolute left-1/2 top-1/2 transition-transform duration-700 ease-in-out"
+                            style={{
+                              transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${radius}px) rotate(${
+                                -angle + counterRotate
+                              }deg)`,
+                            }}
+                          >
+                            <Link
+                              to={`/book-rating/${book._id}`}
+                              onClick={() => setCoverStep(i)}
+                              aria-hidden={isCenter}
+                              tabIndex={isCenter ? -1 : 0}
+                              className={`block relative h-25 w-15 sm:h-30 sm:w-20 lg:h-30 lg:w-20 cursor-pointer overflow-hidden bg-white shadow-lg transition-all duration-300 ${
+                                isCenter
+                                  ? "opacity-100 pointer-events-none"
+                                  : "hover:opacity-80 hover:scale-105"
+                              }`}
+                            >
+                              <img
+                                src={book.coverImage}
+                                alt={book.title}
+                                className="h-full w-full object-cover"
+                              />
+                            </Link>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
-
-      {/* PAGINATION */}
-      {!loading && totalPages > 1 && (
-        <div className="flex justify-center items-center gap-4 mt-12">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-            className="p-3 rounded-full border border-gray-200 text-gray-600 disabled:opacity-30 hover:bg-gray-50 transition-colors"
-          >
-            <ChevronLeft size={20} />
-          </button>
-
-          <div className="flex gap-2">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`w-10 h-10 rounded-xl font-bold text-sm transition-all ${
-                  currentPage === i + 1
-                    ? "bg-yellow-400 text-gray-900 shadow-md"
-                    : "text-gray-400 hover:text-gray-900"
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
-
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-            className="p-3 rounded-full border border-gray-200 text-gray-600 disabled:opacity-30 hover:bg-gray-50 transition-colors"
-          >
-            <ChevronRight size={20} />
-          </button>
         </div>
-      )}
+      </section>
+
+      {/* LIST SECTION */}
+      <section
+        id="browse"
+        className="max-w-7xl mx-auto px-6 pb-12 sm:pb-16"
+      >
+        <div className="bg-white py-4 sm:py-6 mt-10 w-full">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div>
+              <p className="text-xs uppercase tracking-[0.25em] text-slate-400">
+                Latest Arrivals
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-black">Featured Books</h2>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="text-sm text-slate-500 font-semibold">
+                Curated picks for you
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            {pageLoading ? (
+              <div className="flex flex-col items-center py-20 gap-4 ">
+                <div className="w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+                <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">
+                  Fetching Books...
+                </p>
+              </div>
+            ) : currentBooks.length > 0 ? (
+              currentBooks.map((book, index) => (
+                <div
+                  key={book._id}
+                  className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start border-b border-slate-300 bg-white py-5 sm:py-6  transition"
+                >
+                  <div className="w-full lg:w-40 shrink-0 flex justify-center lg:justify-start">
+                    <Link
+                      to={`/book-rating/${book._id}`}
+                      className="relative w-32 sm:w-36 lg:w-full overflow-hidden shadow-lg border border-slate-100 bg-white block"
+                    >
+                      <img
+                        src={
+                          book.coverImage ||
+                          "https://via.placeholder.com/150?text=No+Cover"
+                        }
+                        alt={book.title}
+                        className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+                      />
+                    </Link>
+                  </div>
+
+                  <div className="flex-1 w-full">
+                    <div className="flex flex-col xl:flex-row justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-slate-900 font-semibold">
+                            {startIndex + index + 1}.
+                          </span>
+                          <span className="px-2 py-1 rounded-full bg-slate-100 text-[10px] font-bold uppercase text-slate-500">
+                            {book.categories || "General"}
+                          </span>
+                        </div>
+                        <h2 className="text-xl md:text-2xl font-black text-slate-900">
+                          {book.title}
+                        </h2>
+                        <p className="text-slate-500 mt-2 text-sm font-medium">
+                          by{" "}
+                          <span className="text-slate-900 underline decoration-slate-300">
+                            {book.author}
+                          </span>
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Link
+                          to={`/book-rating/${book._id}`}
+                          className="inline-flex items-center justify-center bg-black text-white h-11 rounded-2xl px-4 text-xs font-bold uppercase tracking-wider"
+                        >
+                          Rate
+                        </Link>
+                        <Link
+                          to="/cart"
+                          className="inline-flex items-center justify-center border border-slate-300 text-slate-700 h-11 rounded-2xl px-4 text-xs font-bold uppercase tracking-wider hover:bg-slate-50 transition"
+                        >
+                          Add to Cart
+                        </Link>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-4 mt-4">
+                      <div className="flex items-center gap-1 bg-slate-100 px-3 py-1 rounded-full text-slate-700">
+                        <Star size={16} fill="currentColor" />
+                        <span className="font-black text-sm">
+                          {getAvgRatingByBook(book._id)}
+                        </span>
+                      </div>
+                      <span className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">
+                        {book.pages || "N/A"} Pages
+                      </span>
+                      <div className="h-1 w-1 bg-slate-300 rounded-full"></div>
+                      <span className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">
+                        Rs. {book.price}
+                      </span>
+                    </div>
+
+                    <p className="mt-4 text-slate-500 text-sm line-clamp-2 leading-relaxed">
+                      {book.description ||
+                        "No description available for this title."}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="py-20 text-center border-2 border-dashed border-slate-100 rounded-[3rem]">
+                <BookOpen className="mx-auto text-slate-200 mb-4" size={48} />
+                <p className="text-slate-400 font-bold">
+                  No books match your search.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-center mt-10">
+            <Link
+              to="/books"
+              className="inline-flex items-center justify-center bg-slate-900 text-white px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition"
+            >
+              Explore More
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

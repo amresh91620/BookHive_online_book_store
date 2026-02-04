@@ -24,9 +24,9 @@ export const addBook = async (data) => {
   }
 };
 
-export const getAllBooks = async () => {
+export const getAllBooks = async (params = {}) => {
   try {
-    const res = await axios.get(`${API}/`);
+    const res = await axios.get(`${API}/`, { params });
     return res.data;
   } catch (error) {
     console.error("Get Books API error:", error);

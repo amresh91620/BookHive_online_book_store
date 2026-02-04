@@ -1,4 +1,4 @@
-const Book = require("../model/Book");
+const Book = require("../models/Book");
 const cloudinary = require("../config/cloudinary");
 
 /**
@@ -6,15 +6,67 @@ const cloudinary = require("../config/cloudinary");
  */
 exports.getAllBooks = async (req, res) => {
   try {
-    const books = await Book.find().select("-__v");
+    const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
+    const limitRaw = parseInt(req.query.limit, 10);
+    const limit = Number.isFinite(limitRaw) ? Math.max(limitRaw, 0) : 0;
+    const cursorMode = Object.prototype.hasOwnProperty.call(req.query, "cursor");
+    const cursor = req.query.cursor || null;
+    const q = (req.query.q || "").trim();
+    const category = (req.query.category || "").trim();
 
-    if (!books || books.length === 0) {
-      return res.status(404).json({ msg: "No books found" });
+    const escapeRegex = (value) =>
+      value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    const filters = [];
+    if (q) {
+      filters.push({
+        $or: [
+          { title: { $regex: q, $options: "i" } },
+          { author: { $regex: q, $options: "i" } },
+        ],
+      });
+    }
+    if (category) {
+      filters.push({
+        categories: { $regex: escapeRegex(category), $options: "i" },
+      });
+    }
+
+    const filter = filters.length > 0 ? { $and: filters } : {};
+
+    const totalBooks = await Book.countDocuments(filter);
+
+    const mongoose = require("mongoose");
+    let books = [];
+    let nextCursor = null;
+    let hasMore = false;
+
+    if (cursorMode) {
+      let cursorFilter = filter;
+      if (mongoose.Types.ObjectId.isValid(cursor)) {
+        cursorFilter = { ...filter, _id: { $lt: cursor } };
+      }
+      const page = await Book.find(cursorFilter)
+        .select("-__v")
+        .sort({ _id: -1 })
+        .limit((limit || 10) + 1);
+      hasMore = page.length > (limit || 10);
+      books = hasMore ? page.slice(0, limit || 10) : page;
+      nextCursor = books.length > 0 ? books[books.length - 1]._id : null;
+    } else {
+      const query = Book.find(filter).select("-__v");
+      if (offset) query.skip(offset);
+      if (limit) query.limit(limit);
+      books = await query;
     }
 
     res.status(200).json({
-      totalBooks: books.length,
-      books,
+      totalBooks,
+      offset,
+      limit: limit || totalBooks,
+      books: books || [],
+      nextCursor,
+      hasMore,
     });
   } catch (error) {
     console.error(error);

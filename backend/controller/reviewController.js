@@ -1,5 +1,6 @@
-const Review = require("../model/Review");
-const Book = require("../model/Book");
+const mongoose = require("mongoose");
+const Review = require("../models/Review");
+const Book = require("../models/Book");
 
 exports.addReview = async (req, res) => {
     try {
@@ -98,11 +99,79 @@ exports.deleteReview = async (req, res) => {
 
 exports.getReviewsByBook = async (req, res) => {
   try {
-    const reviews = await Review.find({ book: req.params.bookId })
-      .populate("user", "name email")
-      .sort({ createdAt: -1 });
+    const { bookId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(bookId)) {
+      return res.json({
+        reviews: [],
+        nextCursor: null,
+        hasMore: false,
+        totalRatings: 0,
+        avgRating: "0.0",
+        ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      });
+    }
+    const limitRaw = parseInt(req.query.limit, 10);
+    const limit = Number.isFinite(limitRaw) ? Math.max(limitRaw, 1) : 5;
+    const cursor = req.query.cursor || null;
 
-    res.json(reviews);
+    let filter = { book: bookId };
+    if (cursor) {
+      const cursorReview = await Review.findById(cursor).select("createdAt");
+      if (cursorReview) {
+        filter = {
+          ...filter,
+          $or: [
+            { createdAt: { $lt: cursorReview.createdAt } },
+            {
+              createdAt: cursorReview.createdAt,
+              _id: { $lt: cursorReview._id },
+            },
+          ],
+        };
+      }
+    }
+
+    const page = await Review.find(filter)
+      .populate("user", "name email")
+      .sort({ createdAt: -1, _id: -1 })
+      .limit(limit + 1);
+
+    const hasMore = page.length > limit;
+    const reviews = hasMore ? page.slice(0, limit) : page;
+    const nextCursor = reviews.length > 0 ? reviews[reviews.length - 1]._id : null;
+
+    const statsAgg = await Review.aggregate([
+      { $match: { book: new mongoose.Types.ObjectId(bookId) } },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+          avg: { $avg: "$rating" },
+          r1: { $sum: { $cond: [{ $eq: ["$rating", 1] }, 1, 0] } },
+          r2: { $sum: { $cond: [{ $eq: ["$rating", 2] }, 1, 0] } },
+          r3: { $sum: { $cond: [{ $eq: ["$rating", 3] }, 1, 0] } },
+          r4: { $sum: { $cond: [{ $eq: ["$rating", 4] }, 1, 0] } },
+          r5: { $sum: { $cond: [{ $eq: ["$rating", 5] }, 1, 0] } },
+        },
+      },
+    ]);
+
+    const stats = statsAgg[0] || { total: 0, avg: 0, r1: 0, r2: 0, r3: 0, r4: 0, r5: 0 };
+
+    res.json({
+      reviews,
+      nextCursor,
+      hasMore,
+      totalRatings: stats.total,
+      avgRating: stats.avg ? stats.avg.toFixed(1) : "0.0",
+      ratingDistribution: {
+        1: stats.r1 || 0,
+        2: stats.r2 || 0,
+        3: stats.r3 || 0,
+        4: stats.r4 || 0,
+        5: stats.r5 || 0,
+      },
+    });
   } catch (error) {
     console.error("Get reviews error:", error);
     res.status(500).json({ msg: error.message });

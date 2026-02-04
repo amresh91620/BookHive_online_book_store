@@ -23,6 +23,22 @@ const fetchBooks = async () => {
     }
   };
 
+  const fetchBooksPage = async ({
+    offset = 0,
+    limit = 5,
+    q = "",
+    category = "",
+    cursor = "",
+  } = {}) => {
+    try {
+      const res = await getAllBooks({ offset, limit, q, category, cursor });
+      return res;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
 
 const createBook = async (bookData) => {
     try {
@@ -78,6 +94,7 @@ const createBook = async (bookData) => {
         books,
         loading,
         fetchBooks,
+        fetchBooksPage,
         createBook,
         editBook,
         removeBook,

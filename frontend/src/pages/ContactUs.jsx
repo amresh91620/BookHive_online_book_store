@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Mail, Phone, MapPin, Send, CheckCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Clock, CheckCircle } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { sendMessageApi } from "../services/authApi";
 
@@ -40,38 +40,44 @@ const ContactUs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-16 px-4">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <Toaster position="top-center" />
 
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto px-6 py-14 sm:py-20">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-slate-800 mb-4">Get In Touch</h1>
-          <p className="text-lg text-slate-600">
-            We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+        <div className="text-center mb-14">
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+            Contact Us
+          </p>
+          <h1 className="mt-4 text-3xl sm:text-4xl font-black">
+            We’d love to hear from you
+          </h1>
+          <p className="mt-3 text-slate-600 max-w-2xl mx-auto">
+            Have a question about a book, an order, or your account? Send us a
+            message and we’ll respond quickly.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10">
           {/* Left Section */}
-          <div className="space-y-8">
-            <div className="bg-white rounded-2xl shadow-lg p-8 border">
-              <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
+          <div className="space-y-6">
+            <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+              <h2 className="text-xl font-bold mb-6">Contact Information</h2>
 
-              <div className="space-y-6">
+              <div className="space-y-5">
                 <div className="flex gap-4">
-                  <div className="bg-blue-100 p-3 rounded-full">
+                  <div className="bg-blue-50 p-3 rounded-2xl">
                     <Mail className="text-blue-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold">Email</h3>
-                    <p className="text-slate-600">support@company.com</p>
+                    <p className="text-slate-600">support@bookhive.com</p>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="bg-green-100 p-3 rounded-full">
-                    <Phone className="text-green-600" />
+                  <div className="bg-emerald-50 p-3 rounded-2xl">
+                    <Phone className="text-emerald-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold">Phone</h3>
@@ -80,83 +86,107 @@ const ContactUs = () => {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="bg-purple-100 p-3 rounded-full">
-                    <MapPin className="text-purple-600" />
+                  <div className="bg-violet-50 p-3 rounded-2xl">
+                    <MapPin className="text-violet-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold">Address</h3>
                     <p className="text-slate-600">
-                      123 Business Street, Suite 100<br />New York, NY 10001
+                      123 Library Lane, Suite 100
+                      <br />
+                      New York, NY 10001
                     </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="bg-amber-50 p-3 rounded-2xl">
+                    <Clock className="text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Hours</h3>
+                    <p className="text-slate-600">Mon–Sat, 9:00 AM – 7:00 PM</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white p-8 rounded-2xl">
-              <h3 className="text-2xl font-bold mb-4">Why Contact Us?</h3>
-              <ul className="space-y-3">
-                <li className="flex gap-2"><CheckCircle /> 24/7 Support</li>
-                <li className="flex gap-2"><CheckCircle /> Quick Response Time</li>
-              </ul>
+            <div className="bg-slate-900 text-white rounded-3xl p-6">
+              <h3 className="text-xl font-bold mb-4">Why contact us?</h3>
+              <div className="space-y-3 text-sm text-white/80">
+                <div className="flex items-center gap-2">
+                  <CheckCircle size={18} className="text-emerald-400" />
+                  Quick responses within 24 hours
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle size={18} className="text-emerald-400" />
+                  Order, account, and book help
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle size={18} className="text-emerald-400" />
+                  Friendly reader support
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Contact Form */}
-          <div className="bg-white rounded-2xl shadow-lg p-8 border">
-            <h2 className="text-2xl font-bold mb-6">Send us a Message</h2>
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+            <h2 className="text-xl font-bold mb-6">Send us a message</h2>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Name */}
               <div>
-                <label className="block font-semibold mb-2">Your Name</label>
+                <label className="block text-sm font-semibold mb-2">
+                  Your Name
+                </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="w-full px-4 py-3 border rounded-lg"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
                   placeholder="Enter your name"
                 />
               </div>
 
-              {/* Email */}
               <div>
-                <label className="block font-semibold mb-2">Your Email</label>
+                <label className="block text-sm font-semibold mb-2">
+                  Your Email
+                </label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full px-4 py-3 border rounded-lg"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
                   placeholder="Enter your email"
                 />
               </div>
 
-              {/* Message */}
               <div>
-                <label className="block font-semibold mb-2">Your Message</label>
+                <label className="block text-sm font-semibold mb-2">
+                  Your Message
+                </label>
                 <textarea
                   rows="5"
                   value={formData.message}
                   onChange={(e) =>
                     setFormData({ ...formData, message: e.target.value })
                   }
-                  className="w-full px-4 py-3 border rounded-lg resize-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl resize-none outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
                   placeholder="Write your message..."
                 ></textarea>
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full flex justify-center items-center gap-2 py-4 rounded-lg text-white font-semibold ${
+                className={`w-full flex justify-center items-center gap-2 py-4 rounded-2xl text-white font-semibold ${
                   loading
                     ? "bg-slate-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
+                    : "bg-slate-900 hover:bg-slate-800"
                 }`}
               >
                 {loading ? "Sending..." : <><Send /> Send Message</>}

@@ -34,7 +34,7 @@ export const ReviewProvider = ({ children }) => {
       setLoading(true);
       const data = await getReviewsByBook(bookId);
       // ✅ For single book page - just replace the reviews
-      setReviews(data);
+      setReviews(data?.reviews || data || []);
     } catch (error) {
       console.error("Fetch reviews error", error);
       toast.error("Failed to load reviews");
@@ -49,10 +49,14 @@ export const ReviewProvider = ({ children }) => {
     try {
       setLoading(true);
       let allReviews = [];
-
-      for (const bookId of bookIds) {
-        const data = await getReviewsByBook(bookId);
-        allReviews = [...allReviews, ...data];
+      for (const bookId of bookIds.filter(Boolean)) {
+        try {
+          const data = await getReviewsByBook(bookId);
+          const list = data?.reviews || data || [];
+          allReviews = [...allReviews, ...list];
+        } catch (err) {
+          // skip failed book review request to avoid breaking the whole load
+        }
       }
       setReviews(allReviews);
     } catch (error) {
@@ -63,6 +67,15 @@ export const ReviewProvider = ({ children }) => {
     }
   };
 
+  const fetchReviewsPage = async (
+    bookId,
+    { cursor = null, limit = 5 } = {},
+  ) => {
+    if (!bookId) return null;
+    const data = await getReviewsByBook(bookId, { cursor, limit });
+    return data;
+  };
+
   // Add Review
   const addNewReview = async (reviewData) => {
     try {
@@ -70,10 +83,11 @@ export const ReviewProvider = ({ children }) => {
       await addReview(reviewData);
       await fetchReviews(reviewData.bookId); // Refresh list for that book only
       toast.success("Review Submitted!");
-      return true;
+      return { ok: true };
     } catch (error) {
-      toast.error(error?.response?.data?.msg || "Failed to add review");
-      return false;
+      const msg = error?.response?.data?.msg || "Failed to add review";
+      toast.error(msg);
+      return { ok: false, errorMsg: msg };
     } finally {
       setLoading(false);
     }
@@ -151,6 +165,7 @@ const deleteUserReviewByAdmin = async (reviewId) => {
         loading,
         addNewReview,
         fetchReviews,
+        fetchReviewsPage,
         fetchAllReviews, // ✅ Export new function
         removeReview,
         editReview,

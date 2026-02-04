@@ -3,11 +3,17 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 import HomeSection from "./pages/HomeSection";
+import Books from "./pages/Books";
 import BookRatingPage from "./pages/BookRatingPage";
 import About from "./pages/About";
 import ContactUs from "./pages/ContactUs";
+import Profile from "./pages/Profile";
+import ProfileUpdate from "./pages/ProfileUpdate";
+import ProfileSettings from "./pages/ProfileSettings";
+import Cart from "./pages/Cart";
 
 import { useAuth } from "./hooks/useAuth";
  
@@ -37,13 +43,19 @@ function AppWrapper() {
   return (
     <>
       {!hideLayout && <Navbar />}
+      <ScrollToTop />
 
       <Routes>
         {/* ===== PUBLIC ROUTES ===== */}
         <Route path="/" element={<HomeSection />} />
+        <Route path="/books" element={<Books />} />
         <Route path="/book-rating/:id" element={<BookRatingPage />}/>
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactUs />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/update" element={<ProfileUpdate />} />
+        <Route path="/profile/settings" element={<ProfileSettings />} />
+        <Route path="/cart" element={<Cart />} />
 
         {/* ===== ADMIN ROUTES (PROTECTED) ===== */}
         <Route
