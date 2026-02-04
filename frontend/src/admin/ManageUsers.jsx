@@ -12,8 +12,10 @@ const ManageUsers = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (!users?.length) {
+      fetchUsers();
+    }
+  }, [users?.length, fetchUsers]);
 
   const handleDeleteUser = (id) => {
     toast(

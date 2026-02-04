@@ -11,8 +11,10 @@ const ManageReviews = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    fetchAllUsersReviews();
-  }, []);
+    if (!reviews?.length) {
+      fetchAllUsersReviews();
+    }
+  }, [reviews?.length, fetchAllUsersReviews]);
 
   const handleDelete = async (reviewId) => {
     toast((t) => (

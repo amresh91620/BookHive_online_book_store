@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { 
   BookOpen, Users, Star, PlusCircle, 
   ChevronRight, Book, ArrowRight, ArrowLeft, Trash2, Shield
@@ -9,12 +9,21 @@ import { useAdmin } from "../hooks/useAdmin";
 
 const AdminDashboard = () => {
   const { books, loading } = useBooks();
-  const { statsData = {}, allUsers = [], deleteUser, updateUserRole } = useAdmin();
+  const { statsData = {}, allUsers = [], deleteUser, updateUserRole, fetchUsers, fetchDashboardStats } = useAdmin();
   
   // State to switch between "Books" and "Users" view in the main table
   const [activeView, setActiveView] = useState("recent-books");
 
   const recentBooks = books?.slice(0, 3) || [];
+
+  useEffect(() => {
+    if (!allUsers?.length) {
+      fetchUsers();
+    }
+    if (!statsData?.totalBooks && !statsData?.totalUsers && !statsData?.totalReviews) {
+      fetchDashboardStats();
+    }
+  }, [allUsers?.length, statsData, fetchUsers, fetchDashboardStats]);
 
   const stats = [
     { title: "Total Books", value: statsData?.totalBooks || "0", icon: <BookOpen />, color: "bg-blue-600", description: "In your collection" },

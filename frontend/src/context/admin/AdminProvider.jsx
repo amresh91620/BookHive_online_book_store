@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { getAllUser, deleteUser,dashboardData } from "../../services/adminApi";
 import { getUserAllMessages,deleteUserMessage } from "../../services/authApi";
 import { AdminContext } from "./AdminContext";
+import { useAuth } from "../../hooks/useAuth";
 
 export const AdminProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
@@ -13,8 +14,9 @@ export const AdminProvider = ({ children }) => {
   totalBooks: 0,
   totalReviews: 0
 });
+  const { user } = useAuth();
 
-  const fetchDashboardStats = async () => {
+  const fetchDashboardStats = useCallback(async () => {
   try {
     setLoading(true);
     const data = await dashboardData(); 
@@ -24,10 +26,10 @@ export const AdminProvider = ({ children }) => {
   } finally {
     setLoading(false);
   }
-};
+}, []);
 
   // Users fetch karne ka function
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       const res = await getAllUser();
@@ -39,10 +41,10 @@ export const AdminProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // User delete karne ka function
-  const removeUser = async (id) => {
+  const removeUser = useCallback(async (id) => {
     try {
       setLoading(true);
       const res = await deleteUser(id); 
@@ -58,9 +60,9 @@ export const AdminProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
   
-  const fetchAllMessages = async () => {
+  const fetchAllMessages = useCallback(async () => {
   try {
     setLoading(true);
     const res = await getUserAllMessages();
@@ -71,9 +73,9 @@ export const AdminProvider = ({ children }) => {
   } finally {
     setLoading(false);
   }
-};
+}, []);
 
-const removeMessage = async(id) => {
+const removeMessage = useCallback(async (id) => {
   try {
     setLoading(true);
     await deleteUserMessage(id);
@@ -85,31 +87,43 @@ const removeMessage = async(id) => {
   } finally {
     setLoading(false);
   }
-};
+}, []);
 
  useEffect(() => {
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  if (token && user?.role === "admin") {
+  if (user?.role === "admin") {
     fetchUsers();
     fetchDashboardStats();
   }
-}, []);
+}, [user?.role, fetchUsers, fetchDashboardStats]);
+
+  const value = useMemo(
+    () => ({
+      users,
+      loading,
+      fetchUsers,
+      removeUser,
+      fetchDashboardStats,
+      statsData,
+      fetchAllMessages,
+      removeMessage,
+      messages,
+    }),
+    [
+      users,
+      loading,
+      fetchUsers,
+      removeUser,
+      fetchDashboardStats,
+      statsData,
+      fetchAllMessages,
+      removeMessage,
+      messages,
+    ],
+  );
 
   return (
     <AdminContext.Provider
-      value={{
-        users,
-        loading,
-        fetchUsers,
-        removeUser,
-        fetchDashboardStats,
-        statsData,
-        fetchAllMessages,
-        removeMessage,
-        messages
-      }}
+      value={value}
     >
       {children}
     </AdminContext.Provider>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Star, BookOpen, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useBooks } from "../hooks/useBooks";
@@ -10,6 +10,7 @@ const HomeSection = () => {
   const [pageBooks, setPageBooks] = useState([]);
   const [pageLoading, setPageLoading] = useState(false);
   const { getAvgRatingByBook, fetchAllReviews } = useReview();
+  const lastReviewIdsRef = useRef("");
 
   const coverBooks = books.filter((book) => book.coverImage).slice(0, 11);
   const coverIndex =
@@ -21,10 +22,12 @@ const HomeSection = () => {
   const currentBooks = pageBooks;
 
   useEffect(() => {
-    if (pageBooks.length > 0) {
-      const bookIds = pageBooks.map((book) => book._id);
-      fetchAllReviews(bookIds);
-    }
+    if (pageBooks.length === 0) return;
+    const bookIds = pageBooks.map((book) => book._id).filter(Boolean);
+    const key = bookIds.join("|");
+    if (key === lastReviewIdsRef.current) return;
+    lastReviewIdsRef.current = key;
+    fetchAllReviews(bookIds);
   }, [pageBooks, fetchAllReviews]);
 
   useEffect(() => {

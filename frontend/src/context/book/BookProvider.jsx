@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { addBook, getAllBooks, deleteBook, updateBook } from "../../services/bookApi";
 import toast from "react-hot-toast";
 import { BookContext } from "./BookContext";
@@ -10,7 +10,7 @@ export const BookProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
 
-const fetchBooks = async () => {
+const fetchBooks = useCallback(async () => {
     try {
       setLoading(true);
       const res = await getAllBooks();
@@ -21,9 +21,9 @@ const fetchBooks = async () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchBooksPage = async ({
+  const fetchBooksPage = useCallback(async ({
     offset = 0,
     limit = 5,
     q = "",
@@ -37,10 +37,10 @@ const fetchBooks = async () => {
       console.error(error);
       throw error;
     }
-  };
+  }, []);
 
 
-const createBook = async (bookData) => {
+const createBook = useCallback(async (bookData) => {
     try {
       setLoading(true);
       const res = await addBook(bookData);
@@ -52,10 +52,10 @@ const createBook = async (bookData) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
 
-  const editBook = async (id, data) => {
+  const editBook = useCallback(async (id, data) => {
     try {
       setLoading(true);
       const res = await updateBook(id, data);
@@ -68,9 +68,9 @@ const createBook = async (bookData) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const removeBook = async (id) => {
+  const removeBook = useCallback(async (id) => {
     try {
       setLoading(true);
       await deleteBook(id);
@@ -81,24 +81,37 @@ const createBook = async (bookData) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Auto fetch on mount
   useEffect(() => {
     fetchBooks();
-  }, []);
+  }, [fetchBooks]);
+
+  const value = useMemo(
+    () => ({
+      books,
+      loading,
+      fetchBooks,
+      fetchBooksPage,
+      createBook,
+      editBook,
+      removeBook,
+    }),
+    [
+      books,
+      loading,
+      fetchBooks,
+      fetchBooksPage,
+      createBook,
+      editBook,
+      removeBook,
+    ],
+  );
 
   return (
     <BookContext.Provider
-      value={{
-        books,
-        loading,
-        fetchBooks,
-        fetchBooksPage,
-        createBook,
-        editBook,
-        removeBook,
-      }}
+      value={value}
     >
       {children}
     </BookContext.Provider>

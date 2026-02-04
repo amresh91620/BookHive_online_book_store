@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   addReview,
   getReviewsByBook,
@@ -14,7 +14,7 @@ export const ReviewProvider = ({ children }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
 
-   const fetchAllUsersReviews = async () => {
+  const fetchAllUsersReviews = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getAllReviews();
@@ -25,15 +25,14 @@ export const ReviewProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  // ✅ Fetch Reviews - REPLACE instead of accumulate for single book page
-  const fetchReviews = async (bookId) => {
+  // Fetch reviews for a single book page (replace mode)
+  const fetchReviews = useCallback(async (bookId) => {
     if (!bookId) return;
     try {
       setLoading(true);
       const data = await getReviewsByBook(bookId);
-      // ✅ For single book page - just replace the reviews
       setReviews(data?.reviews || data || []);
     } catch (error) {
       console.error("Fetch reviews error", error);
@@ -41,10 +40,10 @@ export const ReviewProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  // ✅ NEW: Fetch ALL reviews for homepage (accumulate mode)
-  const fetchAllReviews = async (bookIds) => {
+  // Fetch reviews for multiple books (homepage, accumulate)
+  const fetchAllReviews = useCallback(async (bookIds) => {
     if (!bookIds || bookIds.length === 0) return;
     try {
       setLoading(true);
@@ -65,116 +64,136 @@ export const ReviewProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchReviewsPage = async (
-    bookId,
-    { cursor = null, limit = 5 } = {},
-  ) => {
-    if (!bookId) return null;
-    const data = await getReviewsByBook(bookId, { cursor, limit });
-    return data;
-  };
+  const fetchReviewsPage = useCallback(
+    async (bookId, { cursor = null, limit = 5 } = {}) => {
+      if (!bookId) return null;
+      const data = await getReviewsByBook(bookId, { cursor, limit });
+      return data;
+    },
+    [],
+  );
 
-  // Add Review
-  const addNewReview = async (reviewData) => {
-    try {
-      setLoading(true);
-      await addReview(reviewData);
-      await fetchReviews(reviewData.bookId); // Refresh list for that book only
-      toast.success("Review Submitted!");
-      return { ok: true };
-    } catch (error) {
-      const msg = error?.response?.data?.msg || "Failed to add review";
-      toast.error(msg);
-      return { ok: false, errorMsg: msg };
-    } finally {
-      setLoading(false);
-    }
-  };
+  const addNewReview = useCallback(
+    async (reviewData) => {
+      try {
+        setLoading(true);
+        await addReview(reviewData);
+        await fetchReviews(reviewData.bookId);
+        toast.success("Review Submitted!");
+        return { ok: true };
+      } catch (error) {
+        const msg = error?.response?.data?.msg || "Failed to add review";
+        toast.error(msg);
+        return { ok: false, errorMsg: msg };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchReviews],
+  );
 
-  // Delete Review
-  const removeReview = async (reviewId, bookId) => {
-    try {
-      setLoading(true);
-      await deleteReviewApi(reviewId);
-      // Optimistically update UI
-      setReviews((prev) => prev.filter((rev) => rev._id !== reviewId));
-      toast.success("Review deleted successfully");
-      return true;
-    } catch (error) {
-      toast.error(error?.response?.data?.msg || "Could not delete review");
-      // Refetch to ensure consistency
-      await fetchReviews(bookId);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const removeReview = useCallback(
+    async (reviewId, bookId) => {
+      try {
+        setLoading(true);
+        await deleteReviewApi(reviewId);
+        setReviews((prev) => prev.filter((rev) => rev._id !== reviewId));
+        toast.success("Review deleted successfully");
+        return true;
+      } catch (error) {
+        toast.error(error?.response?.data?.msg || "Could not delete review");
+        await fetchReviews(bookId);
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchReviews],
+  );
 
-  // Update Review
-  const editReview = async (reviewId, bookId, updatedData) => {
-    try {
-      setLoading(true);
-      await updateReviewApi(reviewId, updatedData);
-      await fetchReviews(bookId); // Refresh to get populated user data
-      toast.success("Review updated!");
-      return true;
-    } catch (error) {
-      toast.error(error?.response?.data?.msg || "Update failed");
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const editReview = useCallback(
+    async (reviewId, bookId, updatedData) => {
+      try {
+        setLoading(true);
+        await updateReviewApi(reviewId, updatedData);
+        await fetchReviews(bookId);
+        toast.success("Review updated!");
+        return true;
+      } catch (error) {
+        toast.error(error?.response?.data?.msg || "Update failed");
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchReviews],
+  );
 
-  // Get Average Rating by Book
-  const getAvgRatingByBook = (bookId) => {
-    if (!reviews || reviews.length === 0) return "0.0";
+  const getAvgRatingByBook = useCallback(
+    (bookId) => {
+      if (!reviews || reviews.length === 0) return "0.0";
+      const bookReviews = reviews.filter((r) => {
+        const rBookId = r.book?._id || r.book;
+        return String(rBookId) === String(bookId);
+      });
+      if (bookReviews.length === 0) return "0.0";
+      const total = bookReviews.reduce(
+        (sum, r) => sum + (Number(r.rating) || 0),
+        0,
+      );
+      return (total / bookReviews.length).toFixed(1);
+    },
+    [reviews],
+  );
 
-    // Filter reviews belonging to this book
-    const bookReviews = reviews.filter((r) => {
-      const rBookId = r.book?._id || r.book;
-      return String(rBookId) === String(bookId);
-    });
+  const deleteUserReviewByAdmin = useCallback(
+    async (reviewId) => {
+      try {
+        await deleteUserReview(reviewId);
+        toast.success("Review deleted successfully");
+        await fetchAllUsersReviews();
+      } catch (error) {
+        console.error("Delete review full error:", error);
+        console.error("Error response:", error.response);
+      }
+    },
+    [fetchAllUsersReviews],
+  );
 
-    if (bookReviews.length === 0) return "0.0";
-
-    const total = bookReviews.reduce(
-      (sum, r) => sum + (Number(r.rating) || 0),
-      0,
-    );
-    return (total / bookReviews.length).toFixed(1);
-  };
-
-const deleteUserReviewByAdmin = async (reviewId) => {
-  try {
-    await deleteUserReview(reviewId);
-    toast.success("Review deleted successfully");
-    await fetchAllUsersReviews(); 
-  } catch (error) {
-    console.error("Delete review full error:", error);
-    console.error("Error response:", error.response); // Full error dekho
-  }
-};
+  const value = useMemo(
+    () => ({
+      reviews,
+      loading,
+      addNewReview,
+      fetchReviews,
+      fetchReviewsPage,
+      fetchAllReviews,
+      removeReview,
+      editReview,
+      getAvgRatingByBook,
+      fetchAllUsersReviews,
+      deleteUserReviewByAdmin,
+    }),
+    [
+      reviews,
+      loading,
+      addNewReview,
+      fetchReviews,
+      fetchReviewsPage,
+      fetchAllReviews,
+      removeReview,
+      editReview,
+      getAvgRatingByBook,
+      fetchAllUsersReviews,
+      deleteUserReviewByAdmin,
+    ],
+  );
 
   return (
-    <ReviewContext.Provider
-      value={{
-        reviews,
-        loading,
-        addNewReview,
-        fetchReviews,
-        fetchReviewsPage,
-        fetchAllReviews, // ✅ Export new function
-        removeReview,
-        editReview,
-        getAvgRatingByBook,
-        fetchAllUsersReviews,
-        deleteUserReviewByAdmin,
-      }}
-    >
-      {children}
-    </ReviewContext.Provider>
+    <ReviewContext.Provider value={value}>{children}</ReviewContext.Provider>
   );
 };
+
+export default ReviewProvider;

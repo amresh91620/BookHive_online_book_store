@@ -20,8 +20,10 @@ const ManageMessages = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetchAllMessages();
-  }, []);
+    if (!messages?.length) {
+      fetchAllMessages();
+    }
+  }, [messages?.length, fetchAllMessages]);
 
   const handleDeleteMessage = (id) => {
     toast(

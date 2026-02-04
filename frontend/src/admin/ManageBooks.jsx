@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, Edit, Trash2, Search, Book, ChevronLeft, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,11 +7,17 @@ import { useBooks } from "../hooks/useBooks";
 const ManageBooks = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const { books, removeBook, loading } = useBooks();
+  const { books, removeBook, loading, fetchBooks } = useBooks();
 
   // --- PAGINATION STATES ---
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  useEffect(() => {
+    if (!books?.length) {
+      fetchBooks();
+    }
+  }, [books?.length, fetchBooks]);
 
   const handleDelete = (id) => {
     toast((t) => (

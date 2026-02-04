@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Search, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useBooks } from "../hooks/useBooks";
@@ -29,7 +29,7 @@ const Books = () => {
     return ["all", ...Array.from(set)];
   }, [books]);
 
-  const loadFirstPage = async () => {
+  const loadFirstPage = useCallback(async () => {
     try {
       setInitialLoading(true);
       const res = await fetchBooksPage({
@@ -48,9 +48,9 @@ const Books = () => {
     } finally {
       setInitialLoading(false);
     }
-  };
+  }, [fetchBooksPage, booksPerPage, search, category]);
 
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
     if (!hasMore || loadingMore) return;
     if (!nextCursor) return;
     setLoadingMore(true);
@@ -69,11 +69,11 @@ const Books = () => {
     } finally {
       setLoadingMore(false);
     }
-  };
+  }, [hasMore, loadingMore, nextCursor, fetchBooksPage, booksPerPage, search, category]);
 
   useEffect(() => {
     loadFirstPage();
-  }, [fetchBooksPage, booksPerPage, search, category]);
+  }, [loadFirstPage]);
 
   useEffect(() => {
     const node = observerRef.current;
@@ -89,7 +89,7 @@ const Books = () => {
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [hasMore, nextCursor, loadingMore, search, category]);
+  }, [hasMore, nextCursor, loadingMore, loadMore]);
 
   return (
     <div className="bg-white text-slate-900 min-h-screen">
