@@ -30,8 +30,8 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
       icon: <MessageSquare size={20} /> 
     },
       { 
-      name: "Manage Messege", 
-      path: "/admin/messsge", 
+      name: "Manage Messages", 
+      path: "/admin/messages", 
       icon: <MessageSquare size={20} /> 
     },
   ];
@@ -91,7 +91,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           <div className="bg-slate-30 p-4  border border-slate-300 flex items-center gap-3">
             {/* Dynamic Initial */}
             <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm">
-              {user?.name?.charAt(0).toUpperCase() || "A"}
+              {(user?.name || user?.email || "A").charAt(0).toUpperCase()}
             </div>
             <div className="overflow-hidden">
               <p className="text-sm font-bold text-slate-900 truncate">

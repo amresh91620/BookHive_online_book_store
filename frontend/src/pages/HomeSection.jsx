@@ -1,14 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Star, BookOpen, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useBooks } from "../hooks/useBooks";
 import { useReview } from "../hooks/useReview";
+import { useAuth } from "../hooks/useAuth";
+import AuthModal from "../components/AuthModal";
+import toast from "react-hot-toast";
 
 const HomeSection = () => {
   const { books, fetchBooksPage } = useBooks();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [coverStep, setCoverStep] = useState(0);
   const [pageBooks, setPageBooks] = useState([]);
   const [pageLoading, setPageLoading] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authType, setAuthType] = useState("login");
   const { getAvgRatingByBook, fetchAllReviews } = useReview();
   const lastReviewIdsRef = useRef("");
 
@@ -57,10 +64,24 @@ const HomeSection = () => {
     return () => clearInterval(timer);
   }, [coverBooks.length]);
 
-  // Removed sync setState on mount to avoid cascading renders.
+  const handleAddToCart = () => {
+    if (!user) {
+      toast.error("Please login to add items to cart.");
+      setAuthType("login");
+      setIsAuthModalOpen(true);
+      return;
+    }
+    navigate("/cart");
+  };
 
   return (
     <div className="bg-white text-slate-900 overflow-x-hidden">
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        type={authType}
+        setType={setAuthType}
+      />
       {/* HERO */}
       <section className="border-b border-slate-200 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 py-12 sm:py-16">
@@ -242,6 +263,10 @@ const HomeSection = () => {
                         </Link>
                         <Link
                           to="/cart"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleAddToCart();
+                          }}
                           className="inline-flex items-center justify-center border border-slate-300 text-slate-700 h-11 rounded-2xl px-4 text-xs font-bold uppercase tracking-wider hover:bg-slate-50 transition"
                         >
                           Add to Cart
@@ -282,10 +307,10 @@ const HomeSection = () => {
             )}
           </div>
 
-          <div className="flex justify-center mt-10">
+          <div className="flex justify-end mt-10">
             <Link
               to="/books"
-              className="inline-flex items-center justify-center bg-slate-900 text-white px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition"
+              className="inline-flex items-center justify-center bg-slate-800 text-white px-4 py-2 rounded-2xl text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition"
             >
               Explore More
             </Link>

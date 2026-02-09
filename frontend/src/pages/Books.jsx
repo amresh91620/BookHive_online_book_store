@@ -1,10 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Search, BookOpen } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useBooks } from "../hooks/useBooks";
+import { useAuth } from "../hooks/useAuth";
+import AuthModal from "../components/AuthModal";
+import toast from "react-hot-toast";
 
 const Books = () => {
   const { books, fetchBooksPage } = useBooks();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [pageBooks, setPageBooks] = useState([]);
@@ -12,6 +17,8 @@ const Books = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextCursor, setNextCursor] = useState(null);
   const [hasMore, setHasMore] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authType, setAuthType] = useState("login");
   const observerRef = useRef(null);
 
   const booksPerPage = 10;
@@ -91,8 +98,24 @@ const Books = () => {
     return () => observer.disconnect();
   }, [hasMore, nextCursor, loadingMore, loadMore]);
 
+  const handleAddToCart = () => {
+    if (!user) {
+      toast.error("Please login to add items to cart.");
+      setAuthType("login");
+      setIsAuthModalOpen(true);
+      return;
+    }
+    navigate("/cart");
+  };
+
   return (
     <div className="bg-white text-slate-900 min-h-screen">
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        type={authType}
+        setType={setAuthType}
+      />
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
@@ -203,6 +226,10 @@ const Books = () => {
                         </Link>
                         <Link
                           to="/cart"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleAddToCart();
+                          }}
                           className="inline-flex items-center justify-center border border-slate-300 text-slate-700 h-11 rounded-2xl px-4 text-xs font-bold uppercase tracking-wider hover:bg-slate-50 transition"
                         >
                           Add to Cart
@@ -237,10 +264,20 @@ const Books = () => {
 
         {/* Infinite Scroll Sentinel */}
         <div ref={observerRef} className="h-10" />
-        {loadingMore && (
+        {loadingMore ? (
           <div className="flex justify-center py-6">
             <div className="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
           </div>
+        ) : (
+          !initialLoading &&
+          pageBooks.length > 0 &&
+          !hasMore && (
+            <div className="flex justify-end py-6">
+              <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">
+                No more items
+              </p>
+            </div>
+          )
         )}
       </div>
     </div>

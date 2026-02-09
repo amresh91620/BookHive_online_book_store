@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Star, Send, ArrowLeft, Loader2, Trash2, Edit3, Calendar, BookOpen, Tag, DollarSign } from "lucide-react";
 import { useBooks } from "../hooks/useBooks";
 import { useAuth } from "../hooks/useAuth";
@@ -33,6 +33,16 @@ const BookRatingPage = () => {
     ratingDistribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
     totalRatings: 0,
   });
+
+  const handleBuyNow = () => {
+    if (!user) {
+      toast.error("Please login to continue.");
+      setIsAuthModalOpen(true);
+      setAuthType("login");
+      return;
+    }
+    navigate("/cart");
+  };
 
   const loadFirstPage = async () => {
     if (!id) return;
@@ -169,12 +179,12 @@ const BookRatingPage = () => {
           <p className="text-gray-600 leading-relaxed max-w-3xl">{book.description}</p> 
         </div>
         <div>
-                  <Link
-          to="/cart"
-          className="inline-flex items-center justify-center bg-amber-300 text-gray-900 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-amber-200 transition"
-        >
-          Buy Now
-        </Link>
+          <button
+            onClick={handleBuyNow}
+            className="inline-flex items-center justify-center bg-amber-300 text-gray-900 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-amber-200 transition"
+          >
+            Buy Now
+          </button>
         </div>
       </div>
 
@@ -262,7 +272,7 @@ const BookRatingPage = () => {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-lg font-bold border border-indigo-100">
-                      {rev.user?.name?.charAt(0).toUpperCase() || "?"}
+                      {(rev.user?.name || "?").charAt(0).toUpperCase()}
                     </div>
                     <div>
                       <p className="font-bold text-gray-900">{rev.user?.name || "Anonymous"}</p>
