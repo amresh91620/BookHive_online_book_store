@@ -1,29 +1,37 @@
 import { useState } from "react";
 import AuthModal from "./AuthModal";
-import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import {
-  BookOpenCheck,
-  MoreVertical,
+  BookOpen,
+  User,
+  ShoppingCart,
+  Menu,
   X,
   LogOut,
-  ShoppingCart,
+  Heart,
+  Settings,
+  MoreVertical,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
+import { useCart } from "../hooks/useCart";
 import toast from "react-hot-toast";
 
 const Navbar = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("login");
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
 
   const { user, logout } = useAuth();
-  
+  const { cartCount } = useCart();
+
   const handleLogout = () => {
     logout();
     toast.success("Logged out successfully!");
     navigate("/");
+    setUserDropdownOpen(false);
   };
 
   const openModal = (type) => {
@@ -31,230 +39,270 @@ const Navbar = () => {
     setIsModalOpen(true);
   };
 
-  const activeClass =
-    "text-blue-200 border-b-2 border-blue-200 pb-1 font-semibold";
-  const normalClass =
-    "text-slate-300 hover:text-white transition-all duration-300";
-  const mobileActiveClass = "text-white bg-white/10 border border-white/10";
-  const mobileNormalClass =
-    "text-slate-200 hover:text-white hover:bg-white/5 border border-transparent";
+  const navItems = [
+    { path: "/", label: "Home" },
+    { path: "/books", label: "Books" },
+    { path: "/categories", label: "Categories" },
+    { path: "/bestsellers", label: "Bestsellers" },
+    { path: "/deals", label: "Deals" },
+    { path: "/about", label: "About" },
+    { path: "/contact", label: "Contact" },
+  ];
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-gradient-to-r from-slate-950 via-blue-950 to-slate-950 backdrop-blur-md border-b border-slate-800">
-        <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 h-20">
-          {/* Logo Section */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="bg-white/10 p-2 rounded-lg group-hover:bg-white/20 transition-colors border border-white/10">
-              <BookOpenCheck className="text-white" size={24} />
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        {/* Top Bar */}
+        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-2">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between text-xs sm:text-sm">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <span className="text-[10px] sm:text-sm">📚 Free shipping on orders over ₹999</span>
+                <span className="hidden md:inline">|</span>
+                <span className="hidden md:inline">
+                  ⭐ 4.8/5 from 10K+ reviews
+                </span>
+              </div>
+              <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-sm">
+                {user ? (
+                  <span className="truncate max-w-[120px] sm:max-w-none">Welcome back, {user.name?.split(" ")[0]}!</span>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => openModal("login")}
+                      className="hover:text-blue-100 transition hidden sm:inline"
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      onClick={() => openModal("register")}
+                      className="hover:text-blue-100 transition hidden sm:inline"
+                    >
+                      Create Account
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-            <span className="text-white text-2xl font-semibold tracking-wide font-serif">
-              Book<span className="text-blue-200">Hive</span>
-            </span>
-          </Link>
+          </div>
+        </div>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-10">
-            <ul className="flex items-center gap-8 text-xs uppercase tracking-[0.2em] font-semibold">
-              <li>
-                <NavLink
-                  to="/"
-                  end
-                  className={({ isActive }) =>
-                    isActive ? activeClass : normalClass
-                  }
-                >
-                  Home
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/books"
-                  className={() =>
-                    location.pathname.startsWith("/books") ||
-                    location.pathname.startsWith("/book-rating")
-                      ? activeClass
-                      : normalClass
-                  }
-                >
-                  Books
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/about"
-                  className={({ isActive }) =>
-                    isActive ? activeClass : normalClass
-                  }
-                >
-                  About
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/contact"
-                  className={({ isActive }) =>
-                    isActive ? activeClass : normalClass
-                  }
-                >
-                  Contact
-                </NavLink>
-              </li>
-            </ul>
+        {/* Main Navbar */}
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
+              <div className="bg-gradient-to-br from-blue-600 to-cyan-500 p-2 sm:p-2.5 rounded-xl group-hover:rotate-12 transition-transform">
+                <BookOpen className="text-white w-5 h-5 sm:w-6 sm:h-6" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                  Book
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600">
+                    Hive
+                  </span>
+                </span>
+                <span className="text-[8px] sm:text-[10px] text-slate-500 -mt-1 tracking-wider">
+                  READ • DISCOVER • ENJOY
+                </span>
+              </div>
+            </Link>
 
-            <div className="flex items-center gap-4 ml-4 border-l border-slate-800 pl-8">
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center flex-1 max-w-2xl mx-8">
+              <div className="flex items-center flex-1">
+                {navItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `px-4 py-2 font-medium transition-all text-sm ${
+                        isActive
+                          ? "text-blue-600 border-b-2 border-blue-600"
+                          : "text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                      }`
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Side Actions */}
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* Cart */}
+              <Link
+                to={user ? "/cart" : "#"}
+                onClick={(e) => {
+                  if (!user) {
+                    e.preventDefault();
+                    openModal("login");
+                  }
+                }}
+                className="relative p-2 hover:bg-slate-100 rounded-lg transition-colors group"
+              >
+                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-slate-700 group-hover:text-blue-600 transition-colors" />
+
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-bold w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center ring-2 ring-white">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* User Menu */}
               {user ? (
-                <div className="flex items-center gap-3">
-                  <Link
-                    to="/cart"
-                    className="hidden lg:flex items-center gap-2 bg-white/10 text-white/90 border border-white/10 px-4 py-2 rounded-2xl text-xs uppercase tracking-wider hover:bg-white/20 transition-colors"
+                <div className="relative">
+                  <button
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                    className="flex items-center gap-2 p-2 hover:bg-slate-100 rounded-lg transition-colors"
                   >
-                    <ShoppingCart size={20} />
-                  </Link>
-                  <Link
-                    to="/user/profile"
-                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 transition-colors border border-white/10 rounded-full p-1.5 pr-2"
-                  >
-                    <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs uppercase">
-                      {user.name?.charAt(0) || user.email?.charAt(0) || "U"}
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      {user.name?.charAt(0).toUpperCase() ||
+                        user.email?.charAt(0).toUpperCase()}
                     </div>
-                  </Link>
+                  </button>
+
+                  {userDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-56 sm:w-64 bg-white rounded-xl shadow-2xl border border-slate-200 py-2 z-50">
+                      <div className="px-4 py-3 border-b border-slate-100">
+                        <p className="font-semibold text-slate-900 text-sm sm:text-base">
+                          {user.name}
+                        </p>
+                        <p className="text-xs sm:text-sm text-slate-500 truncate">
+                          {user.email}
+                        </p>
+                      </div>
+
+                      <Link
+                        to="/user/profile"
+                        className="flex items-center gap-3 px-4 py-2.5 sm:py-3 hover:bg-slate-50 transition-colors text-sm"
+                        onClick={() => setUserDropdownOpen(false)}
+                      >
+                        <User className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
+                        <span>My Profile</span>
+                      </Link>
+
+                      <Link
+                        to="/user/wishlist"
+                        className="flex items-center gap-3 px-4 py-2.5 sm:py-3 hover:bg-slate-50 transition-colors text-sm"
+                        onClick={() => setUserDropdownOpen(false)}
+                      >
+                        <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500" />
+                        <span>Wishlist</span>
+                      </Link>
+
+                      <Link
+                        to="/user/orders"
+                        className="flex items-center gap-3 px-4 py-2.5 sm:py-3 hover:bg-slate-50 transition-colors text-sm"
+                        onClick={() => setUserDropdownOpen(false)}
+                      >
+                        <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+                        <span>My Orders</span>
+                      </Link>
+
+                      <Link
+                        to="/user/settings"
+                        className="flex items-center gap-3 px-4 py-2.5 sm:py-3 hover:bg-slate-50 transition-colors text-sm"
+                        onClick={() => setUserDropdownOpen(false)}
+                      >
+                        <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
+                        <span>Settings</span>
+                      </Link>
+
+                      <div className="border-t border-slate-100 mt-2 pt-2">
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center gap-3 px-4 py-2.5 sm:py-3 w-full text-left hover:bg-red-50 text-red-600 transition-colors text-sm"
+                        >
+                          <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <>
                   <button
                     onClick={() => openModal("login")}
-                    className="text-white/90 hover:text-white transition font-semibold text-sm uppercase tracking-wider"
+                    className="hidden md:inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 text-slate-700 font-semibold hover:text-blue-600 transition-colors text-sm"
                   >
-                    Log in
+                    <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                    Sign In
                   </button>
                   <button
                     onClick={() => openModal("register")}
-                    className="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2.5 rounded-2xl text-xs font-semibold uppercase tracking-wider transition-all shadow-lg shadow-blue-900/20"
+                    className="hidden md:inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold hover:from-blue-700 hover:to-cyan-700 transition-all shadow-md text-sm"
                   >
                     Get Started
                   </button>
                 </>
               )}
+
+              {/* Three Dot Menu Button - Mobile Only */}
+              <div className="relative lg:hidden">
+                <button
+                  onClick={() => setMenuDropdownOpen(!menuDropdownOpen)}
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-slate-700" />
+                </button>
+
+                {menuDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-white rounded-xl shadow-2xl border border-slate-200 py-2 z-50">
+                    {navItems.map((item) => (
+                      <NavLink
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setMenuDropdownOpen(false)}
+                        className={({ isActive }) =>
+                          `flex items-center px-4 py-2.5 sm:py-3 transition-colors text-sm ${
+                            isActive
+                              ? "bg-blue-50 text-blue-600 font-semibold border-l-4 border-blue-600"
+                              : "text-slate-700 hover:bg-slate-50"
+                          }`
+                        }
+                      >
+                        {item.label}
+                      </NavLink>
+                    ))}
+                    
+                    {!user && (
+                      <>
+                        <div className="border-t border-slate-100 my-2"></div>
+                        <button
+                          onClick={() => {
+                            openModal("login");
+                            setMenuDropdownOpen(false);
+                          }}
+                          className="flex items-center gap-2 px-4 py-2.5 sm:py-3 w-full text-left text-slate-700 hover:bg-slate-50 transition-colors text-sm md:hidden"
+                        >
+                          <User className="w-4 h-4" />
+                          Sign In
+                        </button>
+                        <button
+                          onClick={() => {
+                            openModal("register");
+                            setMenuDropdownOpen(false);
+                          }}
+                          className="flex items-center justify-center px-4 py-2.5 sm:py-3 w-[calc(100%-1rem)] mx-2 text-center bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg font-semibold mt-2 text-sm md:hidden"
+                        >
+                          Create Account
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-
-          <div className="md:hidden flex items-center gap-3">
-            {user && (
-              <Link
-                to="/cart"
-                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/10 text-white/90 hover:bg-white/20 transition"
-              >
-                <ShoppingCart size={20} />
-              </Link>
-            )}
-            <button onClick={() => setIsOpen(!isOpen)} className="text-white">
-              {isOpen ? <X size={28} /> : <MoreVertical size={26} />}
-            </button>
-          </div>
         </nav>
-
-        {/* Mobile Dropdown */}
-        {isOpen && (
-          <div className="md:hidden bg-gradient-to-b from-slate-950 to-blue-950 border-t border-slate-800 px-6 py-4 max-h-[75vh] overflow-y-auto">
-            <ul className="flex flex-col gap-3 text-base pb-2">
-              <NavLink
-                to="/"
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  `px-4 py-3 rounded-xl transition ${
-                    isActive ? mobileActiveClass : mobileNormalClass
-                  }`
-                }
-              >
-                Home
-              </NavLink>
-              <NavLink
-                to="/books"
-                onClick={() => setIsOpen(false)}
-                className={() =>
-                  `px-4 py-3 rounded-xl transition ${
-                    location.pathname.startsWith("/books") ||
-                    location.pathname.startsWith("/book-rating")
-                      ? mobileActiveClass
-                      : mobileNormalClass
-                  }`
-                }
-              >
-                Books
-              </NavLink>
-              <NavLink
-                to="/about"
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  `px-4 py-3 rounded-xl transition ${
-                    isActive ? mobileActiveClass : mobileNormalClass
-                  }`
-                }
-              >
-                About
-              </NavLink>
-              <NavLink
-                to="/contact"
-                onClick={() => setIsOpen(false)}
-                className={({ isActive }) =>
-                  `px-4 py-3 rounded-xl transition ${
-                    isActive ? mobileActiveClass : mobileNormalClass
-                  }`
-                }
-              >
-                Contact
-              </NavLink>
-              <hr className="border-slate-800" />
-              {user ? (
-                <>
-                  <NavLink
-                    to="/user/profile"
-                    onClick={() => setIsOpen(false)}
-                    className={({ isActive }) =>
-                      `px-4 py-3 rounded-xl transition block ${
-                        isActive ? mobileActiveClass : mobileNormalClass
-                      }`
-                    }
-                  >
-                    My Profile
-                  </NavLink>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsOpen(false);
-                    }}
-                    className="text-left text-red-300 font-semibold flex items-center gap-2 px-4 py-3 rounded-xl hover:bg-red-500/10 transition w-full"
-                  >
-                    <LogOut size={18} /> Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => {
-                      openModal("login");
-                      setIsOpen(false);
-                    }}
-                    className="text-left text-blue-300 font-semibold px-4 py-3 rounded-xl hover:bg-blue-500/10 transition"
-                  >
-                    Log in
-                  </button>
-                  <button
-                    onClick={() => {
-                      openModal("register");
-                      setIsOpen(false);
-                    }}
-                    className="bg-blue-700 text-center py-3 rounded-2xl font-bold uppercase tracking-wider"
-                  >
-                    Sign Up Free
-                  </button>
-                </>
-              )}
-            </ul>
-          </div>
-        )}
       </header>
+
+      {/* Spacer to prevent content from going under fixed navbar */}
+      <div className="h-[88px] sm:h-[96px]"></div>
 
       <AuthModal
         isOpen={isModalOpen}

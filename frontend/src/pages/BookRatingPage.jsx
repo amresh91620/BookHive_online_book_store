@@ -93,7 +93,7 @@ const BookRatingPage = () => {
     } finally {
       setPageLoading(false);
     }
-  };
+  };  
 
   useEffect(() => {
     loadFirstPage();

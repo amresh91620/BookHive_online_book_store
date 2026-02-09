@@ -75,38 +75,70 @@ exports.getAllBooks = async (req, res) => {
 };
 
 /**
- * ✅ Add New Book (with Cloudinary image upload)
+ * ✅ Add New Book (with ALL fields)
  */
 exports.addBook = async (req, res) => {
   try {
-    const { title, author, description, categories, price, publishedDate, pages } = req.body;
+    const { 
+      title, 
+      author, 
+      description, 
+      categories, 
+      price, 
+      originalPrice,
+      publishedDate, 
+      pages,
+      isbn,
+      publisher,
+      language,
+      format,
+      edition,
+      genre,
+      stock,
+      featured,
+      bestseller,
+      newArrival,
+      ageGroup
+    } = req.body;
 
-    // Validate if file exists
-    if (!req.file) {
-      return res.status(400).json({ msg: "Cover image is required" });
-    }
-
-    // 🔒 Validation
+    // Validate required fields
     if (!title || !author || !description || !categories || !price || !publishedDate || !pages) {
       return res.status(400).json({ msg: "All required fields must be filled" });
     }
 
+    // Validate image
+    if (!req.file) {
+      return res.status(400).json({ msg: "Cover image is required" });
+    }
+
+    // Validation
     if (title.length < 2) return res.status(400).json({ msg: "Title must be at least 2 characters" });
     if (price < 0) return res.status(400).json({ msg: "Price cannot be negative" });
     if (pages < 1) return res.status(400).json({ msg: "Pages must be greater than 0" });
 
-    // Multer + Cloudinary: file uploaded
-    const coverImageUrl = req.file.path; // Cloudinary URL
+    const coverImageUrl = req.file.path;
 
     const book = await Book.create({
       title,
       author,
       description,
       categories,
-      price,
+      price: Number(price),
+      originalPrice: originalPrice ? Number(originalPrice) : undefined,
       publishedDate,
-      pages,
+      pages: Number(pages),
+      isbn: isbn || undefined,
+      publisher: publisher || undefined,
+      language: language || 'English',
+      format: format || 'Paperback',
+      edition: edition || undefined,
+      genre: genre || undefined,
+      stock: stock ? Number(stock) : 0,
       coverImage: coverImageUrl,
+      featured: featured === 'true' || featured === true,
+      bestseller: bestseller === 'true' || bestseller === true,
+      newArrival: newArrival === 'true' || newArrival === true,
+      ageGroup: ageGroup || undefined,
     });
 
     res.status(201).json({
@@ -120,14 +152,24 @@ exports.addBook = async (req, res) => {
 };
 
 /**
- * ✅ Update Book (Cloudinary support)
+ * ✅ Update Book
  */
 exports.updateBook = async (req, res) => {
   try {
-
     // Handle new cover image if uploaded
     if (req.file) {
-      req.body.coverImage = req.file.path; // Cloudinary URL
+      req.body.coverImage = req.file.path;
+    }
+
+    // Convert string booleans to actual booleans
+    if (req.body.featured !== undefined) {
+      req.body.featured = req.body.featured === 'true' || req.body.featured === true;
+    }
+    if (req.body.bestseller !== undefined) {
+      req.body.bestseller = req.body.bestseller === 'true' || req.body.bestseller === true;
+    }
+    if (req.body.newArrival !== undefined) {
+      req.body.newArrival = req.body.newArrival === 'true' || req.body.newArrival === true;
     }
 
     const book = await Book.findByIdAndUpdate(
