@@ -1,17 +1,10 @@
-import axios from "axios";
-const API = "/api/users";
+import http, { withAuth } from "./http";
 
-
-const authHeader = () => {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    return {
-        Authorization: `Bearer ${token}`,
-    };
-};
+const API = "/users";
 
 export const loginApi = async (data) => {
     try {
-        const res = await axios.post(`${API}/login`, data);
+        const res = await http.post(`${API}/login`, data);
         return res.data;
     } catch (error) {
         console.error("Login API error:", error);
@@ -22,7 +15,7 @@ export const loginApi = async (data) => {
 
 export const registerApi = async (data) => {
     try {
-        const res = await axios.post(`${API}/register`, data);
+        const res = await http.post(`${API}/register`, data);
         return res.data;
     } catch (error) {
         console.error("Register API error:", error);
@@ -32,7 +25,7 @@ export const registerApi = async (data) => {
 
 export const sendRegisterOtpApi = async (email) => {
     try {
-        const res = await axios.post(`${API}/send-otp`, { email });
+        const res = await http.post(`${API}/send-otp`, { email });
         return res.data;
     } catch (error) {
         console.error("Send-otp API error:", error);
@@ -42,7 +35,7 @@ export const sendRegisterOtpApi = async (email) => {
 
 export const verifyRegisterOtpApi = async (email, otp) => {
     try {
-        const res = await axios.post(`${API}/verify-otp`, { email, otp });
+        const res = await http.post(`${API}/verify-otp`, { email, otp });
         return res.data;
     } catch (error) {
         console.error("Verify-otp API error:", error);
@@ -52,7 +45,7 @@ export const verifyRegisterOtpApi = async (email, otp) => {
 
 export const sendForgotPasswordOtpApi = async (email) => {
     try {
-        const res = await axios.post(`${API}/forgot-password/send-otp`, { email });
+        const res = await http.post(`${API}/forgot-password/send-otp`, { email });
         return res.data;
     } catch (error) {
         console.error("Forgot-password send-otp API error:", error);
@@ -62,7 +55,7 @@ export const sendForgotPasswordOtpApi = async (email) => {
 
 export const resetPasswordApi = async (payload) => {
     try {
-        const res = await axios.post(`${API}/forgot-password/reset`, payload);
+        const res = await http.post(`${API}/forgot-password/reset`, payload);
         return res.data;
     } catch (error) {
         console.error("Reset-password API error:", error);
@@ -72,7 +65,7 @@ export const resetPasswordApi = async (payload) => {
 
 export const sendMessageApi = async (formData) => {
   try {
-    const res = await axios.post(`${API}/send`, formData);
+    const res = await http.post(`${API}/send`, formData);
     return res.data;
   } catch (error) {
     const msg = error.response?.data?.msg || "Server Error";
@@ -83,9 +76,7 @@ export const sendMessageApi = async (formData) => {
 
 export const getUserAllMessages = async () => {
     try {
-        const res = await axios.get(`${API}/messages`, {
-            headers: authHeader(),
-        });
+        const res = await http.get(`${API}/messages`, withAuth());
         return res.data; 
     } catch (error) {
         console.error("Get Messages Data API error:", error);
@@ -95,9 +86,7 @@ export const getUserAllMessages = async () => {
 
 export const deleteUserMessage = async (id) => {
     try {
-        const res = await axios.delete(`${API}/messages/${id}`, {
-            headers: authHeader(),
-        });
+        const res = await http.delete(`${API}/messages/${id}`, withAuth());
         return res.data;
     } catch (error) {
         console.error("Delete Message Data API error:", error);

@@ -6,11 +6,25 @@ const adminRouter =require('./Routes/adminRoutes');
 const bookRouter =require('./Routes/bookRoutes');
 const reviewRouter =require('./Routes/reviewRoutes');
 const cartRouter =require('./Routes/cartRoutes');
+const wishlistRouter = require("./Routes/wishlistRoutes");
+const addressRouter = require("./Routes/addressRoutes");
 
-app.use(cors({ 
-  origin: 'http://localhost:5173', 
-  credentials: true 
-}));
+const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
 // Middleware
 app.use(express.json({ limit: '10mb' })); 
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -20,5 +34,7 @@ app.use("/api/books", bookRouter);
 app.use('/api/admin',adminRouter);
 app.use("/api/reviews",reviewRouter);
 app.use("/api/cart", cartRouter);
+app.use("/api/wishlist", wishlistRouter);
+app.use("/api/address", addressRouter);
 
 module.exports = app;

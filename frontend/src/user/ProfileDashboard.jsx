@@ -1,145 +1,224 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Lock, Bell, ShieldCheck, LogOut, ChevronRight } from 'lucide-react';
+import { Lock, Bell, LogOut, ChevronRight, ShoppingBag, Heart, MapPin, CreditCard, Package } from 'lucide-react';
+import { Card, Button, Badge } from '../components/ui';
+import { EmptyState } from '../components/common';
+import { useAuth } from '../hooks/useAuth';
+import { useWishlist } from '../hooks/useWishlist';
+import { useAddress } from '../hooks/useAddress';
 
 const Profile = () => {
+  const { user, logout } = useAuth();
+
+  const orders = [];
+  const { items: wishlist } = useWishlist();
+  const { addresses } = useAddress();
+  const paymentMethods = [];
+
+  const stats = [
+    { label: 'Total Orders', value: String(orders.length), icon: ShoppingBag, color: 'text-blue-600' },
+    { label: 'Wishlist Items', value: String(wishlist.length), icon: Heart, color: 'text-pink-600' },
+    { label: 'Saved Addresses', value: String(addresses.length), icon: MapPin, color: 'text-green-600' },
+    { label: 'Payment Methods', value: String(paymentMethods.length), icon: CreditCard, color: 'text-purple-600' },
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      {/* Profile Dashboard Section */}
-      <div className="rounded-lg bg-white p-6 shadow-sm border border-slate-200 mb-6">
-        <div className="mb-5 flex items-center gap-2 border-b pb-3 text-lg font-semibold text-slate-700">
-          <span>Profile Overview</span>
-        </div>
-        
-        {/* Grid Section */}
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* My Orders */}
-          <div className="rounded-lg bg-gray-50 p-5">
-            <h3 className="mb-4 text-lg font-semibold">My Orders</h3>
-
-            <div className="mb-3 flex items-center justify-between rounded-md bg-white p-3 shadow-sm">
-              <div>
-                <p className="font-medium">Wireless Headphones</p>
-                <p className="text-sm text-gray-500">
-                  Order #BH10234 • Delivered
-                </p>
+    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={stat.label} variant="elevated" padding="lg" hover>
+              <div className="flex items-center gap-4">
+                <div className={`p-3 bg-slate-100 rounded-xl ${stat.color}`}>
+                  <Icon size={24} />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-slate-900">{stat.value}</p>
+                  <p className="text-xs text-slate-600 font-medium">{stat.label}</p>
+                </div>
               </div>
-              <span className="font-semibold text-green-600">₹2,499</span>
-            </div>
-
-            <div className="mb-3 flex items-center justify-between rounded-md bg-white p-3 shadow-sm">
-              <div>
-                <p className="font-medium">Smart Watch</p>
-                <p className="text-sm text-gray-500">
-                  Order #BH10210 • In Transit
-                </p>
-              </div>
-              <span className="font-semibold text-blue-600">₹3,999</span>
-            </div>
-
-            <div className="flex items-center justify-between rounded-md bg-white p-3 shadow-sm">
-              <div>
-                <p className="font-medium">Mechanical Keyboard</p>
-                <p className="text-sm text-gray-500">
-                  Order #BH10245 • Processing
-                </p>
-              </div>
-              <span className="font-semibold text-orange-600">₹4,200</span>
-            </div>
-
-            <Link to="/user/orders" className="mt-4 text-sm font-medium text-blue-600 hover:underline">
-              View All Orders →
-            </Link>
-          </div>
-
-          {/* Wishlist */}
-          <div className="rounded-lg bg-gray-50 p-5">
-            <h3 className="mb-4 text-lg font-semibold">Wishlist</h3>
-
-            <ul className="space-y-3">
-              <li className="flex justify-between text-sm bg-white p-2 rounded">
-                <span>Nike Running Shoes</span>
-                <span className="font-medium">₹5,999</span>
-              </li>
-              <li className="flex justify-between text-sm bg-white p-2 rounded">
-                <span>Bluetooth Speaker</span>
-                <span className="font-medium">₹1,799</span>
-              </li>
-              <li className="flex justify-between text-sm bg-white p-2 rounded">
-                <span>Laptop Backpack</span>
-                <span className="font-medium">₹1,299</span>
-              </li>
-            </ul>
-
-            <Link to="/user/wishlist" className="mt-4 text-sm font-medium text-blue-600 hover:underline">
-              View Wishlist →
-            </Link>
-          </div>
-
-          {/* Address Book */}
-          <div className="rounded-lg bg-gray-50 p-5">
-            <h3 className="mb-4 text-lg font-semibold">Address Book</h3>
-
-            <div className="bg-white p-3 rounded-md">
-              <p className="text-sm font-medium">Default Address</p>
-              <p className="mt-1 text-sm text-gray-600">
-                Amresh Kumar <br />
-                123, MG Road <br />
-                Bangalore, Karnataka - 560001 <br />
-                +91 9876543210
-              </p>
-            </div>
-
-            <div className="mt-4 flex gap-3">
-              <Link to="/user/address" className="rounded-md bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700">
-                Add New
-              </Link>
-              <Link to="/user/address" className="rounded-md bg-orange-500 px-4 py-2 text-sm text-white hover:bg-orange-600">
-                Edit
-              </Link>
-            </div>
-          </div>
-
-          {/* Payment Methods */}
-          <div className="rounded-lg bg-gray-50 p-5">
-            <h3 className="mb-4 text-lg font-semibold">Payment Methods</h3>
-
-            <div className="bg-white p-3 rounded-md space-y-2">
-              <p className="text-sm">💳 Visa **** 3245</p>
-              <p className="text-sm">🏦 UPI - Google Pay</p>
-            </div>
-
-            <Link to="/user/payments" className="mt-4 text-sm font-medium text-blue-600 hover:underline">
-              Manage Payments →
-            </Link>
-          </div>
-        </div>
+            </Card>
+          );
+        })}
       </div>
-       {/* NEW: Account Settings (Added from your image design) */}
-          <div className="">
-            <h3 className="mb-4 text-lg font-semibold text-slate-800">Account Settings</h3>
-            <div className="overflow-hidden border-b border-gray-300 bg-white">
-              <button className="flex w-full items-center justify-between border-b border-gray-100 p-3 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3 text-slate-600">
-                  <Lock size={18} className="text-slate-400" />
-                  <span className="text-sm font-medium">Change Password</span>
-                </div>
-              </button>
-              <button className="flex w-full items-center justify-between border-b border-gray-100 p-3 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3 text-slate-600">
-                  <Bell size={18} className="text-slate-400" />
-                  <span className="text-sm font-medium">Manage Notifications</span>
-                </div>
-              </button>
-              <button className="flex w-full items-center justify-between p-3 hover:bg-red-50 transition-colors group">
-                <div className="flex items-center gap-3 text-red-500">
-                  <LogOut size={18} />
-                  <span className="text-sm font-medium">Logout</span>
-                </div>
-                <ChevronRight size={16} className="text-gray-300 group-hover:text-red-400" />
-              </button>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Orders */}
+        <Card variant="elevated" padding="lg">
+          <Card.Header>
+            <Card.Title>Recent Orders</Card.Title>
+          </Card.Header>
+          <Card.Content>
+            {orders.length === 0 ? (
+              <EmptyState
+                icon={Package}
+                title="No orders yet"
+                description="Your recent orders will show up here once you start shopping."
+              />
+            ) : (
+              <div className="space-y-3">
+                {orders.map((order) => (
+                  <div key={order.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div className="flex-1">
+                      <p className="font-semibold text-slate-900 text-sm">{order.product}</p>
+                      <p className="text-xs text-slate-500">Order #{order.id}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-slate-900">₹{order.price}</p>
+                      <Badge variant={order.statusColor} size="sm">
+                        {order.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Link to="/user/orders">
+              <Button variant="ghost" size="sm" fullWidth className="mt-4">
+                View All Orders →
+              </Button>
+            </Link>
+          </Card.Content>
+        </Card>
+
+        {/* Wishlist */}
+        <Card variant="elevated" padding="lg">
+          <Card.Header>
+            <Card.Title>Wishlist</Card.Title>
+          </Card.Header>
+          <Card.Content>
+            {wishlist.length === 0 ? (
+              <EmptyState
+                icon={Heart}
+                title="Wishlist is empty"
+                description="Save books you love to keep track of them here."
+              />
+            ) : (
+              <div className="space-y-3">
+                {wishlist.slice(0, 3).map((item) => (
+                  <div key={item._id} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                    <span className="text-sm font-medium text-slate-900">{item.title}</span>
+                    <span className="font-bold text-slate-900">₹{item.price}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Link to="/user/wishlist">
+              <Button variant="ghost" size="sm" fullWidth className="mt-4">
+                View Wishlist →
+              </Button>
+            </Link>
+          </Card.Content>
+        </Card>
+
+        {/* Address Book */}
+        <Card variant="elevated" padding="lg">
+          <Card.Header>
+            <Card.Title>Address Book</Card.Title>
+          </Card.Header>
+          <Card.Content>
+            {addresses.length === 0 ? (
+              <EmptyState
+                icon={MapPin}
+                title="No saved addresses"
+                description="Add a delivery address to speed up checkout."
+              />
+            ) : (
+              <div className="p-4 bg-slate-50 rounded-lg mb-4">
+                <Badge variant="primary" size="sm" className="mb-2">Default Address</Badge>
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  {addresses[0]?.fullName || user?.name || "Reader"}<br />
+                  {addresses[0]?.street}<br />
+                  {addresses[0]?.city}, {addresses[0]?.state} - {addresses[0]?.pincode}<br />
+                  {addresses[0]?.phone}
+                </p>
+              </div>
+            )}
+            <div className="flex gap-3">
+              <Link to="/user/address" className="flex-1">
+                <Button variant="success" size="sm" fullWidth>
+                  Add New
+                </Button>
+              </Link>
+              <Link to="/user/address" className="flex-1">
+                <Button variant="warning" size="sm" fullWidth>
+                  Edit
+                </Button>
+              </Link>
             </div>
+          </Card.Content>
+        </Card>
+
+        {/* Payment Methods */}
+        <Card variant="elevated" padding="lg">
+          <Card.Header>
+            <Card.Title>Payment Methods</Card.Title>
+          </Card.Header>
+          <Card.Content>
+            {paymentMethods.length === 0 ? (
+              <EmptyState
+                icon={CreditCard}
+                title="No payment methods"
+                description="Add a payment method to make checkout faster."
+              />
+            ) : (
+              <div className="space-y-2 mb-4">
+                {paymentMethods.map((method) => (
+                  <div key={method.id} className="p-3 bg-slate-50 rounded-lg text-sm text-slate-700">
+                    {method.label}
+                  </div>
+                ))}
+              </div>
+            )}
+            <Link to="/user/payments">
+              <Button variant="ghost" size="sm" fullWidth>
+                Manage Payments →
+              </Button>
+            </Link>
+          </Card.Content>
+        </Card>
+      </div>
+
+      {/* Account Settings */}
+      <Card variant="elevated" padding="lg">
+        <Card.Header>
+          <Card.Title>Account Settings</Card.Title>
+        </Card.Header>
+        <Card.Content>
+          <div className="space-y-2">
+            <Button variant="ghost" fullWidth className="justify-between">
+              <div className="flex items-center gap-3">
+                <Lock size={18} className="text-slate-500" />
+                <span>Change Password</span>
+              </div>
+              <ChevronRight size={18} className="text-slate-400" />
+            </Button>
+            <Button variant="ghost" fullWidth className="justify-between">
+              <div className="flex items-center gap-3">
+                <Bell size={18} className="text-slate-500" />
+                <span>Manage Notifications</span>
+              </div>
+              <ChevronRight size={18} className="text-slate-400" />
+            </Button>
+            <Button
+              variant="danger"
+              fullWidth
+              className="justify-between hover:bg-red-50"
+              onClick={logout}
+              disabled={!user}
+            >
+              <div className="flex items-center gap-3">
+                <LogOut size={18} />
+                <span>Logout</span>
+              </div>
+              <ChevronRight size={18} />
+            </Button>
           </div>
+        </Card.Content>
+      </Card>
     </div>
   );
 };

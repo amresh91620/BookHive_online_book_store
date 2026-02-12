@@ -1,4 +1,4 @@
-import { useState} from "react";
+import { useState } from "react";
 import { 
   loginApi, 
   registerApi, 
@@ -11,10 +11,24 @@ import {
 import { AuthContext } from "./AuthContext";
 
 const getInitialUser = () => {
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) return JSON.parse(storedUser);
-  const sessionUser = sessionStorage.getItem("user");
-  return sessionUser ? JSON.parse(sessionUser) : null;
+  const readUser = (storage) => {
+    const storedUser = storage.getItem("user");
+    const storedToken = storage.getItem("token");
+    if (!storedUser || !storedToken) {
+      storage.removeItem("user");
+      storage.removeItem("token");
+      return null;
+    }
+    try {
+      return JSON.parse(storedUser);
+    } catch (error) {
+      storage.removeItem("user");
+      storage.removeItem("token");
+      return null;
+    }
+  };
+
+  return readUser(localStorage) || readUser(sessionStorage);
 };
 
 const AuthProvider = ({ children }) => {
@@ -55,8 +69,10 @@ const AuthProvider = ({ children }) => {
   
   const logout = () => {
     setUser(null);
-    localStorage.clear();
-    sessionStorage.clear();
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("token");
   };
 
   const sendMessge = async (data) => {

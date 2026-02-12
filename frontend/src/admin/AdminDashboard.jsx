@@ -6,6 +6,7 @@ import {
 import { Link } from "react-router-dom";
 import { useBooks } from "../hooks/useBooks";
 import { useAdmin } from "../hooks/useAdmin";
+import { Button, Card, Badge, Spinner } from "../components/ui";
 
 const AdminDashboard = () => {
   const { books, loading } = useBooks();
@@ -44,12 +45,14 @@ const AdminDashboard = () => {
           </p>
         </div>
         {activeView === "manage-users" && (
-          <button 
+          <Button 
+            variant="outline"
+            size="sm"
             onClick={() => setActiveView("recent-books")}
-            className="flex items-center gap-2 text-sm font-bold text-slate-600 bg-white border px-4 py-2 rounded-lg shadow-sm hover:bg-slate-50 transition-all"
+            className="flex items-center gap-2"
           >
             <ArrowLeft size={16} /> Back to Stats
-          </button>
+          </Button>
         )}
       </div>
 
@@ -57,14 +60,14 @@ const AdminDashboard = () => {
       {activeView === "recent-books" && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-top-4 duration-500">
           {stats.map((item, idx) => (
-            <div key={idx} className="bg-white p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 rounded-xl">
+            <Card key={idx} className="hover:shadow-md transition-all">
               <div className={`${item.color} w-fit p-3 rounded-lg text-white shadow-sm mb-4`}>
                 {React.cloneElement(item.icon, { size: 22 })}
               </div>
               <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">{item.title}</h3>
               <p className="text-3xl font-bold text-gray-900 mt-1">{item.value}</p>
               <p className="text-sm text-gray-400 mt-1">{item.description}</p>
-            </div>
+            </Card>
           ))}
         </div>
       )}

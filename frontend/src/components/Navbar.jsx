@@ -15,10 +15,10 @@ import {
 import { useAuth } from "../hooks/useAuth";
 import { useCart } from "../hooks/useCart";
 import toast from "react-hot-toast";
+import { BRAND, NAV_ITEMS, TOP_BAR } from "../config/site";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("login");
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -39,16 +39,6 @@ const Navbar = () => {
     setIsModalOpen(true);
   };
 
-  const navItems = [
-    { path: "/", label: "Home" },
-    { path: "/books", label: "Books" },
-    { path: "/categories", label: "Categories" },
-    { path: "/bestsellers", label: "Bestsellers" },
-    { path: "/deals", label: "Deals" },
-    { path: "/about", label: "About" },
-    { path: "/contact", label: "Contact" },
-  ];
-
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
@@ -57,10 +47,10 @@ const Navbar = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between text-xs sm:text-sm">
               <div className="flex items-center gap-2 sm:gap-4">
-                <span className="text-[10px] sm:text-sm">📚 Free shipping on orders over ₹999</span>
+                <span className="text-[10px] sm:text-sm">{TOP_BAR.promo}</span>
                 <span className="hidden md:inline">|</span>
                 <span className="hidden md:inline">
-                  ⭐ 4.8/5 from 10K+ reviews
+                  {TOP_BAR.rating}
                 </span>
               </div>
               <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-sm">
@@ -88,7 +78,7 @@ const Navbar = () => {
         </div>
 
         {/* Main Navbar */}
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
@@ -97,13 +87,13 @@ const Navbar = () => {
               </div>
               <div className="flex flex-col">
                 <span className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                  Book
+                  {BRAND.wordmark.leading}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600">
-                    Hive
+                    {BRAND.wordmark.accent}
                   </span>
                 </span>
                 <span className="text-[8px] sm:text-[10px] text-slate-500 -mt-1 tracking-wider">
-                  READ • DISCOVER • ENJOY
+                  {BRAND.tagline}
                 </span>
               </div>
             </Link>
@@ -111,7 +101,7 @@ const Navbar = () => {
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center flex-1 max-w-2xl mx-8">
               <div className="flex items-center flex-1">
-                {navItems.map((item) => (
+                {NAV_ITEMS.map((item) => (
                   <NavLink
                     key={item.path}
                     to={item.path}
@@ -252,7 +242,7 @@ const Navbar = () => {
 
                 {menuDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-white rounded-xl shadow-2xl border border-slate-200 py-2 z-50">
-                    {navItems.map((item) => (
+                    {NAV_ITEMS.map((item) => (
                       <NavLink
                         key={item.path}
                         to={item.path}

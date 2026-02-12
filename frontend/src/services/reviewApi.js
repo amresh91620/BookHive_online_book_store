@@ -1,17 +1,10 @@
-import axios from "axios";
-const API = "/api/reviews";
-
-const authHeader = () => {
-    const token = localStorage.getItem("token");
-    return { Authorization: `Bearer ${token}` };
-};
+import http, { withAuth } from "./http";
+const API = "/reviews";
 
 
 export const getAllReviews = async () => {
   try {
-    const res = await axios.get(`${API}/`, {
-      headers: { ...authHeader() },
-    });
+    const res = await http.get(`${API}/`, withAuth());
     return res.data;
   } catch (error) {
     console.error("Get all review error:", error);
@@ -22,9 +15,7 @@ export const getAllReviews = async () => {
 // 1. Add New Review
 export const addReview = async (data) => {
     try {
-        const res = await axios.post(`${API}/`, data, {
-            headers: { ...authHeader() },
-        });
+        const res = await http.post(`${API}/`, data, withAuth());
         return res.data;
     } catch (error) {
         console.error("Add review error:", error);
@@ -35,7 +26,7 @@ export const addReview = async (data) => {
 // 2. Get Reviews by Book ID
 export const getReviewsByBook = async (bookId, params = {}) => {
     try {
-        const res = await axios.get(`${API}/book/${bookId}`, { params });
+        const res = await http.get(`${API}/book/${bookId}`, { params });
         return res.data;
     } catch (error) {
         console.error("API error fetching reviews:", error);
@@ -46,9 +37,7 @@ export const getReviewsByBook = async (bookId, params = {}) => {
 // 3. Update Review (Own)
 export const updateReviewApi = async (reviewId, data) => {
     try {
-        const res = await axios.put(`${API}/${reviewId}`, data, {
-            headers: { ...authHeader() },
-        });
+        const res = await http.put(`${API}/${reviewId}`, data, withAuth());
         return res.data;
     } catch (error) {
         console.error("Update review error:", error);
@@ -59,9 +48,7 @@ export const updateReviewApi = async (reviewId, data) => {
 // 4. Delete Review (Own)
 export const deleteReviewApi = async (reviewId) => {
     try {
-        const res = await axios.delete(`${API}/${reviewId}`, {
-            headers: { ...authHeader() },
-        });
+        const res = await http.delete(`${API}/${reviewId}`, withAuth());
         return res.data;
     } catch (error) {
         console.error("Delete review error:", error);
@@ -71,9 +58,7 @@ export const deleteReviewApi = async (reviewId) => {
 
 export const deleteUserReview = async (reviewId) => {
   try {
-    const res = await axios.delete(`${API}/delete/${reviewId}`, {
-      headers: { ...authHeader() },
-    });
+    const res = await http.delete(`${API}/delete/${reviewId}`, withAuth());
     return res.data;
   } catch (error) {
     console.error("Delete review error:", error);

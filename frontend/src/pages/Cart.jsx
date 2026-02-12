@@ -1,7 +1,11 @@
 import { useCart } from "../hooks/useCart";
 import { useNavigate } from "react-router-dom";
-import { DollarSign, BookOpen, Tag, Calendar, Package, Star } from "lucide-react";
+import { DollarSign, BookOpen, Tag, Calendar, Package, Star, ShoppingCart } from "lucide-react";
 import { useEffect } from "react";
+import { Button, Card, Badge } from "../components/ui";
+import { EmptyState } from "../components/common";
+import { LoadingSpinner } from "../components/ui/Spinner";
+import showToast from "../utils/toast";
 
 const Cart = () => {
   const { cart, cartCount, cartTotal, loading, removeFromCart, updateQuantity, fetchCart } = useCart();
@@ -11,203 +15,219 @@ const Cart = () => {
     fetchCart();
   }, []);
 
+  const handleRemove = async (itemId) => {
+    try {
+      await removeFromCart(itemId);
+      showToast.success("Item removed from cart");
+    } catch (error) {
+      showToast.error("Failed to remove item");
+    }
+  };
+
+  const handleUpdateQuantity = async (itemId, newQuantity) => {
+    if (newQuantity < 1) return;
+    try {
+      await updateQuantity(itemId, newQuantity);
+    } catch (error) {
+      showToast.error("Failed to update quantity");
+    }
+  };
+
   if (loading && (!cart.items || cart.items.length === 0)) {
-    return (
-      <div className="p-20 text-center">
-        <div className="animate-pulse text-gray-500 text-xl">Loading cart...</div>
-      </div>
-    );
+    return <LoadingSpinner fullScreen message="Loading your cart..." />;
   }
 
   if (!cart.items || cart.items.length === 0) {
     return (
-      <div className="p-20 text-center">
-        <div className="text-gray-400 text-xl mb-4">Your cart is empty.</div>
-        <button
-          onClick={() => navigate("/")}
-          className="bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition"
-        >
-          Continue Shopping
-        </button>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center py-20">
+        <EmptyState
+          icon={ShoppingCart}
+          title="Your cart is empty"
+          description="Looks like you haven't added any books to your cart yet. Start shopping to fill it up!"
+          actionLabel="Continue Shopping"
+          onAction={() => navigate("/")}
+        />
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <div className="flex justify-between items-center mb-10">
-        <h1 className="text-3xl font-black">Your Cart ({cartCount} items)</h1>
-        <button
-          onClick={() => navigate("/")}
-          className="text-sm text-gray-600 hover:text-black transition"
-        >
-          ← Continue Shopping
-        </button>
-      </div>
-
-      <div className="space-y-8">
-        {cart.items.map((item) => {
-          const book = item.book || {};
-          const itemSubtotal = (book.price || 0) * (item.quantity || 1);
-
-          return (
-            <div
-              key={item._id}
-              className="flex flex-col lg:flex-row gap-6 border rounded-xl p-6 shadow-sm hover:shadow-md transition"
-            >
-              {/* Book Cover */}
-              <img
-                src={book.coverImage || "/placeholder.png"}
-                className="w-40 h-56 object-cover rounded-lg shadow-md"
-                alt={book.title || "Book"}
-                onError={(e) => {
-                  e.target.src = "/placeholder.png";
-                }}
-              />
-
-              {/* Book Details */}
-              <div className="flex-1 flex flex-col">
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold mb-1">
-                    {book.title || "Untitled"}
-                  </h2>
-                  <p className="text-gray-500 mb-3 italic">
-                    by {book.author || "Unknown"}
-                  </p>
-
-                  {/* Description */}
-                  {book.description && book.description.trim() !== "" && (
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                      {book.description}
-                    </p>
-                  )}
-
-                  {/* Book Specs Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 text-sm mb-4">
-                    <div className="flex items-center gap-2">
-                      <DollarSign size={16} className="text-green-600" />
-                      <span className="font-semibold">₹{book.price || 0}</span>
-                    </div>
-                    {book.pages > 0 && (
-                      <div className="flex items-center gap-2">
-                        <BookOpen size={16} className="text-blue-500" />
-                        <span>{book.pages} pages</span>
-                      </div>
-                    )}
-                    {book.categories && book.categories !== 'N/A' && (
-                      <div className="flex items-center gap-2">
-                        <Tag size={16} className="text-purple-500" />
-                        <span className="capitalize">{book.categories}</span>
-                      </div>
-                    )}
-                    {book.publishedDate && (
-                      <div className="flex items-center gap-2">
-                        <Calendar size={16} className="text-orange-500" />
-                        <span>{new Date(book.publishedDate).getFullYear()}</span>
-                      </div>
-                    )}
-                    {book.rating > 0 && (
-                      <div className="flex items-center gap-2">
-                        <Star size={16} className="text-yellow-500" />
-                        <span>{book.rating} / 5</span>
-                      </div>
-                    )}
-                    {book.stock > 0 && (
-                      <div className="flex items-center gap-2">
-                        <Package size={16} className="text-indigo-500" />
-                        <span>{book.stock} in stock</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Additional Details - Only show if data exists */}
-                  {((book.isbn && book.isbn !== 'N/A') || 
-                    (book.publisher && book.publisher !== 'Unknown Publisher') || 
-                    (book.language && book.language !== 'English')) && (
-                    <div className="text-xs text-gray-500 space-y-1">
-                      {book.isbn && book.isbn !== 'N/A' && (
-                        <p><span className="font-semibold">ISBN:</span> {book.isbn}</p>
-                      )}
-                      {book.publisher && book.publisher !== 'Unknown Publisher' && (
-                        <p><span className="font-semibold">Publisher:</span> {book.publisher}</p>
-                      )}
-                      {book.language && book.language !== 'English' && (
-                        <p><span className="font-semibold">Language:</span> {book.language}</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Bottom Controls */}
-                <div className="flex justify-between items-center mt-4 pt-4 border-t">
-                  {/* Quantity Controls */}
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-600">Quantity:</span>
-                    <button
-                      onClick={() => updateQuantity(item._id, item.quantity - 1)}
-                      disabled={item.quantity === 1 || loading}
-                      className="px-3 py-1 border rounded hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      -
-                    </button>
-                    <span className="font-semibold w-8 text-center">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                      disabled={loading}
-                      className="px-3 py-1 border rounded hover:bg-gray-100 transition disabled:opacity-50"
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  {/* Subtotal and Remove */}
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500">Subtotal</p>
-                      <p className="text-xl font-bold">
-                        ₹{itemSubtotal.toFixed(2)}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => removeFromCart(item._id)}
-                      disabled={loading}
-                      className="text-red-500 hover:text-red-700 hover:underline transition text-sm disabled:opacity-50"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Total & Checkout */}
-      <div className="mt-10 border-t pt-6">
-        <div className="max-w-md ml-auto">
-          <div className="space-y-2 text-lg">
-            <div className="flex justify-between text-gray-600">
-              <span>Subtotal:</span>
-              <span>₹{cartTotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-gray-600">
-              <span>Shipping:</span>
-              <span className="text-green-600">FREE</span>
-            </div>
-            <div className="flex justify-between text-2xl font-black pt-2 border-t">
-              <span>Total:</span>
-              <span>₹{cartTotal.toFixed(2)}</span>
-            </div>
+    <div className="min-h-screen bg-slate-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+          <div>
+            <h1 className="text-3xl font-black text-slate-900">Your Cart</h1>
+            <p className="text-slate-600 mt-1">{cartCount} {cartCount === 1 ? 'item' : 'items'} in your cart</p>
           </div>
-          
-          <button
-            onClick={() => navigate("/checkout")}
-            disabled={loading}
-            className="w-full mt-6 bg-black text-white px-6 py-4 rounded-xl hover:bg-gray-800 transition font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Proceed to Checkout
-          </button>
+          <Button variant="ghost" onClick={() => navigate("/")}>
+            ← Continue Shopping
+          </Button>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Cart Items */}
+          <div className="lg:col-span-2 space-y-6">
+            {cart.items.map((item) => {
+              const book = item.book || {};
+              const itemSubtotal = (book.price || 0) * (item.quantity || 1);
+
+              return (
+                <Card key={item._id} variant="elevated" padding="lg" hover>
+                  <div className="flex flex-col sm:flex-row gap-6">
+                    {/* Book Cover */}
+                    <img
+                      src={book.coverImage || "/placeholder.png"}
+                      className="w-full sm:w-32 h-48 sm:h-44 object-cover rounded-lg shadow-md"
+                      alt={book.title || "Book"}
+                      onError={(e) => {
+                        e.target.src = "/placeholder.png";
+                      }}
+                    />
+
+                    {/* Book Details */}
+                    <div className="flex-1 flex flex-col">
+                      <div className="flex-1">
+                        <h2 className="text-xl font-bold text-slate-900 mb-1">
+                          {book.title || "Untitled"}
+                        </h2>
+                        <p className="text-slate-500 mb-3 italic text-sm">
+                          by {book.author || "Unknown"}
+                        </p>
+
+                        {/* Description */}
+                        {book.description && book.description.trim() !== "" && (
+                          <p className="text-sm text-slate-600 mb-4 line-clamp-2">
+                            {book.description}
+                          </p>
+                        )}
+
+                        {/* Book Specs */}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          <Badge variant="secondary" size="sm" icon={DollarSign}>
+                            ₹{book.price || 0}
+                          </Badge>
+                          {book.pages > 0 && (
+                            <Badge variant="secondary" size="sm" icon={BookOpen}>
+                              {book.pages} pages
+                            </Badge>
+                          )}
+                          {book.categories && book.categories !== 'N/A' && (
+                            <Badge variant="secondary" size="sm" icon={Tag}>
+                              {book.categories}
+                            </Badge>
+                          )}
+                          {book.publishedDate && (
+                            <Badge variant="secondary" size="sm" icon={Calendar}>
+                              {new Date(book.publishedDate).getFullYear()}
+                            </Badge>
+                          )}
+                          {book.stock > 0 && (
+                            <Badge variant="success" size="sm" icon={Package}>
+                              {book.stock} in stock
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Bottom Controls */}
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 border-t border-slate-100">
+                        {/* Quantity Controls */}
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm text-slate-600 font-medium">Quantity:</span>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => handleUpdateQuantity(item._id, item.quantity - 1)}
+                              disabled={item.quantity === 1 || loading}
+                            >
+                              -
+                            </Button>
+                            <span className="font-semibold w-8 text-center">{item.quantity}</span>
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => handleUpdateQuantity(item._id, item.quantity + 1)}
+                              disabled={loading}
+                            >
+                              +
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Subtotal and Remove */}
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <p className="text-xs text-slate-500">Subtotal</p>
+                            <p className="text-xl font-bold text-slate-900">
+                              ₹{itemSubtotal.toFixed(2)}
+                            </p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            onClick={() => handleRemove(item._id)}
+                            disabled={loading}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Order Summary */}
+          <div className="lg:col-span-1">
+            <Card variant="elevated" padding="lg" className="sticky top-24">
+              <Card.Header>
+                <Card.Title>Order Summary</Card.Title>
+              </Card.Header>
+              <Card.Content>
+                <div className="space-y-3 mb-6">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Subtotal ({cartCount} items)</span>
+                    <span className="font-semibold">₹{cartTotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Shipping</span>
+                    <Badge variant="success" size="sm">FREE</Badge>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Tax</span>
+                    <span className="font-semibold">₹0.00</span>
+                  </div>
+                  <div className="border-t border-slate-200 pt-3 flex justify-between text-lg font-black text-slate-900">
+                    <span>Total</span>
+                    <span>₹{cartTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <Button
+                  variant="primary"
+                  fullWidth
+                  size="lg"
+                  onClick={() => navigate("/checkout")}
+                  disabled={loading}
+                >
+                  Proceed to Checkout
+                </Button>
+
+                <div className="mt-4 text-center">
+                  <Button
+                    variant="ghost"
+                    fullWidth
+                    onClick={() => navigate("/books")}
+                  >
+                    Continue Shopping
+                  </Button>
+                </div>
+              </Card.Content>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

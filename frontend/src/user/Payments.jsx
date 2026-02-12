@@ -1,5 +1,7 @@
 import React from "react";
 import { CreditCard, Plus, Trash2 } from "lucide-react";
+import { Card, Button, Badge } from "../components/ui";
+import { EmptyState } from "../components/common";
 
 const Payments = ({
   payments = [],
@@ -13,19 +15,19 @@ const Payments = ({
   if (payments.length === 0) {
     return (
       <div className="space-y-4">
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-8 text-center">
-          <CreditCard size={48} className="mx-auto mb-3 text-slate-300" />
-          <p className="text-sm text-slate-500">No payment methods found.</p>
-        </div>
-        {showActions && (
-          <PaymentActions onAdd={onAdd} onRemove={onRemove} hasPayments={false} />
-        )}
+        <EmptyState
+          icon={CreditCard}
+          title="No payment methods"
+          description="Add a payment method to make purchases easier"
+          actionLabel={showActions ? "Add Payment Method" : undefined}
+          onAction={showActions ? onAdd : undefined}
+        />
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {displayPayments.map((method) => (
         <PaymentCard key={method.id} payment={method} />
       ))}
@@ -45,46 +47,36 @@ const PaymentCard = ({ payment }) => {
   const isDefault = payment.status === "Default";
 
   return (
-    <div className="flex items-center justify-between rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
-      <div className="flex items-center gap-3">
-        <div className="rounded-md bg-slate-200 p-2">
-          <CreditCard size={18} className="text-slate-600" />
+    <Card variant="default" padding="md">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-slate-100 rounded-lg">
+            <CreditCard size={20} className="text-slate-600" />
+          </div>
+          <span className="font-semibold text-slate-900">{payment.label}</span>
         </div>
-        <span className="text-sm font-medium text-slate-800">
-          {payment.label}
-        </span>
-      </div>
 
-      {isDefault && (
-        <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-slate-600">
-          {payment.status}
-        </span>
-      )}
-    </div>
+        {isDefault && (
+          <Badge variant="primary" size="sm">
+            {payment.status}
+          </Badge>
+        )}
+      </div>
+    </Card>
   );
 };
 
 const PaymentActions = ({ onAdd, onRemove, hasPayments }) => {
   return (
-    <div className="flex flex-wrap gap-3 pt-1">
-      <button
-        type="button"
-        onClick={onAdd}
-        className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
-      >
-        <Plus size={16} />
-        <span>Add Payment Method</span>
-      </button>
+    <div className="flex flex-wrap gap-3">
+      <Button variant="primary" size="sm" icon={Plus} onClick={onAdd}>
+        Add Payment Method
+      </Button>
 
       {hasPayments && (
-        <button
-          type="button"
-          onClick={onRemove}
-          className="inline-flex items-center gap-1.5 rounded-md border border-rose-300 px-4 py-2 text-sm text-rose-600 transition hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
-        >
-          <Trash2 size={16} />
-          <span>Remove Payment Method</span>
-        </button>
+        <Button variant="danger" size="sm" icon={Trash2} onClick={onRemove}>
+          Remove Payment Method
+        </Button>
       )}
     </div>
   );

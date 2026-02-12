@@ -20,6 +20,11 @@ export const ReviewProvider = ({ children }) => {
       const data = await getAllReviews();
       setReviews(data);
     } catch (error) {
+      // Silently handle 401 errors (user not authorized)
+      if (error?.response?.status === 401) {
+        setReviews([]);
+        return;
+      }
       console.error("Fetch reviews error", error);
       toast.error("Failed to load reviews");
     } finally {
@@ -35,6 +40,11 @@ export const ReviewProvider = ({ children }) => {
       const data = await getReviewsByBook(bookId);
       setReviews(data?.reviews || data || []);
     } catch (error) {
+      // Silently handle 401 errors (user not authorized)
+      if (error?.response?.status === 401) {
+        setReviews([]);
+        return;
+      }
       console.error("Fetch reviews error", error);
       toast.error("Failed to load reviews");
     } finally {
@@ -54,11 +64,19 @@ export const ReviewProvider = ({ children }) => {
           const list = data?.reviews || data || [];
           allReviews = [...allReviews, ...list];
         } catch (err) {
-          // skip failed book review request to avoid breaking the whole load
+          // Skip failed book review request (including 401s)
+          if (err?.response?.status !== 401) {
+            console.error(`Failed to fetch reviews for book ${bookId}:`, err);
+          }
         }
       }
       setReviews(allReviews);
     } catch (error) {
+      // Silently handle 401 errors
+      if (error?.response?.status === 401) {
+        setReviews([]);
+        return;
+      }
       console.error("Fetch all reviews error", error);
       toast.error("Failed to load reviews");
     } finally {
@@ -148,6 +166,17 @@ export const ReviewProvider = ({ children }) => {
     [reviews],
   );
 
+  const getReviewCountByBook = useCallback(
+    (bookId) => {
+      if (!reviews || reviews.length === 0) return 0;
+      return reviews.reduce((count, r) => {
+        const rBookId = r.book?._id || r.book;
+        return String(rBookId) === String(bookId) ? count + 1 : count;
+      }, 0);
+    },
+    [reviews],
+  );
+
   const deleteUserReviewByAdmin = useCallback(
     async (reviewId) => {
       try {
@@ -173,6 +202,7 @@ export const ReviewProvider = ({ children }) => {
       removeReview,
       editReview,
       getAvgRatingByBook,
+      getReviewCountByBook,
       fetchAllUsersReviews,
       deleteUserReviewByAdmin,
     }),
@@ -186,6 +216,7 @@ export const ReviewProvider = ({ children }) => {
       removeReview,
       editReview,
       getAvgRatingByBook,
+      getReviewCountByBook,
       fetchAllUsersReviews,
       deleteUserReviewByAdmin,
     ],

@@ -32,6 +32,12 @@ const userSchema = new mongoose.Schema(
         pincode: String,
       },
     ],
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Book",
+      },
+    ],
   },
   { timestamps: true }
 );

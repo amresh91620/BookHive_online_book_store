@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import { getAuthToken } from "../../services/http";
 import {
   getCartService,
   addToCartService,
@@ -9,11 +10,17 @@ import {
 import { CartContext } from "./CartContext";
 
 export const CartProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [cart, setCart] = useState({ items: [] });
   const [loading, setLoading] = useState(false);
 
   const fetchCart = useCallback(async () => {
+    const token = getAuthToken();
+    if (!user || !token) {
+      setCart({ items: [] });
+      return;
+    }
+    
     try {
       setLoading(true);
       const data = await getCartService();
@@ -43,17 +50,26 @@ export const CartProvider = ({ children }) => {
 
       setCart({ items: safeItems });
     } catch (err) {
+      // Silently handle 401 errors (user not logged in)
+      if (err?.response?.status === 401) {
+        setCart({ items: [] });
+        logout();
+        return;
+      }
       console.error("Error fetching cart:", err);
       setCart({ items: [] });
     } finally {
       setLoading(false);
     }
-  }, []); // No dependencies needed
+  }, [user, logout]);
 
   useEffect(() => {
-    if (user) {
+    // Only fetch cart if user is logged in
+    const token = getAuthToken();
+    if (user && token) {
       fetchCart();
     } else {
+      // Clear cart when user logs out
       setCart({ items: [] });
     }
   }, [user, fetchCart]);

@@ -1,5 +1,6 @@
-import { Menu, LogOut, Bell, UserCircle } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
+import { ADMIN_NAV_META } from "../config/adminNav";
 
 const AdminNavbar = ({ toggleSidebar }) => {
   const { logout } = useAuth();
@@ -16,8 +17,10 @@ const AdminNavbar = ({ toggleSidebar }) => {
         </button>
         
         <div className="hidden sm:block">
-          <h2 className="text-slate-900 font-extrabold text-lg">Dashboard</h2>
-          <p className="text-slate-500 text-[11px] uppercase tracking-wider font-bold">Management Portal</p>
+          <h2 className="text-slate-900 font-extrabold text-lg">{ADMIN_NAV_META.title}</h2>
+          <p className="text-slate-500 text-[11px] uppercase tracking-wider font-bold">
+            {ADMIN_NAV_META.subtitle}
+          </p>
         </div>
       </div>
 

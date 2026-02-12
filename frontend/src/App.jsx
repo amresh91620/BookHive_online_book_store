@@ -4,11 +4,16 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
+import ToastProvider from "./components/providers/ToastProvider";
 
 // Pages
 import HomeSection from "./pages/HomeSection";
 import Books from "./pages/Books";
 import BookRatingPage from "./pages/BookRatingPage";
+import Categories from "./pages/Categories";
+import Bestsellers from "./pages/Bestsellers";
+import NewArrivals from "./pages/NewArrivals";
+import Deals from "./pages/Deals";
 import About from "./pages/About";
 import ContactUs from "./pages/ContactUs";
 import Cart from "./pages/Cart";
@@ -20,6 +25,7 @@ import Wishlist from "./user/Wishlist";
 import Orders from "./user/Orders";
 import Address from "./user/Address";
 import Payments from "./user/Payments";
+import UserRoute from "./user/UserRoute";
 
 
 // Admin
@@ -38,6 +44,8 @@ import AuthProvider from "./context/auth/AuthProvider";
 import { BookProvider } from "./context/book/BookProvider";
 import { ReviewProvider } from "./context/review/ReviewProvider";
 import { CartProvider } from "./context/cart/CartProvider";
+import WishlistProvider from "./context/wishlist/WishlistProvider";
+import AddressProvider from "./context/address/AddressProvider";
 
 function AppWrapper() {
   const location = useLocation();
@@ -54,17 +62,76 @@ function AppWrapper() {
         {/* ===== PUBLIC ROUTES ===== */}
         <Route path="/" element={<HomeSection />} />
         <Route path="/books" element={<Books />} />
+        <Route path="/categories" element={<Categories />} />
+        <Route path="/bestsellers" element={<Bestsellers />} />
+        <Route path="/new-arrivals" element={<NewArrivals />} />
+        <Route path="/deals" element={<Deals />} />
         <Route path="/book-rating/:id" element={<BookRatingPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/cart" element={<Cart />} />
 
         {/* ===== USER PROFILE ROUTES ===== */}
-        <Route path="/user/profile" element={<UserLayout><Profile /></UserLayout>} />
-        <Route path="/user/wishlist" element={<UserLayout><Wishlist /></UserLayout>} />
-        <Route path="/user/orders" element={<UserLayout><Orders /></UserLayout>} />
-        <Route path="/user/address" element={<UserLayout><Address /></UserLayout>} />
-        <Route path="/user/payments" element={<UserLayout><Payments /></UserLayout>} />
+        <Route
+          path="/user"
+          element={
+            <UserRoute>
+              <UserLayout>
+                <Profile />
+              </UserLayout>
+            </UserRoute>
+          }
+        />
+        <Route
+          path="/user/profile"
+          element={
+            <UserRoute>
+              <UserLayout>
+                <Profile />
+              </UserLayout>
+            </UserRoute>
+          }
+        />
+        <Route
+          path="/user/wishlist"
+          element={
+            <UserRoute>
+              <UserLayout>
+                <Wishlist />
+              </UserLayout>
+            </UserRoute>
+          }
+        />
+        <Route
+          path="/user/orders"
+          element={
+            <UserRoute>
+              <UserLayout>
+                <Orders />
+              </UserLayout>
+            </UserRoute>
+          }
+        />
+        <Route
+          path="/user/address"
+          element={
+            <UserRoute>
+              <UserLayout>
+                <Address />
+              </UserLayout>
+            </UserRoute>
+          }
+        />
+        <Route
+          path="/user/payments"
+          element={
+            <UserRoute>
+              <UserLayout>
+                <Payments />
+              </UserLayout>
+            </UserRoute>
+          }
+        />
 
         {/* ===== ADMIN ROUTES (PROTECTED) ===== */}
         <Route
@@ -151,9 +218,14 @@ function App() {
         <BookProvider>
           <ReviewProvider>
             <CartProvider>
-            <AdminProvider>
-              <AppWrapper />
-            </AdminProvider>
+            <WishlistProvider>
+              <AddressProvider>
+              <AdminProvider>
+                <ToastProvider />
+                <AppWrapper />
+              </AdminProvider>
+              </AddressProvider>
+            </WishlistProvider>
             </CartProvider>
           </ReviewProvider>
         </BookProvider>

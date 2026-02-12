@@ -1,43 +1,23 @@
-import axios from "axios"; 
+import http, { withAuth } from "./http";
 
-const API = "/api/cart";
-
-const authHeader = () => {
-  const token = localStorage.getItem("token");
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-};
+const API = "/cart";
 
 export const getCartService = async () => {
-  const { data } = await axios.get(API, authHeader());
+  const { data } = await http.get(API, withAuth());
   return data;
 };
 
 export const addToCartService = async (bookId) => {
-  const { data } = await axios.post(
-    `${API}/add`,
-    { bookId },
-    authHeader()
-  );
+  const { data } = await http.post(`${API}/add`, { bookId }, withAuth());
   return data;
 };
 
 export const removeFromCartService = async (itemId) => {
-  const { data } = await axios.delete(
-    `${API}/${itemId}`,
-    authHeader()
-  );
+  const { data } = await http.delete(`${API}/${itemId}`, withAuth());
   return data;
 };
 
 export const updateCartQuantityService = async (itemId, quantity) => {
-  const { data } = await axios.put(
-    `${API}/${itemId}`,
-    { quantity },
-    authHeader()
-  );
+  const { data } = await http.put(`${API}/${itemId}`, { quantity }, withAuth());
   return data;
 };
