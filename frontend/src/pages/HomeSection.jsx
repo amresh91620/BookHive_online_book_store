@@ -9,16 +9,13 @@ import toast from "react-hot-toast";
 import { useCart } from "../hooks/useCart";
 import { BookGrid } from "../components/books";
 import { Button, Badge } from "../components/ui";
+import { BookCarousel3D } from "../components/common";
 import { HOME_CONTENT } from "../config/site";
 
 const HomeSection = () => {
   const { books, fetchBooksPage, loading } = useBooks();
   const { user } = useAuth();
   const { addToCart } = useCart();
-  const [coverStep, setCoverStep] = useState(0);
-  const [viewportWidth, setViewportWidth] = useState(
-    typeof window !== "undefined" ? window.innerWidth : 1024,
-  );
   const [pageBooks, setPageBooks] = useState([]);
   const [pageLoading, setPageLoading] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -31,9 +28,6 @@ const HomeSection = () => {
     bestSellers: [],
     newArrivals: [],
   });
-  const coverBooks = books.filter((book) => book.coverImage).slice(0, 10);
-  const horizontalSpacing =
-    viewportWidth < 640 ? 30 : viewportWidth < 1024 ? 45 : 65;
 
   useEffect(() => {
     if (books.length === 0) return;
@@ -123,20 +117,6 @@ const HomeSection = () => {
     loadPage();
   }, [fetchBooksPage]);
 
-  useEffect(() => {
-    if (coverBooks.length <= 1) return;
-    const timer = setInterval(() => {
-      setCoverStep((prev) => prev + 1);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, [coverBooks.length]);
-
-  useEffect(() => {
-    const handleResize = () => setViewportWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   const handleAddToCart = useCallback(async (bookId) => {
     if (!user) {
       toast.error("Please login to add items to cart.");
@@ -161,8 +141,7 @@ const HomeSection = () => {
         setType={setAuthType}
       />
 
-      {/* Hero Section - 50% Height & Fully Responsive */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-white to-[#F8FAFC] min-h-[420px] sm:min-h-[500px] lg:min-h-[560px] flex items-center">
+      <section className="relative overflow-hidden flex items-center lg:py-10 ">
         <div
           className="absolute inset-0 opacity-[0.03] pointer-events-none"
           style={{
@@ -172,74 +151,17 @@ const HomeSection = () => {
         />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative w-full h-full flex items-center">
-          <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-6 sm:gap-8 lg:gap-12 xl:gap-16 h-full py-6 sm:py-8 lg:py-0">
-            <div className="flex-1 relative w-full h-[320px] sm:h-[400px] lg:h-[500px] order-1 lg:order-2 perspective-[2000px]">
-              <div className="relative h-full w-full flex items-center justify-center">
-                {coverBooks.slice(0, 10).map((book, index) => {
-                  const total = Math.min(coverBooks.length, 10);
-
-                  // Calculate relative position (0 is center, negative is left, positive is right)
-                  let position = (index - (coverStep % total) + total) % total;
-                  if (position > total / 2) position -= total;
-
-                  const absPos = Math.abs(position);
-                  const isActive = position === 0;
-
-                  // --- RESPONSIVE MATH ---
-                  // Spread distance between books
-                  // Shrink books as they move away from center
-                  const scale = 1 - absPos * 0.12;
-                  // Fade out books that are too far to the side
-                  const opacity = absPos > 3 ? 0 : 1 - absPos * 0.25;
-                  // 3D rotation for the "shelf" curve
-                  const rotateY = position * -15;
-                  const xOffset = position * horizontalSpacing;
-                  const zIndex = 100 - absPos;
-
-                  return (
-                    <div
-                      key={book._id}
-                      className="absolute w-28 h-[152px] sm:w-36 sm:h-[210px] md:w-44 md:h-[240px] lg:w-52 lg:h-[288px] xl:w-60 xl:h-[336px] transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]"
-                      style={{
-                        transform: `translateX(${xOffset}px) scale(${scale}) rotateY(${rotateY}deg)`,
-                        zIndex,
-                        opacity,
-                        visibility: opacity === 0 ? "hidden" : "visible",
-                      }}
-                    >
-                      <div
-                        className={`
-            w-full h-full rounded-sm overflow-hidden 
-            border-l-[4px] md:border-l-[8px] border-[#0F172A]
-            shadow-[0_10px_30px_rgba(0,0,0,0.3)]
-            ${isActive ? "ring-2 ring-blue-500/30" : ""}
-          `}
-                      >
-                        {/* Book Reflection/Glossy Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none" />
-
-                        <img
-                          src={book.coverImage}
-                          alt={book.title}
-                          className={`w-full h-full object-cover transition-all duration-700 ${!isActive ? "brightness-75 contrast-125" : ""}`}
-                        />
-                      </div>
-
-                      {/* Subtle Shadow on Floor */}
-                      {isActive && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[80%] h-4 bg-black/20 blur-xl rounded-[100%]" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+          <div className="flex flex-col lg:flex-row items-center justify-between w-full">
+            <BookCarousel3D
+              books={books}
+              className="flex-1 order-1 lg:order-2 perspective-[1200px] sm:perspective-[1600px] lg:perspective-[2000px]"
+            />
 
             {/* Text Content (Order 2) */}
-            <div className="flex-1 text-center lg:text-left z-20 w-full order-2 lg:order-1">
+            <div className="flex-1 text-center lg:text-left z-20 w-full order-2 lg:order-1 p-3">
               <Badge
                 variant="outline"
-                className="mb-2 sm:mb-3 border-[#3B82F6] bg-[#3B82F6]/5 text-[#2563EB]"
+                className="border-[#3B82F6] bg-[#3B82F6]/5 text-[#2563EB]"
               >
                 <Hexagon className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-[#3B82F6] mr-2" />
                 <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest">
@@ -247,7 +169,7 @@ const HomeSection = () => {
                 </span>
               </Badge>
 
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-2 sm:mb-3 md:mb-4 tracking-tight text-[#0F172A]">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight tracking-tight text-[#0F172A]">
                 {HOME_CONTENT.heroTitle} <br />
                 <span className="italic font-medium text-[#2563EB]">
                   {HOME_CONTENT.heroEmphasis}
@@ -288,7 +210,7 @@ const HomeSection = () => {
       {/* Featured Section - Mobile Optimized */}
       <section
         id="featured"
-        className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white border-y border-[#E2E8F0]"
+        className="py-4 sm:py-5 md:py-6 lg:py-7 bg-white border-y border-[#E2E8F0]"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8 sm:mb-10 md:mb-12 lg:mb-16">

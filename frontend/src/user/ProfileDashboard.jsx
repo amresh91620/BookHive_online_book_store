@@ -1,25 +1,78 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Lock, Bell, LogOut, ChevronRight, ShoppingBag, Heart, MapPin, CreditCard, Package } from 'lucide-react';
-import { Card, Button, Badge } from '../components/ui';
-import { EmptyState } from '../components/common';
-import { useAuth } from '../hooks/useAuth';
-import { useWishlist } from '../hooks/useWishlist';
-import { useAddress } from '../hooks/useAddress';
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Lock,
+  Bell,
+  LogOut,
+  ChevronRight,
+  ShoppingBag,
+  Heart,
+  MapPin,
+  CreditCard,
+  Package,
+} from "lucide-react";
+import { Card, Button, Badge } from "../components/ui";
+import { EmptyState } from "../components/common";
+import { useAuth } from "../hooks/useAuth";
+import { useWishlist } from "../hooks/useWishlist";
+import { useAddress } from "../hooks/useAddress";
+import { getMyOrdersApi } from "../services/orderApi";
 
 const Profile = () => {
   const { user, logout } = useAuth();
-
-  const orders = [];
+  const [orders, setOrders] = useState([]);
   const { items: wishlist } = useWishlist();
   const { addresses } = useAddress();
   const paymentMethods = [];
 
+  useEffect(() => {
+    const loadOrders = async () => {
+      try {
+        const data = await getMyOrdersApi();
+        setOrders(Array.isArray(data?.orders) ? data.orders : []);
+      } catch (error) {
+        setOrders([]);
+      }
+    };
+    loadOrders();
+  }, []);
+
+  const statusColor = useMemo(
+    () => ({
+      Pending: "warning",
+      Processing: "primary",
+      Shipped: "secondary",
+      Delivered: "success",
+      Cancelled: "danger",
+    }),
+    []
+  );
+
   const stats = [
-    { label: 'Total Orders', value: String(orders.length), icon: ShoppingBag, color: 'text-blue-600' },
-    { label: 'Wishlist Items', value: String(wishlist.length), icon: Heart, color: 'text-pink-600' },
-    { label: 'Saved Addresses', value: String(addresses.length), icon: MapPin, color: 'text-green-600' },
-    { label: 'Payment Methods', value: String(paymentMethods.length), icon: CreditCard, color: 'text-purple-600' },
+    {
+      label: "Total Orders",
+      value: String(orders.length),
+      icon: ShoppingBag,
+      color: "text-blue-600",
+    },
+    {
+      label: "Wishlist Items",
+      value: String(wishlist.length),
+      icon: Heart,
+      color: "text-pink-600",
+    },
+    {
+      label: "Saved Addresses",
+      value: String(addresses.length),
+      icon: MapPin,
+      color: "text-green-600",
+    },
+    {
+      label: "Payment Methods",
+      value: String(paymentMethods.length),
+      icon: CreditCard,
+      color: "text-purple-600",
+    },
   ];
 
   return (
@@ -35,8 +88,12 @@ const Profile = () => {
                   <Icon size={24} />
                 </div>
                 <div>
-                  <p className="text-2xl font-black text-slate-900">{stat.value}</p>
-                  <p className="text-xs text-slate-600 font-medium">{stat.label}</p>
+                  <p className="text-2xl font-black text-slate-900">
+                    {stat.value}
+                  </p>
+                  <p className="text-xs text-slate-600 font-medium">
+                    {stat.label}
+                  </p>
                 </div>
               </div>
             </Card>
@@ -60,25 +117,44 @@ const Profile = () => {
               />
             ) : (
               <div className="space-y-3">
-                {orders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                    <div className="flex-1">
-                      <p className="font-semibold text-slate-900 text-sm">{order.product}</p>
-                      <p className="text-xs text-slate-500">Order #{order.id}</p>
+                {orders.slice(0, 3).map((order) => {
+                  const firstItem = order.items?.[0];
+                  const title = firstItem?.title || "Order items";
+                  const orderCode = String(order._id)
+                    .slice(-6)
+                    .toUpperCase();
+                  return (
+                    <div
+                      key={order._id}
+                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                    >
+                      <div className="flex-1">
+                        <p className="font-semibold text-slate-900 text-sm">
+                          {title}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Order #{orderCode}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-slate-900">
+                          â‚¹{Number(order.total || 0).toLocaleString()}
+                        </p>
+                        <Badge
+                          variant={statusColor[order.status] || "secondary"}
+                          size="sm"
+                        >
+                          {order.status}
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-slate-900">₹{order.price}</p>
-                      <Badge variant={order.statusColor} size="sm">
-                        {order.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
             <Link to="/user/orders">
               <Button variant="ghost" size="sm" fullWidth className="mt-4">
-                View All Orders →
+                View All Orders â†’
               </Button>
             </Link>
           </Card.Content>
@@ -99,16 +175,23 @@ const Profile = () => {
             ) : (
               <div className="space-y-3">
                 {wishlist.slice(0, 3).map((item) => (
-                  <div key={item._id} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                    <span className="text-sm font-medium text-slate-900">{item.title}</span>
-                    <span className="font-bold text-slate-900">₹{item.price}</span>
+                  <div
+                    key={item._id}
+                    className="flex justify-between items-center p-3 bg-slate-50 rounded-lg"
+                  >
+                    <span className="text-sm font-medium text-slate-900">
+                      {item.title}
+                    </span>
+                    <span className="font-bold text-slate-900">
+                      â‚¹{item.price}
+                    </span>
                   </div>
                 ))}
               </div>
             )}
             <Link to="/user/wishlist">
               <Button variant="ghost" size="sm" fullWidth className="mt-4">
-                View Wishlist →
+                View Wishlist â†’
               </Button>
             </Link>
           </Card.Content>
@@ -128,11 +211,17 @@ const Profile = () => {
               />
             ) : (
               <div className="p-4 bg-slate-50 rounded-lg mb-4">
-                <Badge variant="primary" size="sm" className="mb-2">Default Address</Badge>
+                <Badge variant="primary" size="sm" className="mb-2">
+                  Default Address
+                </Badge>
                 <p className="text-sm text-slate-700 leading-relaxed">
-                  {addresses[0]?.fullName || user?.name || "Reader"}<br />
-                  {addresses[0]?.street}<br />
-                  {addresses[0]?.city}, {addresses[0]?.state} - {addresses[0]?.pincode}<br />
+                  {addresses[0]?.fullName || user?.name || "Reader"}
+                  <br />
+                  {addresses[0]?.street}
+                  <br />
+                  {addresses[0]?.city}, {addresses[0]?.state} -{" "}
+                  {addresses[0]?.pincode}
+                  <br />
                   {addresses[0]?.phone}
                 </p>
               </div>
@@ -167,7 +256,10 @@ const Profile = () => {
             ) : (
               <div className="space-y-2 mb-4">
                 {paymentMethods.map((method) => (
-                  <div key={method.id} className="p-3 bg-slate-50 rounded-lg text-sm text-slate-700">
+                  <div
+                    key={method.id}
+                    className="p-3 bg-slate-50 rounded-lg text-sm text-slate-700"
+                  >
                     {method.label}
                   </div>
                 ))}
@@ -175,7 +267,7 @@ const Profile = () => {
             )}
             <Link to="/user/payments">
               <Button variant="ghost" size="sm" fullWidth>
-                Manage Payments →
+                Manage Payments â†’
               </Button>
             </Link>
           </Card.Content>

@@ -163,7 +163,7 @@ exports.verifyRegisterOtp = async (req, res) => {
    STEP 3: REGISTER USER
 =================================================== */
 exports.register = async (req, res) => {
-  const { name, email, password, confirmPassword } = req.body || {};
+    const { name, email, password, confirmPassword, phone } = req.body || {};
 
   try {
     const record = otpStore[email];
@@ -191,6 +191,7 @@ exports.register = async (req, res) => {
       email,
       password: hashedPassword,
       isVerified: true,
+      phone: phone ? String(phone).trim() : undefined,
     });
 
     delete otpStore[email];
@@ -202,6 +203,8 @@ exports.register = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        phone: user.phone || "",
+        profileImage: user.profileImage || "",
       },
     });
   } catch (err) {
@@ -249,6 +252,8 @@ exports.login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        phone: user.phone || "",
+        profileImage: user.profileImage || "",
       },
     });
   } catch (err) {

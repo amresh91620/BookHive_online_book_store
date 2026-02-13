@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema(
       index: true,
     },
     password: String,
+    phone: String,
+    profileImage: String,
 
     role: {
       type: String,

@@ -8,6 +8,7 @@ const reviewRouter =require('./Routes/reviewRoutes');
 const cartRouter =require('./Routes/cartRoutes');
 const wishlistRouter = require("./Routes/wishlistRoutes");
 const addressRouter = require("./Routes/addressRoutes");
+const orderRouter = require("./Routes/orderRoutes");
 
 const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
   .split(",")
@@ -36,5 +37,6 @@ app.use("/api/reviews",reviewRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/wishlist", wishlistRouter);
 app.use("/api/address", addressRouter);
+app.use("/api/orders", orderRouter);
 
 module.exports = app;
