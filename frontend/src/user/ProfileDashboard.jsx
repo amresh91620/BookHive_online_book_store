@@ -10,6 +10,7 @@ import {
   MapPin,
   CreditCard,
   Package,
+  ArrowRight,
 } from "lucide-react";
 import { Card, Button, Badge } from "../components/ui";
 import { EmptyState } from "../components/common";
@@ -138,7 +139,7 @@ const Profile = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-slate-900">
-                          â‚¹{Number(order.total || 0).toLocaleString()}
+                          ₹{Number(order.total || 0).toLocaleString()}
                         </p>
                         <Badge
                           variant={statusColor[order.status] || "secondary"}
@@ -154,7 +155,7 @@ const Profile = () => {
             )}
             <Link to="/user/orders">
               <Button variant="ghost" size="sm" fullWidth className="mt-4">
-                View All Orders â†’
+                View All Orders <ArrowRight size={15}/>
               </Button>
             </Link>
           </Card.Content>
@@ -183,7 +184,7 @@ const Profile = () => {
                       {item.title}
                     </span>
                     <span className="font-bold text-slate-900">
-                      â‚¹{item.price}
+                      ₹{item.price}
                     </span>
                   </div>
                 ))}
@@ -191,7 +192,7 @@ const Profile = () => {
             )}
             <Link to="/user/wishlist">
               <Button variant="ghost" size="sm" fullWidth className="mt-4">
-                View Wishlist â†’
+                View Wishlist <ArrowRight size={15}/>
               </Button>
             </Link>
           </Card.Content>
@@ -267,7 +268,7 @@ const Profile = () => {
             )}
             <Link to="/user/payments">
               <Button variant="ghost" size="sm" fullWidth>
-                Manage Payments â†’
+                Manage Payments <ArrowRight size={15}/>
               </Button>
             </Link>
           </Card.Content>

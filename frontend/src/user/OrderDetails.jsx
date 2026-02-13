@@ -71,11 +71,11 @@ const OrderDetails = () => {
     if (cancelling) return;
     toast((t) => (
       <div className="space-y-3">
-        <p className="text-sm font-semibold text-slate-900">
+        <p className="text-sm font-semibold text-white">
           Are you sure you want to cancel this order?
         </p>
-        <div className="flex justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={() => toast.dismiss(t.id)}>
+        <div className="flex gap-2">
+          <Button variant="white" size="sm" onClick={() => toast.dismiss(t.id)}>
             No
           </Button>
           <Button
@@ -116,7 +116,7 @@ const OrderDetails = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <p className="text-sm text-slate-500">Order details</p>
@@ -241,7 +241,7 @@ const OrderDetails = () => {
           </Card>
 
           <div className="flex flex-col gap-3">
-            <Button variant="ghost" onClick={() => navigate("/user/orders")}>
+            <Button className="bg-black text-white hover:bg-slate-900" variant="ghost" onClick={() => navigate("/user/orders")}>
               Back to Orders
             </Button>
             {["Pending", "Processing"].includes(order.status) && (
@@ -254,7 +254,7 @@ const OrderDetails = () => {
               </Button>
             )}
             <Link to="/books">
-              <Button variant="primary">Continue Shopping</Button>
+              <Button className="w-full" variant="primary">Continue Shopping</Button>
             </Link>
           </div>
         </div>

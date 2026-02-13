@@ -38,7 +38,7 @@ const Footer = () => {
               {section.links.map((link) => (
                 <Button
                   key={link.label}
-                  variant="ghost"
+                  variant="link"
                   size="sm"
                   asChild
                   className="justify-start px-0 text-slate-300 hover:text-white"
@@ -59,7 +59,7 @@ const Footer = () => {
                   return (
                     <Button
                       key={item.label}
-                      variant="ghost"
+                      variant="link"
                       size="icon"
                       asChild
                       className="text-slate-300 hover:text-white"

@@ -82,12 +82,12 @@ const Checkout = () => {
     toast(
       (t) => (
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-slate-900">
+          <p className="text-sm font-semibold text-white">
             Are you sure you want to place this order?
           </p>
-          <div className="flex justify-end gap-2">
+          <div className="flex gap-2">
             <Button
-              variant="ghost"
+              variant="white"
               size="sm"
               onClick={() => toast.dismiss(t.id)}
             >
