@@ -13,11 +13,23 @@ const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+const isDev = process.env.NODE_ENV !== "production";
+const allowAll = process.env.ALLOW_ALL_ORIGINS === "true";
+const isDevOrigin = (origin) =>
+  /^https?:\/\/localhost:\d+$/.test(origin) ||
+  /^https?:\/\/127\.0\.0\.1:\d+$/.test(origin);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (
+        allowAll ||
+        !origin ||
+        origin === "null" ||
+        allowedOrigins.includes(origin) ||
+        isDevOrigin(origin) ||
+        (isDev && origin)
+      ) {
         return callback(null, true);
       }
       return callback(new Error("Not allowed by CORS"));

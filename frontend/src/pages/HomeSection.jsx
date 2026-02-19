@@ -199,7 +199,7 @@ const HomeSection = () => {
                   return (
                     <div
                       key={book._id}
-                      className="absolute w-28 h-[152px] sm:w-36 sm:h-[210px] md:w-44 md:h-[240px] lg:w-52 lg:h-[288px] xl:w-60 xl:h-[336px] transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                      className="absolute mt-10 w-28 h-[152px] sm:w-36 sm:h-[210px]  md:w-44 md:h-[230px] md:mt-15 lg:w-52 lg:h-[288px] xl:w-60 xl:h-[336px] transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]"
                       style={{
                         transform: `translateX(${xOffset}px) scale(${scale}) rotateY(${rotateY}deg)`,
                         zIndex,
