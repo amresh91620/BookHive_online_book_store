@@ -94,6 +94,8 @@ export const variants = {
     warning: 'bg-amber-600 hover:bg-amber-700 text-white',
     outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50',
     ghost: 'hover:bg-slate-100 text-slate-700',
+    white: 'bg-white hover:bg-slate-100 text-black',
+    link: 'text-white hover:underline',
   },
   
   input: {

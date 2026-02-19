@@ -7,6 +7,8 @@ import {
   verifyRegisterOtpApi,
   sendForgotPasswordOtpApi,
   resetPasswordApi,
+  getProfileApi,
+  updateProfileApi,
 } from "../../services/authApi";
 import { AuthContext } from "./AuthContext";
 
@@ -33,6 +35,18 @@ const getInitialUser = () => {
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(getInitialUser);
+
+  const updateStoredUser = (nextUser) => {
+    setUser(nextUser);
+    const hasLocal = localStorage.getItem("token");
+    const hasSession = sessionStorage.getItem("token");
+    if (hasLocal) {
+      localStorage.setItem("user", JSON.stringify(nextUser));
+    }
+    if (hasSession) {
+      sessionStorage.setItem("user", JSON.stringify(nextUser));
+    }
+  };
 
   const login = async (data, rememberMe = true) => {
     const res = await loginApi(data);
@@ -66,6 +80,18 @@ const AuthProvider = ({ children }) => {
   const resetPassword = async (payload) => {
     return await resetPasswordApi(payload);
   };
+
+  const refreshProfile = async () => {
+    const res = await getProfileApi();
+    updateStoredUser(res.user);
+    return res;
+  };
+
+  const updateProfile = async (formData) => {
+    const res = await updateProfileApi(formData);
+    updateStoredUser(res.user);
+    return res;
+  };
   
   const logout = () => {
     setUser(null);
@@ -91,6 +117,8 @@ const AuthProvider = ({ children }) => {
         verifyRegisterOtp,
         sendForgotPasswordOtp,
         resetPassword,
+        refreshProfile,
+        updateProfile,
       }}
     >
       {children}

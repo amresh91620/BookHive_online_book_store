@@ -148,9 +148,17 @@ const Navbar = () => {
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                     className="flex items-center gap-2 p-2 hover:bg-slate-100 rounded-lg transition-colors"
                   >
-                    <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                      {user.name?.charAt(0).toUpperCase() ||
-                        user.email?.charAt(0).toUpperCase()}
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm">
+                      {user.profileImage ? (
+                        <img
+                          src={user.profileImage}
+                          alt={user.name || "User"}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        user.name?.charAt(0).toUpperCase() ||
+                        user.email?.charAt(0).toUpperCase()
+                      )}
                     </div>
                   </button>
 

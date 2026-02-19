@@ -17,12 +17,15 @@ import Deals from "./pages/Deals";
 import About from "./pages/About";
 import ContactUs from "./pages/ContactUs";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 
 // User Components
 import Profile from "./user/ProfileDashboard";
+import EditProfile from "./user/EditProfile";
 import UserLayout from "./user/UserLayout";
 import Wishlist from "./user/Wishlist";
 import Orders from "./user/Orders";
+import OrderDetails from "./user/OrderDetails";
 import Address from "./user/Address";
 import Payments from "./user/Payments";
 import UserRoute from "./user/UserRoute";
@@ -70,6 +73,14 @@ function AppWrapper() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/cart" element={<Cart />} />
+        <Route
+          path="/checkout"
+          element={
+            <UserRoute>
+              <Checkout />
+            </UserRoute>
+          }
+        />
 
         {/* ===== USER PROFILE ROUTES ===== */}
         <Route
@@ -93,6 +104,16 @@ function AppWrapper() {
           }
         />
         <Route
+          path="/user/profile/edit"
+          element={
+            <UserRoute>
+              <UserLayout>
+                <EditProfile />
+              </UserLayout>
+            </UserRoute>
+          }
+        />
+        <Route
           path="/user/wishlist"
           element={
             <UserRoute>
@@ -108,6 +129,16 @@ function AppWrapper() {
             <UserRoute>
               <UserLayout>
                 <Orders />
+              </UserLayout>
+            </UserRoute>
+          }
+        />
+        <Route
+          path="/user/orders/:id"
+          element={
+            <UserRoute>
+              <UserLayout>
+                <OrderDetails />
               </UserLayout>
             </UserRoute>
           }

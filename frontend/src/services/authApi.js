@@ -73,6 +73,26 @@ export const sendMessageApi = async (formData) => {
   }
 };
 
+export const getProfileApi = async () => {
+  try {
+    const res = await http.get(`${API}/me`, withAuth());
+    return res.data;
+  } catch (error) {
+    console.error("Get profile API error:", error);
+    throw error;
+  }
+};
+
+export const updateProfileApi = async (formData) => {
+  try {
+    const res = await http.put(`${API}/me`, formData, withAuth());
+    return res.data;
+  } catch (error) {
+    console.error("Update profile API error:", error);
+    throw error;
+  }
+};
+
 
 export const getUserAllMessages = async () => {
     try {
