@@ -151,76 +151,11 @@ const HomeSection = () => {
         />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative w-full h-full flex items-center">
-<<<<<<< HEAD
-          <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-6 sm:gap-8 lg:gap-12 xl:gap-16 h-full py-6 sm:py-8 lg:py-0">
-            <div className="flex-1 relative w-full h-[320px] sm:h-[400px] lg:h-[500px] order-1 lg:order-2 perspective-[2000px]">
-              <div className="relative h-full w-full flex items-center justify-center">
-                {coverBooks.slice(0, 10).map((book, index) => {
-                  const total = Math.min(coverBooks.length, 10);
-
-                  // Calculate relative position (0 is center, negative is left, positive is right)
-                  let position = (index - (coverStep % total) + total) % total;
-                  if (position > total / 2) position -= total;
-
-                  const absPos = Math.abs(position);
-                  const isActive = position === 0;
-
-                  // --- RESPONSIVE MATH ---
-                  // Spread distance between books
-                  // Shrink books as they move away from center
-                  const scale = 1 - absPos * 0.12;
-                  // Fade out books that are too far to the side
-                  const opacity = absPos > 3 ? 0 : 1 - absPos * 0.25;
-                  // 3D rotation for the "shelf" curve
-                  const rotateY = position * -15;
-                  const xOffset = position * horizontalSpacing;
-                  const zIndex = 100 - absPos;
-
-                  return (
-                    <div
-                      key={book._id}
-                      className="absolute mt-10 w-28 h-[152px] sm:w-36 sm:h-[210px]  md:w-44 md:h-[230px] md:mt-15 lg:w-52 lg:h-[288px] xl:w-60 xl:h-[336px] transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]"
-                      style={{
-                        transform: `translateX(${xOffset}px) scale(${scale}) rotateY(${rotateY}deg)`,
-                        zIndex,
-                        opacity,
-                        visibility: opacity === 0 ? "hidden" : "visible",
-                      }}
-                    >
-                      <div
-                        className={`
-            w-full h-full rounded-sm overflow-hidden 
-            border-l-[4px] md:border-l-[8px] border-[#0F172A]
-            shadow-[0_10px_30px_rgba(0,0,0,0.3)]
-            ${isActive ? "ring-2 ring-blue-500/30" : ""}
-          `}
-                      >
-                        {/* Book Reflection/Glossy Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none" />
-
-                        <img
-                          src={book.coverImage}
-                          alt={book.title}
-                          className={`w-full h-full object-cover transition-all duration-700 ${!isActive ? "brightness-75 contrast-125" : ""}`}
-                        />
-                      </div>
-
-                      {/* Subtle Shadow on Floor */}
-                      {isActive && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[80%] h-4 bg-black/20 blur-xl rounded-[100%]" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-=======
           <div className="flex flex-col lg:flex-row items-center justify-between w-full">
             <BookCarousel3D
               books={books}
               className="flex-1 order-1 lg:order-2 perspective-[1200px] sm:perspective-[1600px] lg:perspective-[2000px]"
             />
->>>>>>> 6375a3f74c4a447d5b97aaec3845be3cd5305959
 
             {/* Text Content (Order 2) */}
             <div className="flex-1 text-center lg:text-left z-20 w-full order-2 lg:order-1 p-3">
