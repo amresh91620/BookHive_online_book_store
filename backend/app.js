@@ -10,7 +10,11 @@ const wishlistRouter = require("./Routes/wishlistRoutes");
 const addressRouter = require("./Routes/addressRoutes");
 const orderRouter = require("./Routes/orderRoutes");
 
-const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
+const defaultOrigins = [
+  "http://localhost:5173",
+  "https://book-hive-online-book-store-858ahai9t-amresh91620s-projects.vercel.app",
+];
+const allowedOrigins = (process.env.CLIENT_ORIGIN || defaultOrigins.join(","))
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
