@@ -12,6 +12,7 @@ const orderRouter = require("./Routes/orderRoutes");
 
 const defaultOrigins = [
   "http://localhost:5173",
+  "https://book-hive-online-book-store.vercel.app",
   "https://book-hive-online-book-store-858ahai9t-amresh91620s-projects.vercel.app",
 ];
 const allowedOrigins = (process.env.CLIENT_ORIGIN || defaultOrigins.join(","))
@@ -23,6 +24,8 @@ const allowAll = process.env.ALLOW_ALL_ORIGINS === "true";
 const isDevOrigin = (origin) =>
   /^https?:\/\/localhost:\d+$/.test(origin) ||
   /^https?:\/\/127\.0\.0\.1:\d+$/.test(origin);
+const isVercelProjectOrigin = (origin) =>
+  /^https:\/\/book-hive-online-book-store(-[a-z0-9-]+)?\.vercel\.app$/.test(origin);
 
 app.use(
   cors({
@@ -32,6 +35,7 @@ app.use(
         !origin ||
         origin === "null" ||
         allowedOrigins.includes(origin) ||
+        isVercelProjectOrigin(origin) ||
         isDevOrigin(origin) ||
         (isDev && origin)
       ) {
