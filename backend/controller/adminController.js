@@ -1,17 +1,93 @@
 const User = require("../models/User");
 const Book = require("../models/Book");
 const Review = require("../models/Review");
+const Order = require("../models/Order");
+const Contact = require("../models/Contact");
+
+const ORDER_STATUSES = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
+const PAYMENT_STATUSES = ["pending", "paid", "failed", "refunded"];
+
+const ORDER_TRANSITIONS = {
+    Pending: ["Processing", "Cancelled"],
+    Processing: ["Shipped", "Cancelled"],
+    Shipped: ["Delivered"],
+    Delivered: [],
+    Cancelled: [],
+};
+
+const PAYMENT_TRANSITIONS = {
+    pending: ["paid", "failed"],
+    paid: ["refunded"],
+    failed: ["pending"],
+    refunded: [],
+};
 
 
 exports.getDashboardStats = async (req, res) => {
     try {
-        const totalUsers = await User.countDocuments({ role: "user" });
-        const totalBooks = await Book.countDocuments();
-        const totalReviews = await Review.countDocuments();
+        const [
+          totalUsers,
+          totalBooks,
+          totalReviews,
+          totalOrders,
+          totalMessages,
+          pendingOrders,
+          processingOrders,
+          shippedOrders,
+          deliveredOrders,
+          cancelledOrders,
+          pendingPayments,
+          paidPayments,
+          failedPayments,
+          refundedPayments,
+        ] = await Promise.all([
+          User.countDocuments({ role: "user" }),
+          Book.countDocuments(),
+          Review.countDocuments(),
+          Order.countDocuments(),
+          Contact.countDocuments(),
+          Order.countDocuments({ status: "Pending" }),
+          Order.countDocuments({ status: "Processing" }),
+          Order.countDocuments({ status: "Shipped" }),
+          Order.countDocuments({ status: "Delivered" }),
+          Order.countDocuments({ status: "Cancelled" }),
+          Order.countDocuments({ paymentStatus: "pending" }),
+          Order.countDocuments({ paymentStatus: "paid" }),
+          Order.countDocuments({ paymentStatus: "failed" }),
+          Order.countDocuments({ paymentStatus: "refunded" }),
+        ]);
+
+        const revenueAgg = await Order.aggregate([
+          { $group: { _id: "$paymentStatus", total: { $sum: "$total" } } },
+        ]);
+
+        const revenueMap = revenueAgg.reduce((acc, row) => {
+          acc[row._id] = row.total;
+          return acc;
+        }, {});
+
+        const totalPaid = revenueMap.paid || 0;
+        const totalRefunded = revenueMap.refunded || 0;
+        const totalRevenue = totalPaid - totalRefunded;
+
         res.json({
             totalUsers,
             totalBooks,
-            totalReviews
+            totalReviews,
+            totalOrders,
+            totalMessages,
+            pendingOrders,
+            processingOrders,
+            shippedOrders,
+            deliveredOrders,
+            cancelledOrders,
+            pendingPayments,
+            paidPayments,
+            failedPayments,
+            refundedPayments,
+            totalPaid,
+            totalRefunded,
+            totalRevenue,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -19,25 +95,53 @@ exports.getDashboardStats = async (req, res) => {
 }
 
 
-exports.getAllUser = async (req, res) => {
+exports.getAllUsers = async (req, res) => {
     try {
-        const users = await User.find().select("-password");
-        if (users.length === 0) {
-            return res.status(404).json({ msg: "No users found." });
+        const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
+        const limitRaw = parseInt(req.query.limit, 10);
+        const limit = Number.isFinite(limitRaw) ? Math.max(limitRaw, 1) : 20;
+        const search = (req.query.q || "").trim();
+
+        const filter = {};
+        
+        // Search filter
+        if (search) {
+            const searchRegex = { $regex: search, $options: "i" };
+            filter.$or = [
+                { name: searchRegex },
+                { email: searchRegex }
+            ];
         }
 
+        const total = await User.countDocuments(filter);
+        
+        const users = await User.find(filter)
+            .select("-password")
+            .sort({ createdAt: -1 })
+            .skip(offset)
+            .limit(limit);
+
         res.status(200).json({
-            totalUsers: users.length,
             users,
+            total,
+            offset,
+            limit
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
+// Alias for backward compatibility
+exports.getAllUser = exports.getAllUsers;
+
 exports.deleteUser = async (req, res) => {
     try {
         const userId = req.params.id;
+
+        if (String(req.user?.id) === String(userId)) {
+            return res.status(400).json({ msg: "You cannot delete your own account." });
+        }
 
         const user = await User.findById(userId);
         if (!user) {
@@ -53,6 +157,351 @@ exports.deleteUser = async (req, res) => {
     }
 };
 
+exports.updateUserRole = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const { role } = req.body || {};
+
+        if (String(req.user?.id) === String(userId)) {
+            return res.status(400).json({ msg: "You cannot change your own role." });
+        }
+
+        if (!["user", "admin"].includes(role)) {
+            return res.status(400).json({ msg: "Invalid role" });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { role },
+            { new: true }
+        ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        res.json({ msg: "Role updated", user });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+exports.toggleUserBlock = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const { isBlocked } = req.body || {};
+
+        if (String(req.user?.id) === String(userId)) {
+            return res.status(400).json({ msg: "You cannot block your own account." });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { isBlocked: Boolean(isBlocked) },
+            { new: true }
+        ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        res.json({ msg: "User status updated", user });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+exports.getAllOrders = async (req, res) => {
+    try {
+        const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
+        const limitRaw = parseInt(req.query.limit, 10);
+        const limit = Number.isFinite(limitRaw) ? Math.max(limitRaw, 1) : 20;
+        const search = (req.query.q || "").trim();
+        const { status, paymentStatus, from, to } = req.query || {};
+        
+        const filter = {};
+        
+        if (status && ORDER_STATUSES.includes(status)) {
+            filter.status = status;
+        }
+        if (paymentStatus && PAYMENT_STATUSES.includes(paymentStatus)) {
+            filter.paymentStatus = paymentStatus;
+        }
+
+        if (from || to) {
+            filter.createdAt = {};
+            let startDate;
+            let endDate;
+            if (from) {
+                startDate = new Date(from);
+                if (Number.isNaN(startDate.getTime())) {
+                    return res.status(400).json({ msg: "Invalid from date" });
+                }
+                filter.createdAt.$gte = startDate;
+            }
+            if (to) {
+                endDate = new Date(to);
+                if (Number.isNaN(endDate.getTime())) {
+                    return res.status(400).json({ msg: "Invalid to date" });
+                }
+                endDate.setHours(23, 59, 59, 999);
+                filter.createdAt.$lte = endDate;
+            }
+            if (startDate && endDate && startDate > endDate) {
+                return res.status(400).json({ msg: "From date must be before To date" });
+            }
+        }
+
+        // Search filter
+        if (search) {
+            const searchRegex = { $regex: search, $options: "i" };
+            filter.$or = [
+                { orderNumber: searchRegex }
+            ];
+        }
+
+        const total = await Order.countDocuments(filter);
+
+        const orders = await Order.find(filter)
+            .populate("user", "name email")
+            .sort({ createdAt: -1 })
+            .skip(offset)
+            .limit(limit);
+
+        res.json({ 
+            orders, 
+            total,
+            offset,
+            limit
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.getOrderByIdAdmin = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id).populate("user", "name email");
+        if (!order) {
+            return res.status(404).json({ msg: "Order not found" });
+        }
+        res.json({ order });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+    try {
+        const { status, note, trackingNumber, carrier, trackingUrl } = req.body || {};
+        if (!ORDER_STATUSES.includes(status)) {
+            return res.status(400).json({ msg: "Invalid order status" });
+        }
+
+        const order = await Order.findById(req.params.id);
+        if (!order) {
+            return res.status(404).json({ msg: "Order not found" });
+        }
+
+        const hasTrackingUpdate = Boolean(trackingNumber || carrier || trackingUrl);
+        const hasNote = Boolean(note);
+        const isStatusChange = order.status !== status;
+
+        if (order.status === "Cancelled") {
+            return res.status(400).json({ msg: "Cancelled orders cannot be updated" });
+        }
+
+        if (!isStatusChange && !hasTrackingUpdate && !hasNote) {
+            return res.json({ msg: "Order already in this status", order });
+        }
+
+        if (isStatusChange) {
+            const allowedNext = ORDER_TRANSITIONS[order.status] || [];
+            if (!allowedNext.includes(status)) {
+                return res.status(400).json({ msg: `Cannot move from ${order.status} to ${status}` });
+            }
+        }
+        if (!order.status || !ORDER_STATUSES.includes(order.status)) {
+            return res.status(400).json({ msg: "Invalid current order status" });
+        }
+
+        const prevStatus = order.status;
+        if (isStatusChange) {
+            order.status = status;
+        }
+
+        if (isStatusChange || hasNote || hasTrackingUpdate) {
+            order.statusHistory = [
+                ...(order.statusHistory || []),
+                {
+                    status: order.status,
+                    at: new Date(),
+                    by: "admin",
+                    note: hasNote ? String(note).slice(0, 200) : undefined,
+                },
+            ];
+        }
+
+        if (order.status === "Shipped") {
+            if (isStatusChange) {
+                order.shippedAt = new Date();
+            }
+        }
+
+        if (hasTrackingUpdate) {
+            order.tracking = {
+                carrier: carrier || order.tracking?.carrier,
+                trackingNumber: trackingNumber || order.tracking?.trackingNumber,
+                trackingUrl: trackingUrl || order.tracking?.trackingUrl,
+            };
+        }
+
+        if (order.status === "Delivered") {
+            if (isStatusChange) {
+                order.deliveredAt = new Date();
+            }
+            if (order.paymentMethod === "COD") {
+                if (order.paymentStatus !== "paid") {
+                    order.paymentStatus = "paid";
+                    order.paymentHistory = [
+                        ...(order.paymentHistory || []),
+                        {
+                            status: "paid",
+                            at: new Date(),
+                            by: "admin",
+                            note: "COD collected on delivery",
+                        },
+                    ];
+                }
+            }
+        }
+
+        if (order.status === "Cancelled" && prevStatus !== "Cancelled") {
+            if (order.paymentStatus === "paid") {
+                order.paymentStatus = "refunded";
+                order.paymentHistory = [
+                    ...(order.paymentHistory || []),
+                    {
+                        status: "refunded",
+                        at: new Date(),
+                        by: "admin",
+                        note: "Refund on cancellation",
+                    },
+                ];
+            }
+            order.cancelledAt = new Date();
+            if (note) {
+                order.cancellationReason = String(note).slice(0, 200);
+            }
+            await Promise.all(
+                order.items.map((item) =>
+                    Book.findByIdAndUpdate(item.book, {
+                        $inc: { stock: item.quantity, totalSales: -item.quantity },
+                    })
+                )
+            );
+        }
+
+        await order.save();
+
+        res.json({ msg: "Order updated", order });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.updatePaymentStatus = async (req, res) => {
+    try {
+        const { paymentStatus } = req.body || {};
+        if (!PAYMENT_STATUSES.includes(paymentStatus)) {
+            return res.status(400).json({ msg: "Invalid payment status" });
+        }
+
+        const order = await Order.findById(req.params.id);
+        if (!order) {
+            return res.status(404).json({ msg: "Order not found" });
+        }
+
+        if (order.status === "Cancelled" && paymentStatus === "paid") {
+            return res.status(400).json({ msg: "Cancelled orders cannot be marked paid" });
+        }
+
+        if (order.paymentMethod === "COD" && paymentStatus === "paid" && order.status !== "Delivered") {
+            return res.status(400).json({ msg: "COD orders can be marked paid only after delivery" });
+        }
+
+        if (order.paymentStatus === paymentStatus) {
+            return res.json({ msg: "Payment status unchanged", order });
+        }
+
+        const allowedPaymentNext = PAYMENT_TRANSITIONS[order.paymentStatus] || [];
+        if (!allowedPaymentNext.includes(paymentStatus)) {
+            return res.status(400).json({ msg: `Cannot move payment from ${order.paymentStatus} to ${paymentStatus}` });
+        }
+
+        order.paymentStatus = paymentStatus;
+        order.paymentHistory = [
+            ...(order.paymentHistory || []),
+            {
+                status: paymentStatus,
+                at: new Date(),
+                by: "admin",
+            },
+        ];
+        await order.save();
+
+        res.json({ msg: "Payment status updated", order });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 
 
+
+
+// Block user
+exports.blockUser = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        if (String(req.user?.id) === String(userId)) {
+            return res.status(400).json({ msg: "You cannot block your own account." });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { isBlocked: true },
+            { new: true }
+        ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        res.json({ msg: "User blocked successfully", user });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+// Unblock user
+exports.unblockUser = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { isBlocked: false },
+            { new: true }
+        ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        res.json({ msg: "User unblocked successfully", user });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};

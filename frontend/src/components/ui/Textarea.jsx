@@ -1,70 +1,18 @@
-import React from 'react';
-import { AlertCircle } from 'lucide-react';
-import { variants } from '../../theme/config';
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-const Textarea = ({
-  label,
-  name,
-  value,
-  onChange,
-  onBlur,
-  placeholder,
-  error,
-  disabled = false,
-  required = false,
-  rows = 4,
-  maxLength,
-  showCount = false,
-  className = '',
-  ...props
-}) => {
-  const variantStyle = error ? variants.input.error : variants.input.default;
-  
+const Textarea = React.forwardRef(({ className, ...props }, ref) => {
   return (
-    <div className={`space-y-1 ${className}`}>
-      {label && (
-        <div className="flex items-center justify-between">
-          <label htmlFor={name} className="block text-xs font-semibold text-slate-700 ml-1 uppercase tracking-wider">
-            {label}
-            {required && <span className="text-red-500 ml-1">*</span>}
-          </label>
-          {showCount && maxLength && (
-            <span className="text-xs text-slate-500">
-              {value?.length || 0}/{maxLength}
-            </span>
-          )}
-        </div>
+    <textarea
+      className={cn(
+        "flex min-h-[60px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500 disabled:cursor-not-allowed disabled:opacity-50",
+        className
       )}
-      
-      <textarea
-        id={name}
-        name={name}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-        placeholder={placeholder}
-        disabled={disabled}
-        rows={rows}
-        maxLength={maxLength}
-        className={`
-          w-full px-4 py-2.5 bg-white border rounded-xl
-          text-sm text-slate-900 placeholder:text-slate-400
-          transition-all duration-200
-          focus:outline-none resize-none
-          disabled:opacity-60 disabled:cursor-not-allowed
-          ${variantStyle}
-        `}
-        {...props}
-      />
-      
-      {error && (
-        <div className="flex items-center gap-1.5 text-red-600 text-xs mt-1 ml-1">
-          <AlertCircle size={12} />
-          <span>{error}</span>
-        </div>
-      )}
-    </div>
+      ref={ref}
+      {...props}
+    />
   );
-};
+});
+Textarea.displayName = "Textarea";
 
-export default Textarea;
+export { Textarea };

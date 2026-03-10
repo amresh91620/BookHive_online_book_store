@@ -1,26 +1,39 @@
 const express = require("express");
 const router = express.Router();
+const authMiddleware = require("../middleware/authMiddleware");
+const adminMiddleware = require("../middleware/adminMiddleware");
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
-const auth = require('../middleware/authMiddleware');
-const isAdmin = require('../middleware/adminMiddleware');
-const { getAllBooks, addBook, updateBook, deleteBook } = require("../controller/bookController");
+const {
+  getAllBooks,
+  getBookById,
+  addBook,
+  updateBook,
+  deleteBook,
+  getCategories,
+} = require("../controller/bookController");
 
-// Multer Cloudinary Storage
+// Configure Cloudinary storage for multer
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "book_covers",  
-    allowed_formats: ["jpg", "png", "jpeg"],
+    folder: "bookhive/books",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    transformation: [{ width: 800, height: 1200, crop: "limit" }],
   },
 });
 
-const parser = multer({ storage });
+const upload = multer({ storage });
 
-router.get('/', getAllBooks);
-router.post('/add-book', auth, isAdmin, parser.single("coverImage"), addBook);
-router.put('/update-book/:id', auth, isAdmin, parser.single("coverImage"), updateBook);
-router.delete('/delete-book/:id', auth, isAdmin, deleteBook);
+// Public routes
+router.get("/categories", getCategories);
+router.get("/", getAllBooks);
+router.get("/:id", getBookById);
+
+// Admin routes
+router.post("/", authMiddleware, adminMiddleware, upload.single("coverImage"), addBook);
+router.put("/:id", authMiddleware, adminMiddleware, upload.single("coverImage"), updateBook);
+router.delete("/:id", authMiddleware, adminMiddleware, deleteBook);
 
 module.exports = router;

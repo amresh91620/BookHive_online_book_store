@@ -1,33 +1,29 @@
-import React from 'react';
-import { variants } from '../../theme/config';
+import * as React from "react";
+import { cva } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
-const Badge = ({
-  children,
-  variant = 'primary',
-  size = 'md',
-  icon: Icon,
-  className = '',
-  ...props
-}) => {
-  const baseStyles = 'inline-flex items-center font-semibold rounded-lg';
-  
-  const sizeStyles = {
-    sm: 'px-2 py-0.5 text-xs gap-1',
-    md: 'px-2.5 py-1 text-xs gap-1.5',
-    lg: 'px-3 py-1.5 text-sm gap-2',
-  };
-  
-  const variantStyle = variants.badge[variant] || variants.badge.primary;
-  
+const badgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default: "border-transparent bg-amber-100 text-amber-800",
+        secondary: "border-transparent bg-gray-100 text-gray-800",
+        destructive: "border-transparent bg-red-100 text-red-800",
+        success: "border-transparent bg-green-100 text-green-800",
+        outline: "text-gray-700",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+function Badge({ className, variant, ...props }) {
   return (
-    <span
-      className={`${baseStyles} ${sizeStyles[size]} ${variantStyle} ${className}`}
-      {...props}
-    >
-      {Icon && <Icon size={size === 'sm' ? 12 : size === 'lg' ? 16 : 14} />}
-      {children}
-    </span>
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
   );
-};
+}
 
-export default Badge;
+export { Badge, badgeVariants };

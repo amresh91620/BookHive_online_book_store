@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 const {
   createOrder,
   getMyOrders,
@@ -8,9 +8,12 @@ const {
   cancelOrder,
 } = require("../controller/orderController");
 
-router.post("/", auth, createOrder);
-router.get("/", auth, getMyOrders);
-router.get("/:id", auth, getOrderById);
-router.put("/:id/cancel", auth, cancelOrder);
+// All order routes require authentication
+router.use(authMiddleware);
+
+router.post("/", createOrder);
+router.get("/", getMyOrders);
+router.get("/:id", getOrderById);
+router.post("/:id/cancel", cancelOrder);
 
 module.exports = router;

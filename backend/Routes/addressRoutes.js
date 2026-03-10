@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 const {
   getAddresses,
   addAddress,
@@ -8,9 +8,12 @@ const {
   deleteAddress,
 } = require("../controller/addressController");
 
-router.get("/", auth, getAddresses);
-router.post("/", auth, addAddress);
-router.put("/:id", auth, updateAddress);
-router.delete("/:id", auth, deleteAddress);
+// All address routes require authentication
+router.use(authMiddleware);
+
+router.get("/", getAddresses);
+router.post("/", addAddress);
+router.put("/:id", updateAddress);
+router.delete("/:id", deleteAddress);
 
 module.exports = router;

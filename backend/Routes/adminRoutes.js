@@ -1,14 +1,45 @@
-const express =require("express");
-const router = express.Router()
-const auth = require('../middleware/authMiddleware');
-const isAdmin = require('../middleware/adminMiddleware');
-const {getDashboardStats,getAllUser,deleteUser} = require("../controller/adminController");
+const express = require("express");
+const router = express.Router();
+const authMiddleware = require("../middleware/authMiddleware");
+const adminMiddleware = require("../middleware/adminMiddleware");
+const {
+  getDashboardStats,
+  getAllUsers,
+  blockUser,
+  unblockUser,
+  toggleUserBlock,
+  getAllOrders,
+  getOrderByIdAdmin,
+  updateOrderStatus,
+  updatePaymentStatus,
+} = require("../controller/adminController");
+const { getAllReviews, deleteUserReview } = require("../controller/reviewController");
+const { getAllMessages, deleteMessage } = require("../controller/contactController");
 
+// All admin routes require authentication and admin role
+router.use(authMiddleware);
+router.use(adminMiddleware);
 
+// Dashboard
+router.get("/dashboard", getDashboardStats);
 
-router.get("/Dashboard",auth,isAdmin,getDashboardStats);
-router.get("/users",auth,isAdmin,getAllUser);
-router.delete("/users/:id",auth,isAdmin,deleteUser);
+// User management
+router.get("/users", getAllUsers);
+router.put("/users/:id/block", toggleUserBlock);
+router.put("/users/:id/unblock", unblockUser);
 
+// Order management
+router.get("/orders", getAllOrders);
+router.get("/orders/:id", getOrderByIdAdmin);
+router.put("/orders/:id/status", updateOrderStatus);
+router.put("/orders/:id/payment", updatePaymentStatus);
+
+// Review management
+router.get("/reviews", getAllReviews);
+router.delete("/reviews/:id", deleteUserReview);
+
+// Message management
+router.get("/messages", getAllMessages);
+router.delete("/messages/:id", deleteMessage);
 
 module.exports = router;

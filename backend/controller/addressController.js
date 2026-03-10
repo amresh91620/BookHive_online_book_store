@@ -96,12 +96,12 @@ exports.deleteAddress = async (req, res) => {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    const address = user.address.id(id);
-    if (!address) {
+    const addressIndex = user.address.findIndex(addr => addr._id.toString() === id);
+    if (addressIndex === -1) {
       return res.status(404).json({ msg: "Address not found" });
     }
 
-    address.remove();
+    user.address.splice(addressIndex, 1);
     await user.save();
 
     res.json({

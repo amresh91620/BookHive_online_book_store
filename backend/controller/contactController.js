@@ -26,12 +26,38 @@ exports.sendMessage = async (req, res) => {
 
 exports.getUserAllMessages = async (req, res) => {
   try {
-    const messages = await Contact.find().select("-__v").sort({ createdAt: -1 });
+    const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
+    const limitRaw = parseInt(req.query.limit, 10);
+    const limit = Number.isFinite(limitRaw) ? Math.max(limitRaw, 1) : 20;
+    const search = (req.query.q || "").trim();
+
+    const filter = {};
+    
+    // Search filter
+    if (search) {
+      const searchRegex = { $regex: search, $options: "i" };
+      filter.$or = [
+        { name: searchRegex },
+        { email: searchRegex },
+        { subject: searchRegex },
+        { message: searchRegex }
+      ];
+    }
+
+    const total = await Contact.countDocuments(filter);
+    
+    const messages = await Contact.find(filter)
+      .select("-__v")
+      .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(limit);
 
     res.status(200).json({
       success: true,
-      totalMessages: messages.length,
-      messages: messages, // ✅ Changed to plural
+      messages,
+      total,
+      offset,
+      limit
     });
   } catch (error) {
     console.error("Get all messages error:", error);
@@ -41,6 +67,9 @@ exports.getUserAllMessages = async (req, res) => {
     });
   }
 };
+
+// Alias for admin
+exports.getAllMessages = exports.getUserAllMessages;
 
 exports.deleteUserMessage = async (req, res) => {
   try {
@@ -65,3 +94,6 @@ exports.deleteUserMessage = async (req, res) => {
     });
   }
 };
+
+// Alias for admin
+exports.deleteMessage = exports.deleteUserMessage;

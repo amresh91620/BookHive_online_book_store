@@ -2,6 +2,19 @@ const Book = require("../models/Book");
 const cloudinary = require("../config/cloudinary");
 
 /**
+ * ✅ Get Unique Categories
+ */
+exports.getCategories = async (req, res) => {
+  try {
+    const categories = await Book.distinct("categories");
+    res.status(200).json({ categories: categories.filter(Boolean) });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
  * ✅ Get All Books
  */
 exports.getAllBooks = async (req, res) => {
@@ -68,6 +81,24 @@ exports.getAllBooks = async (req, res) => {
       nextCursor,
       hasMore,
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * ✅ Get Single Book by ID
+ */
+exports.getBookById = async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id).select("-__v");
+    
+    if (!book) {
+      return res.status(404).json({ msg: "Book not found" });
+    }
+
+    res.status(200).json({ book });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });

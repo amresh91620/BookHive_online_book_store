@@ -139,24 +139,38 @@ exports.resetPassword = async (req, res) => {
 exports.verifyRegisterOtp = async (req, res) => {
   const { email, otp } = req.body || {};
 
-  const record = otpStore[email];
+  try {
+    if (!email || !otp) {
+      return res.status(400).json({ msg: "Email and OTP are required" });
+    }
 
-  if (!record) {
-    return res.status(400).json({ msg: "OTP not requested" });
+    const record = otpStore[email];
+
+    if (!record) {
+      return res.status(400).json({ msg: "OTP not requested or expired" });
+    }
+
+    if (record.expiresAt < Date.now()) {
+      delete otpStore[email];
+      return res.status(400).json({ msg: "OTP expired. Please request a new one" });
+    }
+
+    // Convert both to string and trim for comparison
+    const storedOtp = String(record.otp).trim();
+    const providedOtp = String(otp).trim();
+
+    if (storedOtp !== providedOtp) {
+      console.log("OTP mismatch:", { stored: storedOtp, provided: providedOtp });
+      return res.status(400).json({ msg: "Invalid OTP. Please check and try again" });
+    }
+
+    record.verified = true;
+
+    res.json({ msg: "Email verified successfully" });
+  } catch (err) {
+    console.error("Verify OTP error:", err);
+    res.status(500).json({ msg: "OTP verification failed" });
   }
-
-  if (record.expiresAt < Date.now()) {
-    delete otpStore[email];
-    return res.status(400).json({ msg: "OTP expired" });
-  }
-
-  if (record.otp !== otp) {
-    return res.status(400).json({ msg: "Invalid OTP" });
-  }
-
-  record.verified = true;
-
-  res.json({ msg: "Email verified successfully" });
 };
 
 /* ===================================================
@@ -233,6 +247,10 @@ exports.login = async (req, res) => {
       return res.status(401).json({ msg: "Please verify your email first" });
     }
 
+    if (user.isBlocked) {
+      return res.status(403).json({ msg: "Your account is blocked. Contact support." });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ msg: "Invalid email or password" });
@@ -259,5 +277,46 @@ exports.login = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error" });
+  }
+};
+
+
+/* ===================================================
+   CHANGE PASSWORD (Authenticated User)
+=================================================== */
+exports.changePassword = async (req, res) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body || {};
+
+  try {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ msg: "All fields are required" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ msg: "New password must be at least 6 characters" });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ msg: "New passwords do not match" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ msg: "Current password is incorrect" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ msg: "Password changed successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Failed to change password" });
   }
 };

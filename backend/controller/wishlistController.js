@@ -18,7 +18,7 @@ exports.getWishlist = async (req, res) => {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    res.json({ items: user.wishlist || [] });
+    res.json({ wishlist: user.wishlist || [] });
   } catch (error) {
     console.error("Get wishlist error:", error);
     res.status(500).json({ msg: "Failed to load wishlist" });
@@ -50,7 +50,7 @@ exports.addToWishlist = async (req, res) => {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    res.json({ items: user.wishlist || [] });
+    res.json({ wishlist: user.wishlist || [] });
   } catch (error) {
     console.error("Add to wishlist error:", error);
     res.status(500).json({ msg: "Failed to update wishlist" });
@@ -77,7 +77,7 @@ exports.removeFromWishlist = async (req, res) => {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    res.json({ items: user.wishlist || [] });
+    res.json({ wishlist: user.wishlist || [] });
   } catch (error) {
     console.error("Remove from wishlist error:", error);
     res.status(500).json({ msg: "Failed to update wishlist" });

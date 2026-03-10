@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const cloudinary = require("../config/cloudinary");
+const authMiddleware = require("../middleware/authMiddleware");
 const {
   sendRegisterOtp,
   verifyRegisterOtp,
@@ -10,34 +8,30 @@ const {
   login,
   sendForgotPasswordOtp,
   resetPassword,
+  changePassword,
 } = require("../controller/authController");
-const { getProfile, updateProfile } = require("../controller/userController");
-const {sendMessage, getUserAllMessages,deleteUserMessage} = require('../controller/contactController')
-const auth = require("../middleware/authMiddleware");
-const isAdmin = require("../middleware/adminMiddleware");
+const {
+  getProfile,
+  updateProfile,
+} = require("../controller/userController");
 
+// Registration flow
+router.post("/register/send-otp", sendRegisterOtp);
+router.post("/register/verify-otp", verifyRegisterOtp);
+router.post("/register", register);
 
+// Login
+router.post("/login", login);
 
-router.post("/send-otp", sendRegisterOtp);
-router.post("/verify-otp", verifyRegisterOtp);
+// Password reset
 router.post("/forgot-password/send-otp", sendForgotPasswordOtp);
 router.post("/forgot-password/reset", resetPassword);
-// Profile upload storage
-const profileStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "user_profiles",
-    allowed_formats: ["jpg", "png", "jpeg"],
-  },
-});
-const profileUpload = multer({ storage: profileStorage });
 
-router.post("/register", register);
-router.post("/login", login);
-router.get("/me", auth, getProfile);
-router.put("/me", auth, profileUpload.single("profileImage"), updateProfile);
+// Change password (protected)
+router.post("/change-password", authMiddleware, changePassword);
 
-router.post("/send", sendMessage);
-router.get('/messages',auth,isAdmin, getUserAllMessages);
-router.delete('/messages/:id',auth,isAdmin, deleteUserMessage);
+// Profile (protected)
+router.get("/profile", authMiddleware, getProfile);
+router.put("/profile", authMiddleware, updateProfile);
+
 module.exports = router;

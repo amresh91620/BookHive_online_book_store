@@ -180,11 +180,42 @@ exports.getReviewsByBook = async (req, res) => {
 
 exports.getAllReviews = async (req, res) => {
   try {
-    const reviews = await Review.find()
+    const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
+    const limitRaw = parseInt(req.query.limit, 10);
+    const limit = Number.isFinite(limitRaw) ? Math.max(limitRaw, 1) : 20;
+    const search = (req.query.q || "").trim();
+    const rating = req.query.rating ? parseInt(req.query.rating) : null;
+
+    const filter = {};
+    
+    // Rating filter
+    if (rating && rating >= 1 && rating <= 5) {
+      filter.rating = rating;
+    }
+
+    // Search filter
+    if (search) {
+      const searchRegex = { $regex: search, $options: "i" };
+      filter.$or = [
+        { comment: searchRegex }
+      ];
+    }
+
+    const total = await Review.countDocuments(filter);
+    
+    const reviews = await Review.find(filter)
       .populate("user", "name email")
       .populate("book", "title author")
-      .sort({ createdAt: -1 });
-    res.json(reviews);
+      .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(limit);
+    
+    res.json({
+      reviews,
+      total,
+      offset,
+      limit
+    });
   } catch (error) {
     console.error("Get all reviews error:", error);
     res.status(500).json({ msg: error.message });

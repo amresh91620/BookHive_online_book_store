@@ -28,8 +28,42 @@ const addressSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const statusHistorySchema = new mongoose.Schema(
+  {
+    status: String,
+    at: { type: Date, default: Date.now },
+    by: {
+      type: String,
+      enum: ["user", "admin", "system"],
+      default: "system",
+    },
+    note: String,
+  },
+  { _id: false }
+);
+
+const paymentHistorySchema = new mongoose.Schema(
+  {
+    status: String,
+    at: { type: Date, default: Date.now },
+    by: {
+      type: String,
+      enum: ["user", "admin", "system"],
+      default: "system",
+    },
+    note: String,
+  },
+  { _id: false }
+);
+
 const orderSchema = new mongoose.Schema(
   {
+    orderNumber: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -52,12 +86,25 @@ const orderSchema = new mongoose.Schema(
       enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
       default: "Pending",
     },
+    statusHistory: [statusHistorySchema],
     subtotal: { type: Number, default: 0 },
     shipping: { type: Number, default: 0 },
     tax: { type: Number, default: 0 },
     total: { type: Number, default: 0 },
+    paymentHistory: [paymentHistorySchema],
+    tracking: {
+      carrier: String,
+      trackingNumber: String,
+      trackingUrl: String,
+    },
+    shippedAt: Date,
+    deliveredAt: Date,
+    cancelledAt: Date,
+    cancellationReason: String,
   },
   { timestamps: true }
 );
+
+orderSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("Order", orderSchema);
