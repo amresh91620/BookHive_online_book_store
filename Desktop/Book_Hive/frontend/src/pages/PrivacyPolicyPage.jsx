@@ -1,0 +1,142 @@
+import { Card, CardContent } from "@/components/ui/card";
+
+export default function PrivacyPolicyPage() {
+  return (
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="container-shell">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
+          <p className="text-gray-600 mb-8">Last updated: {new Date().toLocaleDateString()}</p>
+
+          <Card className="mb-6">
+            <CardContent className="p-8 space-y-6">
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Introduction</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  Welcome to BookHive. We respect your privacy and are committed to protecting your
+                  personal data. This privacy policy will inform you about how we look after your
+                  personal data when you visit our website and tell you about your privacy rights.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  2. Information We Collect
+                </h2>
+                <p className="text-gray-700 leading-relaxed mb-3">
+                  We may collect, use, store and transfer different kinds of personal data about
+                  you:
+                </p>
+                <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+                  <li>Identity Data: name, username, or similar identifier</li>
+                  <li>Contact Data: email address, telephone numbers, and delivery addresses</li>
+                  <li>Transaction Data: details about payments and orders</li>
+                  <li>Technical Data: IP address, browser type, and device information</li>
+                  <li>Usage Data: information about how you use our website</li>
+                  <li>Marketing Data: your preferences in receiving marketing from us</li>
+                </ul>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  3. How We Use Your Information
+                </h2>
+                <p className="text-gray-700 leading-relaxed mb-3">
+                  We use your personal data for the following purposes:
+                </p>
+                <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+                  <li>To process and deliver your orders</li>
+                  <li>To manage your account and provide customer support</li>
+                  <li>To send you important information about your orders</li>
+                  <li>To improve our website and services</li>
+                  <li>To send you marketing communications (with your consent)</li>
+                  <li>To protect against fraud and ensure security</li>
+                </ul>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Data Security</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  We have implemented appropriate security measures to prevent your personal data
+                  from being accidentally lost, used, or accessed in an unauthorized way. We use
+                  encryption technology and secure servers to protect your information.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Data Retention</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  We will only retain your personal data for as long as necessary to fulfill the
+                  purposes we collected it for, including for legal, accounting, or reporting
+                  requirements.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Your Rights</h2>
+                <p className="text-gray-700 leading-relaxed mb-3">You have the right to:</p>
+                <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+                  <li>Access your personal data</li>
+                  <li>Correct inaccurate personal data</li>
+                  <li>Request deletion of your personal data</li>
+                  <li>Object to processing of your personal data</li>
+                  <li>Request restriction of processing your personal data</li>
+                  <li>Request transfer of your personal data</li>
+                  <li>Withdraw consent at any time</li>
+                </ul>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Cookies</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  We use cookies and similar tracking technologies to track activity on our website
+                  and store certain information. You can instruct your browser to refuse all
+                  cookies or to indicate when a cookie is being sent.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Third-Party Links</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  Our website may include links to third-party websites. We have no control over
+                  the content and practices of these sites and cannot accept responsibility for
+                  their privacy policies.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  9. Changes to This Policy
+                </h2>
+                <p className="text-gray-700 leading-relaxed">
+                  We may update our privacy policy from time to time. We will notify you of any
+                  changes by posting the new privacy policy on this page and updating the "Last
+                  updated" date.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">10. Contact Us</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  If you have any questions about this privacy policy or our privacy practices,
+                  please contact us at:
+                </p>
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                  <p className="text-gray-700">
+                    <strong>Email:</strong> privacy@bookhive.com
+                  </p>
+                  <p className="text-gray-700">
+                    <strong>Phone:</strong> +1 (555) 123-4567
+                  </p>
+                  <p className="text-gray-700">
+                    <strong>Address:</strong> 123 Book Street, Reading City, RC 12345
+                  </p>
+                </div>
+              </section>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
