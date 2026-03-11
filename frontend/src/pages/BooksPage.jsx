@@ -18,6 +18,7 @@ export default function BooksPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
+  const [statusFilter, setStatusFilter] = useState(searchParams.get("filter") || "");
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
   const [showFilters, setShowFilters] = useState(false);
 
@@ -35,8 +36,9 @@ export default function BooksPage() {
     };
     if (searchQuery) params.q = searchQuery;
     if (category) params.category = category;
+    if (statusFilter) params.status = statusFilter;
     dispatch(fetchBooks(params));
-  }, [dispatch, searchQuery, category, currentPage]);
+  }, [dispatch, searchQuery, category, statusFilter, currentPage]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -44,6 +46,7 @@ export default function BooksPage() {
     const params = { page: "1" };
     if (searchQuery) params.q = searchQuery;
     if (category) params.category = category;
+    if (statusFilter) params.filter = statusFilter;
     setSearchParams(params);
   };
 
@@ -53,12 +56,14 @@ export default function BooksPage() {
     const params = { page: "1" };
     if (searchQuery) params.q = searchQuery;
     if (newCategory) params.category = newCategory;
+    if (statusFilter) params.filter = statusFilter;
     setSearchParams(params);
   };
 
   const handleClearFilters = () => {
     setSearchQuery("");
     setCategory("");
+    setStatusFilter("");
     setCurrentPage(1);
     setSearchParams({});
   };
@@ -68,18 +73,23 @@ export default function BooksPage() {
     const params = { page: page.toString() };
     if (searchQuery) params.q = searchQuery;
     if (category) params.category = category;
+    if (statusFilter) params.filter = statusFilter;
     setSearchParams(params);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const hasActiveFilters = searchQuery || category;
+  const hasActiveFilters = searchQuery || category || statusFilter;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container-shell py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Explore Books</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            {statusFilter === 'newArrival' ? 'New Arrivals' : 
+             statusFilter === 'bestseller' ? 'Best Sellers' : 
+             statusFilter === 'featured' ? 'Featured Books' : 'Explore Books'}
+          </h1>
           <p className="text-gray-600">
             Discover from our collection of {totalBooks} books
           </p>
@@ -153,6 +163,22 @@ export default function BooksPage() {
                       setCurrentPage(1);
                       const params = { page: "1" };
                       if (searchQuery) params.q = searchQuery;
+                      setSearchParams(params);
+                    }}
+                  />
+                </Badge>
+              )}
+              {statusFilter && (
+                <Badge variant="secondary" className="px-3 py-1 bg-amber-100 text-amber-900 border-amber-200">
+                  Type: {statusFilter === 'newArrival' ? 'New Arrival' : statusFilter}
+                  <X
+                    className="w-3 h-3 ml-2 cursor-pointer"
+                    onClick={() => {
+                      setStatusFilter("");
+                      setCurrentPage(1);
+                      const params = { page: "1" };
+                      if (searchQuery) params.q = searchQuery;
+                      if (category) params.category = category;
                       setSearchParams(params);
                     }}
                   />

@@ -26,6 +26,7 @@ exports.getAllBooks = async (req, res) => {
     const cursor = req.query.cursor || null;
     const q = (req.query.q || "").trim();
     const category = (req.query.category || "").trim();
+    const statusFilter = (req.query.status || "").trim();
 
     const escapeRegex = (value) =>
       value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -43,6 +44,12 @@ exports.getAllBooks = async (req, res) => {
       filters.push({
         categories: { $regex: escapeRegex(category), $options: "i" },
       });
+    }
+
+    if (statusFilter) {
+      if (statusFilter === 'featured') filters.push({ featured: true });
+      if (statusFilter === 'bestseller') filters.push({ bestseller: true });
+      if (statusFilter === 'newArrival') filters.push({ newArrival: true });
     }
 
     const filter = filters.length > 0 ? { $and: filters } : {};

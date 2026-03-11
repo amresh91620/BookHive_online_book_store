@@ -11,6 +11,7 @@ import { ArrowRight, BookOpen, Truck, ShieldCheck, Zap, Sparkles } from "lucide-
 export default function HomePage() {
   const dispatch = useDispatch();
   const { stats, status } = useSelector((state) => state.books);
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(fetchStatsBooks());
@@ -148,11 +149,13 @@ export default function HomePage() {
         <div className="container-shell text-center px-4 relative z-10">
           <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Start Your Reading Journey Today</h2>
           <p className="text-base sm:text-lg mb-6 sm:mb-8 text-gray-300 max-w-2xl mx-auto">
-            Join thousands of book lovers and discover your next great read
+            {user 
+              ? "Welcome back! Ready to find your next favorite story?" 
+              : "Join thousands of book lovers and discover your next great read"}
           </p>
-          <Link to="/register">
+          <Link to={user ? "/books" : "/register"}>
             <Button size="lg" className="bg-[#F59E0B] text-white hover:bg-[#D97706] h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
-              Sign Up Now
+              {user ? "Explore the Catalog" : "Sign Up Now"}
             </Button>
           </Link>
         </div>
