@@ -138,6 +138,14 @@ const booksSlice = createSlice({
         state.status = "loading";
         state.error = null;
       })
+      .addCase(fetchStatsBooks.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchBookById.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
       .addCase(fetchBooks.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.items = action.payload.books || action.payload.items || [];
@@ -148,17 +156,27 @@ const booksSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(fetchStatsBooks.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.stats = {
           featured: action.payload.featured || [],
           bestsellers: action.payload.bestsellers || [],
           newArrivals: action.payload.newArrivals || [],
         };
       })
+      .addCase(fetchStatsBooks.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.categories = action.payload;
       })
       .addCase(fetchBookById.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.selected = action.payload;
+      })
+      .addCase(fetchBookById.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
       })
       .addCase(createBook.fulfilled, (state, action) => {
         state.items = [action.payload, ...state.items];
