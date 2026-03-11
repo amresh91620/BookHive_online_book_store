@@ -4,11 +4,37 @@ import { Search, ArrowRight, Users, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function EnhancedHero() {
-  const { items: books } = useSelector((state) => state.books);
+  const { stats, status } = useSelector((state) => state.books);
   
-  // Dynamic book selection with fallbacks
-  const featuredBooks = books?.slice(0, 3) || [];
+  // Use stats.featured for the hero section to match the optimized homepage fetch
+  const featuredBooks = stats?.featured?.slice(0, 3) || [];
   const placeholderCover = "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=800&auto=format&fit=crop";
+
+  if (status === "loading") {
+    return (
+      <section className="relative min-h-[65vh] w-full flex items-center overflow-hidden py-6 sm:min-h-[75vh] sm:py-8 lg:min-h-[85vh] lg:py-0 bg-[#1F2937]">
+        <div className="container-shell relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            <div className="lg:col-span-7 space-y-6">
+              <div className="h-8 w-48 bg-gray-700 rounded-full animate-pulse"></div>
+              <div className="space-y-3">
+                <div className="h-16 w-3/4 bg-gray-800 rounded-lg animate-pulse"></div>
+                <div className="h-16 w-1/2 bg-gray-800 rounded-lg animate-pulse"></div>
+              </div>
+              <div className="h-20 w-full bg-gray-800 rounded-lg animate-pulse"></div>
+              <div className="flex gap-4">
+                <div className="h-14 w-40 bg-[#F59E0B]/20 rounded-xl animate-pulse"></div>
+                <div className="h-14 w-40 bg-gray-700 rounded-xl animate-pulse"></div>
+              </div>
+            </div>
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="w-72 h-[420px] bg-gray-800 rounded-xl animate-pulse shadow-2xl border-4 border-gray-700"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative min-h-[65vh] w-full flex items-center overflow-hidden py-6 sm:min-h-[75vh] sm:py-8 lg:min-h-[85vh] lg:py-0"
