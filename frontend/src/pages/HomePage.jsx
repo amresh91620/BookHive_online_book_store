@@ -1,23 +1,23 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { fetchBooks } from "@/store/slices/booksSlice";
+import { fetchStatsBooks } from "@/store/slices/booksSlice";
 import BookCard from "@/components/common/BookCard";
 import HeroCarousel from "@/components/home/HeroCarousel";
 import { Button } from "@/components/ui/button";
-import { BookOpen, TrendingUp, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, Truck, ShieldCheck, Zap, Sparkles } from "lucide-react";
 
 export default function HomePage() {
   const dispatch = useDispatch();
-  const { items: books } = useSelector((state) => state.books);
+  const { stats, status } = useSelector((state) => state.books);
 
   useEffect(() => {
-    dispatch(fetchBooks({ limit: 8 }));
+    dispatch(fetchStatsBooks());
   }, [dispatch]);
 
-  const featuredBooks = books.filter((book) => book.featured).slice(0, 4);
-  const bestsellers = books.filter((book) => book.bestseller).slice(0, 4);
-  const newArrivals = books.filter((book) => book.newArrival).slice(0, 4);
+  const featuredBooks = useMemo(() => stats.featured, [stats]);
+  const bestsellers = useMemo(() => stats.bestsellers, [stats]);
+  const newArrivals = useMemo(() => stats.newArrivals, [stats]);
 
   return (
     <div className="min-h-screen bg-white">

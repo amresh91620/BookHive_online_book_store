@@ -54,6 +54,7 @@ export default function BookCard({ book }) {
           <img
             src={book.coverImage}
             alt={book.title}
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
           />
           

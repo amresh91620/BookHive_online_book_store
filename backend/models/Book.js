@@ -19,14 +19,14 @@ const bookSchema = new mongoose.Schema(
       sparse: true,
       trim: true,
     },
-    
+
     // ============ DESCRIPTION ============
     description: {
       type: String,
       required: true,
       trim: true,
     },
-    
+
     // ============ PRICING ============
     price: {
       type: Number,
@@ -43,7 +43,7 @@ const bookSchema = new mongoose.Schema(
       min: 0,
       max: 100,
     },
-    
+
     // ============ PHYSICAL DETAILS ============
     pages: {
       type: Number,
@@ -59,7 +59,7 @@ const bookSchema = new mongoose.Schema(
       enum: ['Hardcover', 'Paperback', 'eBook', 'Audiobook'],
       default: 'Paperback',
     },
-    
+
     // ============ PUBLICATION INFO ============
     publisher: {
       type: String,
@@ -72,7 +72,7 @@ const bookSchema = new mongoose.Schema(
     edition: {
       type: String,
     },
-    
+
     // ============ CATEGORIZATION ============
     categories: {
       type: String,
@@ -84,13 +84,13 @@ const bookSchema = new mongoose.Schema(
     tags: {
       type: [String],
     },
-    
+
     // ============ IMAGES ============
     coverImage: {
       type: String,
       required: true,
     },
-    
+
     // ============ INVENTORY ============
     stock: {
       type: Number,
@@ -98,7 +98,7 @@ const bookSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
-    
+
     // ============ RATINGS & REVIEWS ============
     rating: {
       type: Number,
@@ -110,7 +110,7 @@ const bookSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    
+
     // ============ STATUS ============
     status: {
       type: String,
@@ -129,13 +129,13 @@ const bookSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    
+
     // ============ ADDITIONAL INFO ============
     ageGroup: {
       type: String,
       enum: ['Children', 'Young Adult', 'Adult', 'All Ages'],
     },
-    
+
     // ============ SALES DATA ============
     totalSales: {
       type: Number,
@@ -149,8 +149,15 @@ const bookSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Performance Indexes
+bookSchema.index({ categories: 1 });
+bookSchema.index({ featured: 1 });
+bookSchema.index({ bestseller: 1 });
+bookSchema.index({ newArrival: 1 });
+bookSchema.index({ title: "text", author: "text" }); // For optimized text search (optional, but good for large datasets)
+
 // Auto-calculate discount percentage
-bookSchema.pre('save', function(next) {
+bookSchema.pre('save', function (next) {
   if (this.originalPrice && this.price < this.originalPrice) {
     this.discount = Math.round(((this.originalPrice - this.price) / this.originalPrice) * 100);
   }

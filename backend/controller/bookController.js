@@ -240,3 +240,24 @@ exports.deleteBook = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+/**
+ * ✅ Get Optimized Book Stats (Featured, bestseller, newArrival)
+ * Added for frontend optimization to avoid filtering large collections in the browser
+ */
+exports.getStatsBooks = async (req, res) => {
+  try {
+    const featured = await Book.find({ featured: true }).limit(4).select("-description -__v");
+    const bestsellers = await Book.find({ bestseller: true }).limit(4).select("-description -__v");
+    const newArrivals = await Book.find({ newArrival: true }).limit(4).select("-description -__v");
+
+    res.status(200).json({
+      featured,
+      bestsellers,
+      newArrivals
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};

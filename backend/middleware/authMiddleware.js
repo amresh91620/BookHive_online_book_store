@@ -21,9 +21,9 @@ module.exports = async (req, res, next) => {
     }
 
     req.user = {
-      _id: decoded.id,
-      id: decoded.id,
-      role: user.role || decoded.role,
+      _id: user._id,
+      id: user._id,
+      role: user.role,
       isBlocked: user.isBlocked,
     };
 
@@ -33,3 +33,4 @@ module.exports = async (req, res, next) => {
     res.status(401).json({ msg: "Invalid token" });
   }
 };
+

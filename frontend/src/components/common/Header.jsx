@@ -121,9 +121,7 @@ export default function Header() {
               <NavLink to="/" end className={({ isActive }) => getDesktopNavClass(isActive)}>
                 Home
               </NavLink>
-              <NavLink to="/about" className={({ isActive }) => getDesktopNavClass(isActive)}>
-                About
-              </NavLink>
+
               <Link to="/books" className={getDesktopNavClass(isBooksActive)}>
                 Books
               </Link>
@@ -133,6 +131,9 @@ export default function Header() {
               >
                 New Release
               </Link>
+              <NavLink to="/about" className={({ isActive }) => getDesktopNavClass(isActive)}>
+                About
+              </NavLink>
               <NavLink to="/contact" className={({ isActive }) => getDesktopNavClass(isActive)}>
                 Contact
               </NavLink>

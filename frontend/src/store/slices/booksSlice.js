@@ -1,4 +1,4 @@
-﻿import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "@/services/api";
 import { endpoints } from "@/services/endpoints";
 
@@ -13,6 +13,18 @@ export const fetchBooks = createAsyncThunk(
   async (params, { rejectWithValue }) => {
     try {
       const { data } = await api.get(endpoints.books.list, { params });
+      return data;
+    } catch (error) {
+      return rejectWithValue(extractError(error));
+    }
+  }
+);
+
+export const fetchStatsBooks = createAsyncThunk(
+  "books/fetchStatsBooks",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await api.get(endpoints.books.stats);
       return data;
     } catch (error) {
       return rejectWithValue(extractError(error));
@@ -107,6 +119,11 @@ const booksSlice = createSlice({
     total: 0,
     selected: null,
     categories: [],
+    stats: {
+      featured: [],
+      bestsellers: [],
+      newArrivals: [],
+    },
     status: "idle",
     error: null,
   },
@@ -129,6 +146,13 @@ const booksSlice = createSlice({
       .addCase(fetchBooks.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
+      })
+      .addCase(fetchStatsBooks.fulfilled, (state, action) => {
+        state.stats = {
+          featured: action.payload.featured || [],
+          bestsellers: action.payload.bestsellers || [],
+          newArrivals: action.payload.newArrivals || [],
+        };
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.categories = action.payload;

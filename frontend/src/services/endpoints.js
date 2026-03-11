@@ -1,4 +1,4 @@
-﻿export const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+export const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export const endpoints = {
   auth: {
@@ -14,6 +14,7 @@ export const endpoints = {
   books: {
     list: "/api/books",
     categories: "/api/books/categories",
+    stats: "/api/books/stats-books",
     detail: (id) => `/api/books/${id}`,
     create: "/api/books",
     update: (id) => `/api/books/${id}`,

@@ -12,6 +12,7 @@ const {
   updateBook,
   deleteBook,
   getCategories,
+  getStatsBooks,
 } = require("../controller/bookController");
 
 // Configure Cloudinary storage for multer
@@ -28,6 +29,7 @@ const upload = multer({ storage });
 
 // Public routes
 router.get("/categories", getCategories);
+router.get("/stats-books", getStatsBooks);
 router.get("/", getAllBooks);
 router.get("/:id", getBookById);
 

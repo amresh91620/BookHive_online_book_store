@@ -1,9 +1,8 @@
-﻿import { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AppRoutes from "@/routes/AppRoutes.jsx";
 import { fetchCart } from "@/store/slices/cartSlice";
 import { fetchWishlist } from "@/store/slices/wishlistSlice";
-import { Toaster } from "react-hot-toast";
 
 function App() {
   const dispatch = useDispatch();
@@ -27,7 +26,6 @@ function App() {
   return (
     <>
       <AppRoutes />
-      <Toaster position="top-right" />
     </>
   );
 }

@@ -2,33 +2,34 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import MainLayout from "@/layouts/MainLayout";
 import AdminLayout from "@/layouts/AdminLayout";
-import HomePage from "@/pages/HomePage";
-import BooksPage from "@/pages/BooksPage";
-import BookDetailPage from "@/pages/BookDetailPage";
-import CartPage from "@/pages/CartPage";
-import WishlistPage from "@/pages/WishlistPage";
-import CheckoutPage from "@/pages/CheckoutPage";
-import OrdersPage from "@/pages/OrdersPage";
-import OrderDetailPage from "@/pages/OrderDetailPage";
-import ProfilePage from "@/pages/ProfilePage";
-import LoginPage from "@/pages/auth/LoginPage";
-import RegisterPage from "@/pages/auth/RegisterPage";
-import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
-import AdminBooksPage from "@/pages/admin/AdminBooksPage";
-import AdminBookFormPage from "@/pages/admin/AdminBookFormPage";
-import AdminUsersPage from "@/pages/admin/AdminUsersPage";
-import AdminOrdersPage from "@/pages/admin/AdminOrdersPage";
-import AdminOrderDetailPage from "@/pages/admin/AdminOrderDetailPage";
-import AdminReviewsPage from "@/pages/admin/AdminReviewsPage";
-import AdminMessagesPage from "@/pages/admin/AdminMessagesPage";
-import ContactPage from "@/pages/ContactPage";
-import AboutPage from "@/pages/AboutPage";
-import FAQPage from "@/pages/FAQPage";
-import PrivacyPolicyPage from "@/pages/PrivacyPolicyPage";
-import TermsPage from "@/pages/TermsPage";
-import NotFoundPage from "@/pages/NotFoundPage";
-import AuthTestPage from "@/pages/AuthTestPage";
+import { lazy, Suspense } from "react";
+const HomePage = lazy(() => import("@/pages/HomePage"));
+const BooksPage = lazy(() => import("@/pages/BooksPage"));
+const BookDetailPage = lazy(() => import("@/pages/BookDetailPage"));
+const CartPage = lazy(() => import("@/pages/CartPage"));
+const WishlistPage = lazy(() => import("@/pages/WishlistPage"));
+const CheckoutPage = lazy(() => import("@/pages/CheckoutPage"));
+const OrdersPage = lazy(() => import("@/pages/OrdersPage"));
+const OrderDetailPage = lazy(() => import("@/pages/OrderDetailPage"));
+const ProfilePage = lazy(() => import("@/pages/ProfilePage"));
+const LoginPage = lazy(() => import("@/pages/auth/LoginPage"));
+const RegisterPage = lazy(() => import("@/pages/auth/RegisterPage"));
+const ForgotPasswordPage = lazy(() => import("@/pages/auth/ForgotPasswordPage"));
+const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
+const AdminBooksPage = lazy(() => import("@/pages/admin/AdminBooksPage"));
+const AdminBookFormPage = lazy(() => import("@/pages/admin/AdminBookFormPage"));
+const AdminUsersPage = lazy(() => import("@/pages/admin/AdminUsersPage"));
+const AdminOrdersPage = lazy(() => import("@/pages/admin/AdminOrdersPage"));
+const AdminOrderDetailPage = lazy(() => import("@/pages/admin/AdminOrderDetailPage"));
+const AdminReviewsPage = lazy(() => import("@/pages/admin/AdminReviewsPage"));
+const AdminMessagesPage = lazy(() => import("@/pages/admin/AdminMessagesPage"));
+const ContactPage = lazy(() => import("@/pages/ContactPage"));
+const AboutPage = lazy(() => import("@/pages/AboutPage"));
+const FAQPage = lazy(() => import("@/pages/FAQPage"));
+const PrivacyPolicyPage = lazy(() => import("@/pages/PrivacyPolicyPage"));
+const TermsPage = lazy(() => import("@/pages/TermsPage"));
+const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
+const AuthTestPage = lazy(() => import("@/pages/AuthTestPage"));
 
 // Protected Route Component
 function ProtectedRoute({ children, adminOnly = false }) {
@@ -58,6 +59,11 @@ function PublicRoute({ children }) {
 
 export default function AppRoutes() {
   return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+      </div>
+    }>
     <Routes>
       <Route element={<MainLayout />}>
         {/* Public Routes */}
@@ -227,5 +233,6 @@ export default function AppRoutes() {
         />
       </Route>
     </Routes>
+    </Suspense>
   );
 }
