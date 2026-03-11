@@ -11,6 +11,7 @@ import ReviewSection from "@/components/common/ReviewSection";
 import { Heart, ShoppingCart, Star, BookOpen, Calendar, Globe, Package } from "lucide-react";
 import { formatPrice, shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BookDetailPage() {
   const { id } = useParams();
@@ -61,8 +62,56 @@ export default function BookDetailPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container-shell">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Image Skeleton */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-sm p-6 sticky top-20">
+                <Skeleton className="aspect-[3/4] w-full rounded-lg mb-4" />
+                <div className="space-y-3">
+                  <Skeleton className="h-12 w-full rounded-md" />
+                  <Skeleton className="h-12 w-full rounded-md" />
+                </div>
+              </div>
+            </div>
+
+            {/* Content Skeleton */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <div className="space-y-4 mb-8">
+                  <div className="flex gap-2">
+                    <Skeleton className="h-6 w-20" />
+                    <Skeleton className="h-6 w-20" />
+                  </div>
+                  <Skeleton className="h-10 w-3/4" />
+                  <Skeleton className="h-6 w-1/4" />
+                </div>
+
+                <div className="flex gap-2 mb-8">
+                  {[...Array(5)].map((_, i) => (
+                    <Skeleton key={i} className="h-5 w-5 rounded-full" />
+                  ))}
+                  <Skeleton className="h-6 w-16" />
+                </div>
+
+                <Skeleton className="h-24 w-full mb-8" />
+
+                <div className="grid grid-cols-2 gap-6 mb-8">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="flex gap-3">
+                      <Skeleton className="h-12 w-12 rounded-lg" />
+                      <div className="space-y-2 flex-1">
+                        <Skeleton className="h-4 w-1/2" />
+                        <Skeleton className="h-4 w-3/4" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

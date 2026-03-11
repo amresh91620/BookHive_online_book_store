@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { fetchBooks, fetchCategories } from "@/store/slices/booksSlice";
 import BookCard from "@/components/common/BookCard";
+import BookSkeleton from "@/components/common/BookSkeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
@@ -186,8 +187,10 @@ export default function BooksPage() {
 
         {/* Loading State */}
         {status === "loading" && (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+            {[...Array(8)].map((_, i) => (
+              <BookSkeleton key={i} />
+            ))}
           </div>
         )}
 

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { fetchStatsBooks } from "@/store/slices/booksSlice";
 import BookCard from "@/components/common/BookCard";
+import BookSkeleton from "@/components/common/BookSkeleton";
 import HeroCarousel from "@/components/home/HeroCarousel";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, Truck, ShieldCheck, Zap, Sparkles } from "lucide-react";
@@ -24,7 +25,25 @@ export default function HomePage() {
       <HeroCarousel />
 
       {/* Featured Books */}
-      {featuredBooks.length > 0 && (
+      {status === "loading" ? (
+        <section className="py-10 sm:py-12 lg:py-16 bg-[#F9FAFB]">
+          <div className="container-shell">
+            <div className="flex items-center gap-2 mb-8">
+              <Sparkles className="w-6 h-6 text-gray-200 animate-pulse" />
+              <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, i) => (
+                <BookSkeleton key={i} />
+              ))}
+            </div>
+            {/* Friendly message for cold starts */}
+            <p className="mt-8 text-center text-sm text-gray-400 italic">
+              Our servers are waking up, please wait a moment...
+            </p>
+          </div>
+        </section>
+      ) : featuredBooks.length > 0 && (
         <section className="py-10 sm:py-12 lg:py-16 bg-[#F9FAFB]">
           <div className="container-shell">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-3 sm:gap-0">
@@ -46,7 +65,21 @@ export default function HomePage() {
       )}
 
       {/* Bestsellers - Classic Design */}
-      {bestsellers.length > 0 && (
+      {status === "loading" ? (
+        <section className="py-12 bg-white">
+          <div className="container-shell">
+            <div className="flex flex-col items-center mb-12">
+              <div className="h-10 w-64 bg-gray-100 rounded animate-pulse mb-4"></div>
+              <div className="h-4 w-96 bg-gray-50 rounded animate-pulse"></div>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+              {[...Array(4)].map((_, i) => (
+                <BookSkeleton key={i} />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : bestsellers.length > 0 && (
         <section className="py-12 sm:py-16 lg:py-20 bg-[#FAF9F6] border-y border-[#E5E5E5] relative">
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2378350f' fill-opacity='1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E")`}}></div>
           <div className="container-shell relative z-10">
@@ -84,7 +117,7 @@ export default function HomePage() {
       )}
 
       {/* New Arrivals */}
-      {newArrivals.length > 0 && (
+      {status === "loading" ? null : newArrivals.length > 0 && (
         <section className="py-10 sm:py-12 lg:py-16 bg-[#F9FAFB]">
           <div className="container-shell">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-3 sm:gap-0">
