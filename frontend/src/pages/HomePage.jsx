@@ -121,7 +121,7 @@ export default function HomePage() {
                 <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-[#F59E0B]" />
                 <h2 className="text-2xl sm:text-3xl font-bold text-[#1F2937]">New Arrivals</h2>
               </div>
-              <Link to="/books?filter=newArrival">
+              <Link to="/new-arrivals">
                 <Button variant="ghost" size="sm" className="text-sm sm:text-base text-[#F59E0B] hover:text-[#D97706] hover:bg-[#FEF3C7]">View All</Button>
               </Link>
             </div>

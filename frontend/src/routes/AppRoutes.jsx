@@ -1,10 +1,11 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import MainLayout from "@/layouts/MainLayout";
 import AdminLayout from "@/layouts/AdminLayout";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 const HomePage = lazy(() => import("@/pages/HomePage"));
 const BooksPage = lazy(() => import("@/pages/BooksPage"));
+const NewArrivalsPage = lazy(() => import("@/pages/NewArrivalsPage"));
 const BookDetailPage = lazy(() => import("@/pages/BookDetailPage"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
 const WishlistPage = lazy(() => import("@/pages/WishlistPage"));
@@ -58,6 +59,13 @@ function PublicRoute({ children }) {
 }
 
 export default function AppRoutes() {
+  const location = useLocation();
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
@@ -69,6 +77,7 @@ export default function AppRoutes() {
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/books" element={<BooksPage />} />
+        <Route path="/new-arrivals" element={<NewArrivalsPage />} />
         <Route path="/books/:id" element={<BookDetailPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/about" element={<AboutPage />} />

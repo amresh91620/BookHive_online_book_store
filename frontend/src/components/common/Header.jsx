@@ -43,8 +43,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const queryFilter = new URLSearchParams(location.search).get("filter");
-  const isNewReleaseActive =
-    location.pathname === "/books" && queryFilter === "newArrival";
+  const isNewReleaseActive = location.pathname === "/new-arrivals";
   const isBooksActive =
     location.pathname.startsWith("/books") && !isNewReleaseActive;
 
@@ -128,7 +127,7 @@ export default function Header() {
                 Books
               </Link>
               <Link
-                to="/books?filter=newArrival"
+                to="/new-arrivals"
                 className={getDesktopNavClass(isNewReleaseActive)}
               >
                 New Release
@@ -250,7 +249,7 @@ export default function Header() {
                 Books
               </Link>
               <Link
-                to="/books?filter=newArrival"
+                to="/new-arrivals"
                 className={getMobileNavClass(isNewReleaseActive)}
                 onClick={() => setMobileMenuOpen(false)}
               >

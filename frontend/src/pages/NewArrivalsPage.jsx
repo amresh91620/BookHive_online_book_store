@@ -7,16 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, X } from "lucide-react";
+import { Search, Filter, X, Sparkles } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 
 const ITEMS_PER_PAGE = 12;
 
-export default function BooksPage() {
+export default function NewArrivalsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
-  const [statusFilter, setStatusFilter] = useState(searchParams.get("filter") || "");
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
   const [showFilters, setShowFilters] = useState(false);
 
@@ -26,10 +25,10 @@ export default function BooksPage() {
   const params = {
     limit: ITEMS_PER_PAGE,
     offset: (currentPage - 1) * ITEMS_PER_PAGE,
+    status: "newArrival", // Always filter for new arrivals
   };
   if (debouncedSearch) params.q = debouncedSearch;
   if (category) params.category = category;
-  if (statusFilter) params.status = statusFilter;
 
   const { data: booksData, isLoading } = useBooksList(params);
   const { data: categories = [] } = useBookCategories();
@@ -44,7 +43,6 @@ export default function BooksPage() {
     const params = { page: "1" };
     if (searchQuery) params.q = searchQuery;
     if (category) params.category = category;
-    if (statusFilter) params.filter = statusFilter;
     setSearchParams(params);
   };
 
@@ -54,14 +52,12 @@ export default function BooksPage() {
     const params = { page: "1" };
     if (searchQuery) params.q = searchQuery;
     if (newCategory) params.category = newCategory;
-    if (statusFilter) params.filter = statusFilter;
     setSearchParams(params);
   };
 
   const handleClearFilters = () => {
     setSearchQuery("");
     setCategory("");
-    setStatusFilter("");
     setCurrentPage(1);
     setSearchParams({});
   };
@@ -71,24 +67,21 @@ export default function BooksPage() {
     const params = { page: page.toString() };
     if (searchQuery) params.q = searchQuery;
     if (category) params.category = category;
-    if (statusFilter) params.filter = statusFilter;
     setSearchParams(params);
   };
 
-  const hasActiveFilters = searchQuery || category || statusFilter;
+  const hasActiveFilters = searchQuery || category;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container-shell py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {statusFilter === 'newArrival' ? 'New Arrivals' : 
-             statusFilter === 'bestseller' ? 'Best Sellers' : 
-             statusFilter === 'featured' ? 'Featured Books' : 'Explore Books'}
-          </h1>
+          <div className="flex items-center gap-3 mb-4">
+            <h1 className="text-4xl font-bold text-gray-900">New Arrivals</h1>
+          </div>
           <p className="text-gray-600">
-            Discover from our collection of {totalBooks} books
+            Discover from our collection of {totalBooks} new books
           </p>
         </div>
 
@@ -165,22 +158,6 @@ export default function BooksPage() {
                   />
                 </Badge>
               )}
-              {statusFilter && (
-                <Badge variant="secondary" className="px-3 py-1 bg-amber-100 text-amber-900 border-amber-200">
-                  Type: {statusFilter === 'newArrival' ? 'New Arrival' : statusFilter}
-                  <X
-                    className="w-3 h-3 ml-2 cursor-pointer"
-                    onClick={() => {
-                      setStatusFilter("");
-                      setCurrentPage(1);
-                      const params = { page: "1" };
-                      if (searchQuery) params.q = searchQuery;
-                      if (category) params.category = category;
-                      setSearchParams(params);
-                    }}
-                  />
-                </Badge>
-              )}
             </div>
           )}
 
@@ -242,7 +219,7 @@ export default function BooksPage() {
         {/* No Results */}
         {!isLoading && books.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-gray-500 text-lg mb-4">No books found</p>
+            <p className="text-gray-500 text-lg mb-4">No new arrivals found</p>
             {hasActiveFilters && (
               <Button onClick={handleClearFilters}>Clear Filters</Button>
             )}
