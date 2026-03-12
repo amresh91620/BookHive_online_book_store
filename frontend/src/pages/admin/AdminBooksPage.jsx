@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchBooks, deleteBook } from "@/store/slices/booksSlice";
+import { useBooksList, useDeleteBook } from "@/hooks/api/useBooks";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,36 +13,29 @@ import toast from "react-hot-toast";
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminBooksPage() {
-  const dispatch = useDispatch();
-  const { items: books, status, total } = useSelector((state) => state.books);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    const params = {
-      limit: ITEMS_PER_PAGE,
-      offset: (currentPage - 1) * ITEMS_PER_PAGE,
-    };
-    if (searchQuery) {
-      params.q = searchQuery;
-    }
-    dispatch(fetchBooks(params));
-  }, [dispatch, currentPage, searchQuery]);
+  const params = {
+    limit: ITEMS_PER_PAGE,
+    offset: (currentPage - 1) * ITEMS_PER_PAGE,
+  };
+  if (searchQuery) {
+    params.q = searchQuery;
+  }
+
+  const { data: booksData, isLoading } = useBooksList(params);
+  const deleteBook = useDeleteBook();
+
+  const books = booksData?.books || booksData?.items || [];
+  const total = booksData?.totalBooks || booksData?.total || 0;
 
   const handleDelete = (bookId) => {
     if (window.confirm("Are you sure you want to delete this book?")) {
-      dispatch(deleteBook(bookId))
-        .unwrap()
-        .then(() => {
-          toast.success("Book deleted successfully");
-          // Refresh the current page
-          dispatch(fetchBooks({
-            limit: ITEMS_PER_PAGE,
-            offset: (currentPage - 1) * ITEMS_PER_PAGE,
-            q: searchQuery || undefined,
-          }));
-        })
-        .catch((err) => toast.error(err));
+      deleteBook.mutate(bookId, {
+        onSuccess: () => toast.success("Book deleted successfully"),
+        onError: (err) => toast.error(err?.response?.data?.msg || "Failed to delete book"),
+      });
     }
   };
 
@@ -90,10 +83,8 @@ export default function AdminBooksPage() {
         </div>
 
         {/* Books Table */}
-        {status === "loading" ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
-          </div>
+        {isLoading ? (
+          <LoadingSkeleton type="table" count={1} />
         ) : (
           <Card>
             <div className="overflow-x-auto">

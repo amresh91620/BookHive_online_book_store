@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { fetchBooks, fetchCategories } from "@/store/slices/booksSlice";
+import { useBooksList, useBookCategories } from "@/hooks/api/useBooks";
 import BookCard from "@/components/common/BookCard";
 import BookSkeleton from "@/components/common/BookSkeleton";
 import { Input } from "@/components/ui/input";
@@ -9,12 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, X } from "lucide-react";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const ITEMS_PER_PAGE = 12;
 
 export default function BooksPage() {
-  const dispatch = useDispatch();
-  const { items: books, status, total: totalBooks, categories } = useSelector((state) => state.books);
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
@@ -22,23 +20,23 @@ export default function BooksPage() {
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
   const [showFilters, setShowFilters] = useState(false);
 
+  // Debounce search query to reduce API calls
+  const debouncedSearch = useDebounce(searchQuery, 500);
+
+  const params = {
+    limit: ITEMS_PER_PAGE,
+    offset: (currentPage - 1) * ITEMS_PER_PAGE,
+  };
+  if (debouncedSearch) params.q = debouncedSearch;
+  if (category) params.category = category;
+  if (statusFilter) params.status = statusFilter;
+
+  const { data: booksData, isLoading } = useBooksList(params);
+  const { data: categories = [] } = useBookCategories();
+
+  const books = booksData?.books || booksData?.items || [];
+  const totalBooks = booksData?.totalBooks || booksData?.total || books.length;
   const totalPages = Math.ceil(totalBooks / ITEMS_PER_PAGE);
-
-  // Fetch categories on mount
-  useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
-
-  useEffect(() => {
-    const params = {
-      limit: ITEMS_PER_PAGE,
-      offset: (currentPage - 1) * ITEMS_PER_PAGE,
-    };
-    if (searchQuery) params.q = searchQuery;
-    if (category) params.category = category;
-    if (statusFilter) params.status = statusFilter;
-    dispatch(fetchBooks(params));
-  }, [dispatch, searchQuery, category, statusFilter, currentPage]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -212,7 +210,7 @@ export default function BooksPage() {
         </div>
 
         {/* Loading State */}
-        {status === "loading" && (
+        {isLoading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
             {[...Array(8)].map((_, i) => (
               <BookSkeleton key={i} />
@@ -221,7 +219,7 @@ export default function BooksPage() {
         )}
 
         {/* Books Grid */}
-        {status !== "loading" && books.length > 0 && (
+        {!isLoading && books.length > 0 && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
               {books.map((book) => (
@@ -243,7 +241,7 @@ export default function BooksPage() {
         )}
 
         {/* No Results */}
-        {status !== "loading" && books.length === 0 && (
+        {!isLoading && books.length === 0 && (
           <div className="text-center py-20">
             <p className="text-gray-500 text-lg mb-4">No books found</p>
             {hasActiveFilters && (

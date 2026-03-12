@@ -7,23 +7,27 @@ export default function AuthTestPage() {
   const { user, token } = useSelector((state) => state.auth);
 
   const checkAuth = () => {
-    console.log("=== AUTH CHECK ===");
-    console.log("Redux State - User:", user);
-    console.log("Redux State - Token:", token);
-    
-    const stored = loadAuth();
-    console.log("LocalStorage - User:", stored.user);
-    console.log("LocalStorage - Token:", stored.token);
-    
-    const tokenFromGetter = getToken();
-    console.log("getToken() result:", tokenFromGetter);
-    
-    console.log("=== END CHECK ===");
+    if (import.meta.env.DEV) {
+      console.log("=== AUTH CHECK ===");
+      console.log("Redux State - User:", user);
+      console.log("Redux State - Token:", token);
+      
+      const stored = loadAuth();
+      console.log("LocalStorage - User:", stored.user);
+      console.log("LocalStorage - Token:", stored.token);
+      
+      const tokenFromGetter = getToken();
+      console.log("getToken() result:", tokenFromGetter);
+      
+      console.log("=== END CHECK ===");
+    }
   };
 
   const clearStorage = () => {
     localStorage.clear();
-    console.log("Storage cleared");
+    if (import.meta.env.DEV) {
+      console.log("Storage cleared");
+    }
     window.location.reload();
   };
 

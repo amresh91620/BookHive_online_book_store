@@ -16,8 +16,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useAdminOrderNotifications } from "@/hooks/useAdminOrderNotifications";
 
 export default function AdminLayout() {
   const location = useLocation();
@@ -25,6 +27,9 @@ export default function AdminLayout() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Enable order notifications
+  const { pendingOrdersCount } = useAdminOrderNotifications();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -104,13 +109,15 @@ export default function AdminLayout() {
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
+              const showBadge = item.path === "/admin/orders" && pendingOrdersCount > 0;
+              
               return (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setSidebarOpen(false)}
                   className={`
-                    flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+                    flex items-center gap-3 px-4 py-3 rounded-lg transition-colors relative
                     ${
                       active
                         ? "bg-amber-50 text-amber-700 font-medium"
@@ -119,7 +126,15 @@ export default function AdminLayout() {
                   `}
                 >
                   <Icon className="w-5 h-5" />
-                  <span>{item.label}</span>
+                  <span className="flex-1">{item.label}</span>
+                  {showBadge && (
+                    <Badge 
+                      variant="destructive" 
+                      className="ml-auto min-w-[20px] h-5 flex items-center justify-center px-1.5"
+                    >
+                      {pendingOrdersCount}
+                    </Badge>
+                  )}
                 </Link>
               );
             })}

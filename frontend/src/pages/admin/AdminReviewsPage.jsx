@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAdminReviews, deleteAdminReview } from "@/store/slices/adminSlice";
+import { useState } from "react";
+import { useAdminReviews, useDeleteAdminReview } from "@/hooks/api/useAdmin";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,27 +12,25 @@ import { shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
 
 export default function AdminReviewsPage() {
-  const dispatch = useDispatch();
-  const { reviews = [], status } = useSelector((state) => state.admin);
   const [searchQuery, setSearchQuery] = useState("");
   const [ratingFilter, setRatingFilter] = useState("");
   const [deleteDialog, setDeleteDialog] = useState({ open: false, reviewId: null });
+  
+  const { data: reviewsData, isLoading } = useAdminReviews();
+  const deleteReview = useDeleteAdminReview();
 
-  useEffect(() => {
-    dispatch(fetchAdminReviews());
-  }, [dispatch]);
+  const reviews = reviewsData?.reviews || [];
 
   const handleDelete = async () => {
     if (!deleteDialog.reviewId) return;
     
-    try {
-      await dispatch(deleteAdminReview(deleteDialog.reviewId)).unwrap();
-      toast.success("Review deleted successfully");
-      setDeleteDialog({ open: false, reviewId: null });
-      dispatch(fetchAdminReviews());
-    } catch (error) {
-      toast.error(error || "Failed to delete review");
-    }
+    deleteReview.mutate(deleteDialog.reviewId, {
+      onSuccess: () => {
+        toast.success("Review deleted successfully");
+        setDeleteDialog({ open: false, reviewId: null });
+      },
+      onError: (error) => toast.error(error?.response?.data?.msg || "Failed to delete review"),
+    });
   };
 
   const filteredReviews = Array.isArray(reviews) ? reviews.filter((review) => {
@@ -107,10 +105,8 @@ export default function AdminReviewsPage() {
       </div>
 
       {/* Reviews List */}
-      {status === "loading" ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
-        </div>
+      {isLoading ? (
+        <LoadingSkeleton type="list" count={5} />
       ) : filteredReviews.length === 0 ? (
         <Card className="p-12 text-center">
           <p className="text-gray-500">No reviews found</p>

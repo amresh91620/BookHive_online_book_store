@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { updateProfile, fetchProfile, changePassword } from "@/store/slices/authSlice";
-import { fetchAddresses, addAddress, updateAddress, deleteAddress } from "@/store/slices/addressSlice";
-import { fetchOrders } from "@/store/slices/ordersSlice";
+import { useUpdateProfile, useChangePassword } from "@/hooks/api/useProfile";
+import { useAddresses, useAddAddress, useUpdateAddress, useDeleteAddress } from "@/hooks/api/useAddress";
+import { useOrders } from "@/hooks/api/useOrders";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,12 +32,16 @@ import toast from "react-hot-toast";
 import { formatPrice, shortDate } from "@/utils/format";
 
 export default function ProfilePage() {
-  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { addresses } = useSelector((state) => state.address);
-  const { orders } = useSelector((state) => state.orders);
+  const { data: addresses = [] } = useAddresses();
+  const { data: orders = [] } = useOrders();
+  const updateProfile = useUpdateProfile();
+  const changePasswordMutation = useChangePassword();
+  const addAddress = useAddAddress();
+  const updateAddress = useUpdateAddress();
+  const deleteAddress = useDeleteAddress();
+  
   const [activeTab, setActiveTab] = useState("profile");
-  const hasFetched = useRef(false);
 
   const [profileForm, setProfileForm] = useState({
     name: user?.name || "",
@@ -67,16 +71,6 @@ export default function ProfilePage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
-    // Only fetch once if user exists and has a token
-    if (user && user.id && !hasFetched.current) {
-      hasFetched.current = true;
-      dispatch(fetchProfile());
-      dispatch(fetchAddresses());
-      dispatch(fetchOrders());
-    }
-  }, [dispatch, user]);
-
-  useEffect(() => {
     if (user) {
       setProfileForm({
         name: user.name || "",
@@ -91,12 +85,10 @@ export default function ProfilePage() {
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await dispatch(updateProfile(profileForm)).unwrap();
-      toast.success("Profile updated successfully");
-    } catch (error) {
-      toast.error(error);
-    }
+    updateProfile.mutate(profileForm, {
+      onSuccess: () => toast.success("Profile updated successfully"),
+      onError: (error) => toast.error(error?.response?.data?.msg || "Failed to update profile"),
+    });
   };
 
   const handleAddressChange = (e) => {
@@ -105,26 +97,42 @@ export default function ProfilePage() {
 
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
-    try {
-      if (editingAddress) {
-        await dispatch(updateAddress({ id: editingAddress, addressData: addressForm })).unwrap();
-        toast.success("Address updated successfully");
-      } else {
-        await dispatch(addAddress(addressForm)).unwrap();
-        toast.success("Address added successfully");
-      }
-      setShowAddressForm(false);
-      setEditingAddress(null);
-      setAddressForm({
-        fullName: "",
-        phone: "",
-        street: "",
-        city: "",
-        state: "",
-        pincode: "",
+    if (editingAddress) {
+      updateAddress.mutate(
+        { id: editingAddress, addressData: addressForm },
+        {
+          onSuccess: () => {
+            toast.success("Address updated successfully");
+            setShowAddressForm(false);
+            setEditingAddress(null);
+            setAddressForm({
+              fullName: "",
+              phone: "",
+              street: "",
+              city: "",
+              state: "",
+              pincode: "",
+            });
+          },
+          onError: (error) => toast.error(error?.response?.data?.msg || "Failed to update address"),
+        }
+      );
+    } else {
+      addAddress.mutate(addressForm, {
+        onSuccess: () => {
+          toast.success("Address added successfully");
+          setShowAddressForm(false);
+          setAddressForm({
+            fullName: "",
+            phone: "",
+            street: "",
+            city: "",
+            state: "",
+            pincode: "",
+          });
+        },
+        onError: (error) => toast.error(error?.response?.data?.msg || "Failed to add address"),
       });
-    } catch (error) {
-      toast.error(error);
     }
   };
 
@@ -144,13 +152,13 @@ export default function ProfilePage() {
   const handleDeleteAddress = async () => {
     if (!deleteDialog.addressId) return;
     
-    try {
-      await dispatch(deleteAddress(deleteDialog.addressId)).unwrap();
-      toast.success("Address deleted successfully");
-      setDeleteDialog({ open: false, addressId: null });
-    } catch (error) {
-      toast.error(error);
-    }
+    deleteAddress.mutate(deleteDialog.addressId, {
+      onSuccess: () => {
+        toast.success("Address deleted successfully");
+        setDeleteDialog({ open: false, addressId: null });
+      },
+      onError: (error) => toast.error(error?.response?.data?.msg || "Failed to delete address"),
+    });
   };
 
   const handlePasswordChange = (e) => {
@@ -170,18 +178,18 @@ export default function ProfilePage() {
       return;
     }
 
-    try {
-      await dispatch(changePassword(passwordForm)).unwrap();
-      toast.success("Password changed successfully");
-      setShowPasswordForm(false);
-      setPasswordForm({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    } catch (error) {
-      toast.error(error);
-    }
+    changePasswordMutation.mutate(passwordForm, {
+      onSuccess: () => {
+        toast.success("Password changed successfully");
+        setShowPasswordForm(false);
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      },
+      onError: (error) => toast.error(error?.response?.data?.msg || "Failed to change password"),
+    });
   };
 
   return (

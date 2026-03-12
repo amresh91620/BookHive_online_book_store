@@ -1,7 +1,6 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { fetchCart, removeFromCart, updateCartQuantity } from "@/store/slices/cartSlice";
+import { useCart, useRemoveFromCart, useUpdateCartQuantity } from "@/hooks/api/useCart";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
@@ -9,37 +8,49 @@ import { formatPrice } from "@/utils/format";
 import toast from "react-hot-toast";
 
 export default function CartPage() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { items, status } = useSelector((state) => state.cart);
+  const { data: cartData, isLoading } = useCart();
+  const removeFromCart = useRemoveFromCart();
+  const updateCartQuantity = useUpdateCartQuantity();
 
-  useEffect(() => {
-    dispatch(fetchCart());
-  }, [dispatch]);
+  const items = cartData?.items || [];
 
   const handleRemove = (itemId) => {
-    dispatch(removeFromCart(itemId))
-      .unwrap()
-      .then(() => toast.success("Item removed from cart"))
-      .catch((err) => toast.error(err));
+    removeFromCart.mutate(itemId, {
+      onSuccess: () => toast.success("Item removed from cart"),
+      onError: (err) => toast.error(err?.response?.data?.msg || "Failed to remove item"),
+    });
   };
 
   const handleUpdateQuantity = (itemId, currentQty, change) => {
     const newQty = currentQty + change;
     if (newQty < 1) return;
-    dispatch(updateCartQuantity({ itemId, quantity: newQty }))
-      .unwrap()
-      .catch((err) => toast.error(err));
+    updateCartQuantity.mutate(
+      { itemId, quantity: newQty },
+      {
+        onError: (err) => toast.error(err?.response?.data?.msg || "Failed to update quantity"),
+      }
+    );
   };
 
   const subtotal = items.reduce((sum, item) => sum + (item.book?.price || 0) * item.quantity, 0);
   const shipping = 0;
   const total = subtotal + shipping;
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="h-8 w-32 bg-gray-200 rounded mb-6 animate-pulse"></div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              <LoadingSkeleton type="list" count={3} />
+            </div>
+            <div>
+              <LoadingSkeleton type="detail" count={1} />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -73,6 +84,7 @@ export default function CartPage() {
                   <img
                     src={item.book?.coverImage}
                     alt={item.book?.title}
+                    loading="lazy"
                     className="w-24 h-32 object-cover rounded"
                   />
                   <div className="flex-1">

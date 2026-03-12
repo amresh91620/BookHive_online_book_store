@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAdminUsers, toggleUserBlock } from "@/store/slices/adminSlice";
+import { useState } from "react";
+import { useAdminUsers, useToggleUserBlock } from "@/hooks/api/useAdmin";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,22 +10,20 @@ import { shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
 
 export default function AdminUsersPage() {
-  const dispatch = useDispatch();
-  const { users, status } = useSelector((state) => state.admin);
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: usersData, isLoading } = useAdminUsers();
+  const toggleUserBlock = useToggleUserBlock();
 
-  useEffect(() => {
-    dispatch(fetchAdminUsers());
-  }, [dispatch]);
+  const users = usersData?.users || [];
 
   const handleToggleBlock = async (userId, currentStatus) => {
-    try {
-      await dispatch(toggleUserBlock({ userId, isBlocked: !currentStatus })).unwrap();
-      toast.success(currentStatus ? "User unblocked" : "User blocked");
-      dispatch(fetchAdminUsers());
-    } catch (error) {
-      toast.error(error);
-    }
+    toggleUserBlock.mutate(
+      { userId, isBlocked: !currentStatus },
+      {
+        onSuccess: () => toast.success(currentStatus ? "User unblocked" : "User blocked"),
+        onError: (error) => toast.error(error?.response?.data?.msg || "Failed to update user"),
+      }
+    );
   };
 
   const filteredUsers = users.filter(
@@ -54,10 +52,8 @@ export default function AdminUsersPage() {
         </div>
 
         {/* Users Table */}
-        {status === "loading" ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
-          </div>
+        {isLoading ? (
+          <LoadingSkeleton type="table" count={1} />
         ) : (
           <Card>
             <div className="overflow-x-auto">

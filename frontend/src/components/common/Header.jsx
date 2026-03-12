@@ -11,6 +11,8 @@ import {
   X,
 } from "lucide-react";
 import { logout } from "@/store/slices/authSlice";
+import { useCart } from "@/hooks/api/useCart";
+import { useWishlist } from "@/hooks/api/useWishlist";
 import { Button } from "@/components/ui/button";
 import BookHiveLogo from "@/components/common/BookHiveLogo";
 import { cn } from "@/lib/utils";
@@ -33,8 +35,8 @@ const getMobileNavClass = (isActive) =>
 
 export default function Header() {
   const { user } = useSelector((state) => state.auth);
-  const { items: cartItems } = useSelector((state) => state.cart);
-  const { items: wishlistItems } = useSelector((state) => state.wishlist);
+  const { data: cartData } = useCart();
+  const { data: wishlistItems = [] } = useWishlist();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,7 +53,7 @@ export default function Header() {
     navigate("/login");
   };
 
-  const cartCount = user ? (cartItems?.length || 0) : 0;
+  const cartCount = user ? (cartData?.items?.length || 0) : 0;
   const wishlistCount = user ? (wishlistItems?.length || 0) : 0;
 
   return (

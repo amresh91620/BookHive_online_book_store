@@ -1,8 +1,7 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { fetchWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
-import { addToCart } from "@/store/slices/cartSlice";
+import { useWishlist, useRemoveFromWishlist } from "@/hooks/api/useWishlist";
+import { useAddToCart } from "@/hooks/api/useCart";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heart, ShoppingCart, Trash2 } from "lucide-react";
@@ -10,31 +9,33 @@ import { formatPrice } from "@/utils/format";
 import toast from "react-hot-toast";
 
 export default function WishlistPage() {
-  const dispatch = useDispatch();
-  const { items, status } = useSelector((state) => state.wishlist);
-
-  useEffect(() => {
-    dispatch(fetchWishlist());
-  }, [dispatch]);
+  const { data: items = [], isLoading } = useWishlist();
+  const removeFromWishlist = useRemoveFromWishlist();
+  const addToCart = useAddToCart();
 
   const handleRemove = (bookId) => {
-    dispatch(removeFromWishlist(bookId))
-      .unwrap()
-      .then(() => toast.success("Removed from wishlist"))
-      .catch((err) => toast.error(err));
+    removeFromWishlist.mutate(bookId, {
+      onSuccess: () => toast.success("Removed from wishlist"),
+      onError: (err) => toast.error(err?.response?.data?.msg || "Failed to remove"),
+    });
   };
 
   const handleAddToCart = (bookId) => {
-    dispatch(addToCart(bookId))
-      .unwrap()
-      .then(() => toast.success("Added to cart"))
-      .catch((err) => toast.error(err));
+    addToCart.mutate(bookId, {
+      onSuccess: () => toast.success("Added to cart"),
+      onError: (err) => toast.error(err?.response?.data?.msg || "Failed to add to cart"),
+    });
   };
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="h-8 w-32 bg-gray-200 rounded mb-6 animate-pulse"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <LoadingSkeleton type="card" count={6} />
+          </div>
+        </div>
       </div>
     );
   }
@@ -66,6 +67,7 @@ export default function WishlistPage() {
                 <img
                   src={book.coverImage}
                   alt={book.title}
+                  loading="lazy"
                   className="w-full aspect-[3/4] object-cover rounded mb-4"
                 />
               </Link>

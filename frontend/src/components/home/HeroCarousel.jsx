@@ -1,16 +1,16 @@
-import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Search, ArrowRight, Users, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useBookStats } from "@/hooks/api/useBooks";
 
 export default function EnhancedHero() {
-  const { stats, status } = useSelector((state) => state.books);
+  const { data: stats, isLoading } = useBookStats();
   
   // Use stats.featured for the hero section to match the optimized homepage fetch
   const featuredBooks = stats?.featured?.slice(0, 3) || [];
   const placeholderCover = "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=800&auto=format&fit=crop";
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <section className="relative min-h-[65vh] w-full flex items-center overflow-hidden py-6 sm:min-h-[75vh] sm:py-8 lg:min-h-[85vh] lg:py-0 bg-[#1F2937]">
         <div className="container-shell relative z-10">
@@ -126,6 +126,7 @@ export default function EnhancedHero() {
                 <div className="relative">
                   <img 
                     src={featuredBooks[2]?.coverImage || placeholderCover} 
+                    loading="lazy"
                     className="w-36 h-52 sm:w-44 sm:h-64 lg:w-48 lg:h-72 object-cover rounded-lg shadow-2xl border-4 border-white/20"
                     alt="Back book"
                   />
@@ -138,6 +139,7 @@ export default function EnhancedHero() {
                 <div className="relative">
                   <img 
                     src={featuredBooks[1]?.coverImage || placeholderCover} 
+                    loading="lazy"
                     className="w-40 h-56 sm:w-48 sm:h-68 lg:w-52 lg:h-76 object-cover rounded-lg shadow-2xl border-4 border-white/20"
                     alt="Middle book"
                   />
@@ -150,6 +152,7 @@ export default function EnhancedHero() {
                 <div className="relative overflow-hidden rounded-xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.8)] border-[6px] border-white">
                    <img 
                     src={featuredBooks[0]?.coverImage || placeholderCover} 
+                    loading="lazy"
                     className="w-52 h-76 sm:w-60 sm:h-[340px] lg:w-72 lg:h-[420px] object-cover"
                     alt="Featured book"
                   />

@@ -1,9 +1,8 @@
-import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchBookById } from "@/store/slices/booksSlice";
-import { addToCart } from "@/store/slices/cartSlice";
-import { addToWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
+import { useSelector } from "react-redux";
+import { useBookDetails } from "@/hooks/api/useBooks";
+import { useAddToCart } from "@/hooks/api/useCart";
+import { useWishlist, useAddToWishlist, useRemoveFromWishlist } from "@/hooks/api/useWishlist";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -15,19 +14,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BookDetailPage() {
   const { id } = useParams();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { selected: book, status } = useSelector((state) => state.books);
   const { user } = useSelector((state) => state.auth);
-  const { items: wishlistItems } = useSelector((state) => state.wishlist);
+  
+  const { data: book, isLoading } = useBookDetails(id);
+  const { data: wishlistItems = [] } = useWishlist();
+  const addToCart = useAddToCart();
+  const addToWishlist = useAddToWishlist();
+  const removeFromWishlist = useRemoveFromWishlist();
 
   const isInWishlist = wishlistItems?.some((item) => item._id === book?._id);
-
-  useEffect(() => {
-    if (id) {
-      dispatch(fetchBookById(id));
-    }
-  }, [dispatch, id]);
 
   const handleAddToCart = () => {
     if (!user) {
@@ -35,10 +31,10 @@ export default function BookDetailPage() {
       navigate("/login");
       return;
     }
-    dispatch(addToCart(book._id))
-      .unwrap()
-      .then(() => toast.success("Added to cart"))
-      .catch((err) => toast.error(err));
+    addToCart.mutate(book._id, {
+      onSuccess: () => toast.success("Added to cart"),
+      onError: (err) => toast.error(err?.response?.data?.msg || "Failed to add to cart"),
+    });
   };
 
   const handleWishlistToggle = () => {
@@ -48,19 +44,19 @@ export default function BookDetailPage() {
       return;
     }
     if (isInWishlist) {
-      dispatch(removeFromWishlist(book._id))
-        .unwrap()
-        .then(() => toast.success("Removed from wishlist"))
-        .catch((err) => toast.error(err));
+      removeFromWishlist.mutate(book._id, {
+        onSuccess: () => toast.success("Removed from wishlist"),
+        onError: (err) => toast.error(err?.response?.data?.msg || "Failed to remove"),
+      });
     } else {
-      dispatch(addToWishlist(book._id))
-        .unwrap()
-        .then(() => toast.success("Added to wishlist"))
-        .catch((err) => toast.error(err));
+      addToWishlist.mutate(book._id, {
+        onSuccess: () => toast.success("Added to wishlist"),
+        onError: (err) => toast.error(err?.response?.data?.msg || "Failed to add"),
+      });
     }
   };
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container-shell">
@@ -137,6 +133,7 @@ export default function BookDetailPage() {
               <img
                 src={book.coverImage}
                 alt={book.title}
+                loading="lazy"
                 className="w-full rounded-lg shadow-lg mb-4"
               />
               <div className="space-y-3">

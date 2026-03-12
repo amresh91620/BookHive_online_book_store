@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchReviewsByBook, addReview, updateReview, deleteReview } from "@/store/slices/reviewsSlice";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useBookReviews, useAddReview, useUpdateReview, useDeleteReview } from "@/hooks/api/useReviews";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,9 +11,21 @@ import { Star, Edit, Trash2, Send } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function ReviewSection({ bookId }) {
-  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { reviews, stats, loading } = useSelector((state) => state.reviews);
+  const { data: reviewData, isLoading } = useBookReviews(bookId);
+  const addReview = useAddReview();
+  const updateReview = useUpdateReview();
+  const deleteReview = useDeleteReview();
+
+  const reviews = reviewData?.reviews || [];
+  
+  // Handle different API response structures
+  // If stats object exists, use it; otherwise use root-level properties
+  const stats = reviewData?.stats || {
+    avgRating: reviewData?.avgRating || reviewData?.averageRating || 0,
+    totalRatings: reviewData?.totalRatings || reviewData?.total || 0,
+    ratingDistribution: reviewData?.ratingDistribution || reviewData?.distribution || {}
+  };
 
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
@@ -21,12 +33,6 @@ export default function ReviewSection({ bookId }) {
   const [comment, setComment] = useState("");
   const [hoverRating, setHoverRating] = useState(0);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, reviewId: null });
-
-  useEffect(() => {
-    if (bookId) {
-      dispatch(fetchReviewsByBook(bookId));
-    }
-  }, [dispatch, bookId]);
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
@@ -36,24 +42,33 @@ export default function ReviewSection({ bookId }) {
       return;
     }
 
-    try {
-      if (editingReview) {
-        await dispatch(updateReview({ 
-          id: editingReview._id, 
-          reviewData: { rating, comment } 
-        })).unwrap();
-        toast.success("Review updated successfully");
-      } else {
-        await dispatch(addReview({ bookId, rating, comment })).unwrap();
-        toast.success("Review added successfully");
-      }
-      
-      setShowReviewForm(false);
-      setEditingReview(null);
-      setRating(5);
-      setComment("");
-    } catch (error) {
-      toast.error(error || "Failed to submit review");
+    if (editingReview) {
+      updateReview.mutate(
+        { id: editingReview._id, payload: { rating, comment } },
+        {
+          onSuccess: () => {
+            toast.success("Review updated successfully");
+            setShowReviewForm(false);
+            setEditingReview(null);
+            setRating(5);
+            setComment("");
+          },
+          onError: (error) => toast.error(error?.response?.data?.msg || "Failed to update review"),
+        }
+      );
+    } else {
+      addReview.mutate(
+        { bookId, rating, comment },
+        {
+          onSuccess: () => {
+            toast.success("Review added successfully");
+            setShowReviewForm(false);
+            setRating(5);
+            setComment("");
+          },
+          onError: (error) => toast.error(error?.response?.data?.msg || "Failed to add review"),
+        }
+      );
     }
   };
 
@@ -67,13 +82,13 @@ export default function ReviewSection({ bookId }) {
   const handleDeleteReview = async () => {
     if (!deleteDialog.reviewId) return;
     
-    try {
-      await dispatch(deleteReview(deleteDialog.reviewId)).unwrap();
-      toast.success("Review deleted successfully");
-      setDeleteDialog({ open: false, reviewId: null });
-    } catch (error) {
-      toast.error(error || "Failed to delete review");
-    }
+    deleteReview.mutate(deleteDialog.reviewId, {
+      onSuccess: () => {
+        toast.success("Review deleted successfully");
+        setDeleteDialog({ open: false, reviewId: null });
+      },
+      onError: (error) => toast.error(error?.response?.data?.msg || "Failed to delete review"),
+    });
   };
 
   const renderStars = (count, interactive = false, size = "w-5 h-5") => {
@@ -100,6 +115,33 @@ export default function ReviewSection({ bookId }) {
     (review) => review.user?._id === user?._id || review.user?._id === user?.id
   );
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Customer Reviews</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col items-center justify-center p-6 bg-gray-100 rounded-lg animate-pulse">
+                <div className="h-16 w-24 bg-gray-200 rounded mb-2"></div>
+                <div className="h-6 w-32 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 w-40 bg-gray-200 rounded"></div>
+              </div>
+              <div className="space-y-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="h-6 bg-gray-200 rounded animate-pulse"></div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Rating Summary */}
@@ -112,21 +154,22 @@ export default function ReviewSection({ bookId }) {
             {/* Average Rating */}
             <div className="flex flex-col items-center justify-center p-6 bg-amber-50 rounded-lg">
               <div className="text-5xl font-bold text-amber-600 mb-2">
-                {stats?.avgRating || "0.0"}
+                {typeof stats.avgRating === 'string' 
+                  ? parseFloat(stats.avgRating).toFixed(1) 
+                  : (stats.avgRating || 0).toFixed(1)}
               </div>
-              <div className="mb-2">{renderStars(Math.round(stats?.avgRating || 0))}</div>
+              <div className="mb-2">{renderStars(Math.round(parseFloat(stats.avgRating) || 0))}</div>
               <p className="text-gray-600 text-sm">
-                Based on {stats?.totalRatings || 0} reviews
+                Based on {stats.totalRatings || 0} reviews
               </p>
             </div>
 
             {/* Rating Distribution */}
             <div className="space-y-2">
               {[5, 4, 3, 2, 1].map((star) => {
-                const count = stats?.ratingDistribution?.[star] || 0;
-                const percentage = stats?.totalRatings
-                  ? (count / stats.totalRatings) * 100
-                  : 0;
+                const count = stats.ratingDistribution?.[star] || 0;
+                const totalRatings = stats.totalRatings || 0;
+                const percentage = totalRatings > 0 ? (count / totalRatings) * 100 : 0;
                 return (
                   <div key={star} className="flex items-center gap-2">
                     <span className="text-sm font-medium w-8">{star} ★</span>
@@ -198,10 +241,12 @@ export default function ReviewSection({ bookId }) {
                 <Button
                   type="submit"
                   className="bg-amber-600 hover:bg-amber-700"
-                  disabled={loading}
+                  disabled={addReview.isPending || updateReview.isPending}
                 >
                   <Send className="w-4 h-4 mr-2" />
-                  {editingReview ? "Update Review" : "Submit Review"}
+                  {addReview.isPending || updateReview.isPending 
+                    ? "Submitting..." 
+                    : editingReview ? "Update Review" : "Submit Review"}
                 </Button>
                 <Button
                   type="button"

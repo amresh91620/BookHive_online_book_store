@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+﻿import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { fetchCart } from "@/store/slices/cartSlice";
-import { fetchAddresses, addAddress } from "@/store/slices/addressSlice";
-import { createOrder } from "@/store/slices/ordersSlice";
+import { useCart } from "@/hooks/api/useCart";
+import { useAddresses, useAddAddress } from "@/hooks/api/useAddress";
+import { useCreateOrder } from "@/hooks/api/useOrders";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,12 +13,13 @@ import { formatPrice } from "@/utils/format";
 import toast from "react-hot-toast";
 
 export default function CheckoutPage() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { items: cartItems } = useSelector((state) => state.cart);
-  const { addresses } = useSelector((state) => state.address);
-  const { status: orderStatus } = useSelector((state) => state.orders);
+  const { data: cartData } = useCart();
+  const { data: addresses = [] } = useAddresses();
+  const addAddress = useAddAddress();
+  const createOrder = useCreateOrder();
 
+  const cartItems = cartData?.items || [];
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [addressForm, setAddressForm] = useState({
@@ -29,11 +30,6 @@ export default function CheckoutPage() {
     state: "",
     pincode: "",
   });
-
-  useEffect(() => {
-    dispatch(fetchCart());
-    dispatch(fetchAddresses());
-  }, [dispatch]);
 
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddress) {
@@ -47,21 +43,21 @@ export default function CheckoutPage() {
 
   const handleAddAddress = async (e) => {
     e.preventDefault();
-    try {
-      await dispatch(addAddress(addressForm)).unwrap();
-      toast.success("Address added successfully");
-      setShowAddressForm(false);
-      setAddressForm({
-        fullName: "",
-        phone: "",
-        street: "",
-        city: "",
-        state: "",
-        pincode: "",
-      });
-    } catch (error) {
-      toast.error(error);
-    }
+    addAddress.mutate(addressForm, {
+      onSuccess: () => {
+        toast.success("Address added successfully");
+        setShowAddressForm(false);
+        setAddressForm({
+          fullName: "",
+          phone: "",
+          street: "",
+          city: "",
+          state: "",
+          pincode: "",
+        });
+      },
+      onError: (error) => toast.error(error?.response?.data?.msg || "Failed to add address"),
+    });
   };
 
   const handlePlaceOrder = async () => {
@@ -70,18 +66,19 @@ export default function CheckoutPage() {
       return;
     }
 
-    try {
-      await dispatch(
-        createOrder({
-          addressId: selectedAddress,
-          paymentMethod: "COD",
-        })
-      ).unwrap();
-      toast.success("Order placed successfully!");
-      navigate("/orders");
-    } catch (error) {
-      toast.error(error);
-    }
+    createOrder.mutate(
+      {
+        addressId: selectedAddress,
+        paymentMethod: "COD",
+      },
+      {
+        onSuccess: () => {
+          toast.success("Order placed successfully!");
+          navigate("/orders");
+        },
+        onError: (error) => toast.error(error?.response?.data?.msg || "Failed to place order"),
+      }
+    );
   };
 
   const subtotal = cartItems.reduce(
@@ -257,7 +254,7 @@ export default function CheckoutPage() {
                         <h4 className="font-medium text-gray-900">{item.book?.title}</h4>
                         <p className="text-sm text-gray-600">{item.book?.author}</p>
                         <p className="text-sm text-gray-900 mt-1">
-                          Qty: {item.quantity} Ãƒâ€” {formatPrice(item.book?.price)}
+                          Qty: {item.quantity} × {formatPrice(item.book?.price)}
                         </p>
                       </div>
                       <div className="text-right">
@@ -308,9 +305,9 @@ export default function CheckoutPage() {
                   className="w-full"
                   size="lg"
                   onClick={handlePlaceOrder}
-                  disabled={orderStatus === "loading" || !selectedAddress}
+                  disabled={createOrder.isPending || !selectedAddress}
                 >
-                  {orderStatus === "loading" ? "Placing Order..." : "Place Order"}
+                  {createOrder.isPending ? "Placing Order..." : "Place Order"}
                 </Button>
 
                 <p className="text-xs text-gray-500 text-center mt-4">

@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema } from "@/schemas/auth";
 import { sendRegisterOtp, verifyRegisterOtp, registerUser } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,23 +19,27 @@ export default function RegisterPage() {
   const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: Details
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    otp: "",
-    name: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const { register, handleSubmit, formState: { errors }, watch } = useForm({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    }
+  });
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
+    if (!email) {
+      toast.error("Please enter your email");
+      return;
+    }
     try {
-      await dispatch(sendRegisterOtp({ email: formData.email })).unwrap();
+      await dispatch(sendRegisterOtp({ email })).unwrap();
       toast.success("OTP sent to your email");
       setStep(2);
     } catch (error) {
@@ -42,8 +49,12 @@ export default function RegisterPage() {
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
+    if (!otp) {
+      toast.error("Please enter OTP");
+      return;
+    }
     try {
-      await dispatch(verifyRegisterOtp({ email: formData.email, otp: formData.otp })).unwrap();
+      await dispatch(verifyRegisterOtp({ email, otp })).unwrap();
       toast.success("Email verified successfully");
       setStep(3);
     } catch (error) {
@@ -51,14 +62,14 @@ export default function RegisterPage() {
     }
   };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
+  const onSubmit = async (data) => {
     try {
-      await dispatch(registerUser(formData)).unwrap();
+      const registerData = {
+        name: data.name,
+        email: email,
+        password: data.password,
+      };
+      await dispatch(registerUser(registerData)).unwrap();
       toast.success("Registration successful! Please login");
       navigate("/login");
     } catch (error) {
@@ -92,11 +103,10 @@ export default function RegisterPage() {
                 <Label htmlFor="email" className="font-medium text-gray-700">Email</Label>
                 <Input
                   id="email"
-                  name="email"
                   type="email"
                   placeholder="your@email.com"
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   className="focus-visible:ring-[#D97706]"
                 />
@@ -118,11 +128,10 @@ export default function RegisterPage() {
                 <Label htmlFor="otp" className="font-medium text-gray-700">Enter OTP</Label>
                 <Input
                   id="otp"
-                  name="otp"
                   type="text"
                   placeholder="Enter 6-digit OTP"
-                  value={formData.otp}
-                  onChange={handleChange}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
                   required
                   maxLength={6}
                   className="text-center tracking-widest text-lg font-mono focus-visible:ring-[#D97706]"
@@ -153,44 +162,28 @@ export default function RegisterPage() {
 
           {/* Step 3: Complete Registration */}
           {step === 3 && (
-            <form onSubmit={handleRegister} className="space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div className="space-y-1.5">
                 <Label htmlFor="name" className="font-medium text-gray-700">Full Name</Label>
                 <Input
                   id="name"
-                  name="name"
                   type="text"
                   placeholder="John Doe"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
+                  {...register("name")}
                   className="focus-visible:ring-[#D97706]"
                 />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="phone" className="font-medium text-gray-700">Phone (Optional)</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="+1234567890"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="focus-visible:ring-[#D97706]"
-                />
+                {errors.name && (
+                  <p className="text-sm text-red-600">{errors.name.message}</p>
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="password" className="font-medium text-gray-700">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
-                    name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    minLength={6}
+                    {...register("password")}
                     className="focus-visible:ring-[#D97706]"
                   />
                   <button
@@ -201,18 +194,18 @@ export default function RegisterPage() {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="text-sm text-red-600">{errors.password.message}</p>
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="confirmPassword" className="font-medium text-gray-700">Confirm Password</Label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
-                    name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
+                    {...register("confirmPassword")}
                     className="focus-visible:ring-[#D97706]"
                   />
                   <button
@@ -223,6 +216,9 @@ export default function RegisterPage() {
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+                {errors.confirmPassword && (
+                  <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>
+                )}
               </div>
               <Button
                 type="submit"

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAdminOrders, updateOrderStatus } from "@/store/slices/adminSlice";
+import { useState } from "react";
+import { useAdminOrders, useUpdateAdminOrderStatus } from "@/hooks/api/useAdmin";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,23 +11,21 @@ import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
 export default function AdminOrdersPage() {
-  const dispatch = useDispatch();
-  const { orders, status } = useSelector((state) => state.admin);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const { data: ordersData, isLoading } = useAdminOrders();
+  const updateOrderStatus = useUpdateAdminOrderStatus();
 
-  useEffect(() => {
-    dispatch(fetchAdminOrders());
-  }, [dispatch]);
+  const orders = ordersData?.orders || [];
 
   const handleStatusUpdate = async (orderId, newStatus) => {
-    try {
-      await dispatch(updateOrderStatus({ orderId, status: newStatus })).unwrap();
-      toast.success("Order status updated");
-      dispatch(fetchAdminOrders());
-    } catch (error) {
-      toast.error(error);
-    }
+    updateOrderStatus.mutate(
+      { orderId, status: newStatus },
+      {
+        onSuccess: () => toast.success("Order status updated"),
+        onError: (error) => toast.error(error?.response?.data?.msg || "Failed to update order"),
+      }
+    );
   };
 
   const getStatusColor = (status) => {
@@ -91,10 +89,8 @@ export default function AdminOrdersPage() {
         </div>
 
         {/* Orders Table */}
-        {status === "loading" ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
-          </div>
+        {isLoading ? (
+          <LoadingSkeleton type="table" count={1} />
         ) : (
           <Card>
             <div className="overflow-x-auto">
@@ -142,18 +138,36 @@ export default function AdminOrdersPage() {
                         {formatPrice(order.total)}
                       </td>
                       <td className="px-6 py-4">
-                        <select
-                          value={order.status}
-                          onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
-                          className="text-sm border rounded px-2 py-1"
-                          disabled={order.status === "Cancelled" || order.status === "Delivered"}
-                        >
-                          {statuses.map((status) => (
-                            <option key={status} value={status}>
-                              {status}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="flex flex-col gap-2">
+                          <Badge variant={getStatusColor(order.status)} className="w-fit">
+                            {order.status}
+                          </Badge>
+                          {order.status !== "Cancelled" && order.status !== "Delivered" && (
+                            <select
+                              value={order.status}
+                              onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
+                              className="text-xs border rounded px-2 py-1 focus:ring-2 focus:ring-amber-500"
+                            >
+                              {statuses.filter(status => {
+                                // Filter based on current status
+                                if (order.status === "Pending") {
+                                  return ["Pending", "Processing", "Cancelled"].includes(status);
+                                }
+                                if (order.status === "Processing") {
+                                  return ["Processing", "Shipped", "Cancelled"].includes(status);
+                                }
+                                if (order.status === "Shipped") {
+                                  return ["Shipped", "Delivered"].includes(status);
+                                }
+                                return true;
+                              }).map((status) => (
+                                <option key={status} value={status}>
+                                  {status}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <Badge

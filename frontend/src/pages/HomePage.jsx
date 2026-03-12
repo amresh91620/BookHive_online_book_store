@@ -1,7 +1,7 @@
-import { useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useMemo } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { fetchStatsBooks } from "@/store/slices/booksSlice";
+import { useBookStats } from "@/hooks/api/useBooks";
 import BookCard from "@/components/common/BookCard";
 import BookSkeleton from "@/components/common/BookSkeleton";
 import HeroCarousel from "@/components/home/HeroCarousel";
@@ -9,24 +9,19 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, Truck, ShieldCheck, Zap, Sparkles } from "lucide-react";
 
 export default function HomePage() {
-  const dispatch = useDispatch();
-  const { stats, status } = useSelector((state) => state.books);
   const { user } = useSelector((state) => state.auth);
+  const { data: stats, isLoading } = useBookStats();
 
-  useEffect(() => {
-    dispatch(fetchStatsBooks());
-  }, [dispatch]);
-
-  const featuredBooks = useMemo(() => stats.featured, [stats]);
-  const bestsellers = useMemo(() => stats.bestsellers, [stats]);
-  const newArrivals = useMemo(() => stats.newArrivals, [stats]);
+  const featuredBooks = useMemo(() => stats?.featured ?? [], [stats]);
+  const bestsellers = useMemo(() => stats?.bestsellers ?? [], [stats]);
+  const newArrivals = useMemo(() => stats?.newArrivals ?? [], [stats]);
 
   return (
     <div className="min-h-screen bg-white">
       <HeroCarousel />
 
       {/* Featured Books */}
-      {status === "loading" ? (
+      {isLoading ? (
         <section className="py-10 sm:py-12 lg:py-16 bg-[#F9FAFB]">
           <div className="container-shell">
             <div className="flex items-center gap-2 mb-8">
@@ -66,7 +61,7 @@ export default function HomePage() {
       )}
 
       {/* Bestsellers - Classic Design */}
-      {status === "loading" ? (
+      {isLoading ? (
         <section className="py-12 bg-white">
           <div className="container-shell">
             <div className="flex flex-col items-center mb-12">
@@ -118,7 +113,7 @@ export default function HomePage() {
       )}
 
       {/* New Arrivals */}
-      {status === "loading" ? null : newArrivals.length > 0 && (
+      {!isLoading && newArrivals.length > 0 && (
         <section className="py-10 sm:py-12 lg:py-16 bg-[#F9FAFB]">
           <div className="container-shell">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-3 sm:gap-0">

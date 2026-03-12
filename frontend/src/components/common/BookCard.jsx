@@ -1,17 +1,19 @@
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, Star } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "@/store/slices/cartSlice";
-import { addToWishlist, removeFromWishlist } from "@/store/slices/wishlistSlice";
+import { useSelector } from "react-redux";
+import { useAddToCart } from "@/hooks/api/useCart";
+import { useWishlist, useAddToWishlist, useRemoveFromWishlist } from "@/hooks/api/useWishlist";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/utils/format";
 import toast from "react-hot-toast";
 
 export default function BookCard({ book }) {
-  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { items: wishlistItems } = useSelector((state) => state.wishlist);
+  const { data: wishlistItems = [] } = useWishlist();
+  const addToCart = useAddToCart();
+  const addToWishlist = useAddToWishlist();
+  const removeFromWishlist = useRemoveFromWishlist();
 
   const isInWishlist = wishlistItems?.some((item) => item._id === book._id);
 
@@ -21,10 +23,10 @@ export default function BookCard({ book }) {
       toast.error("Please login to add items to cart");
       return;
     }
-    dispatch(addToCart(book._id))
-      .unwrap()
-      .then(() => toast.success("Added to cart"))
-      .catch((err) => toast.error(err));
+    addToCart.mutate(book._id, {
+      onSuccess: () => toast.success("Added to cart"),
+      onError: (err) => toast.error(err?.response?.data?.msg || "Failed to add to cart"),
+    });
   };
 
   const handleWishlistToggle = (e) => {
@@ -34,15 +36,15 @@ export default function BookCard({ book }) {
       return;
     }
     if (isInWishlist) {
-      dispatch(removeFromWishlist(book._id))
-        .unwrap()
-        .then(() => toast.success("Removed from wishlist"))
-        .catch((err) => toast.error(err));
+      removeFromWishlist.mutate(book._id, {
+        onSuccess: () => toast.success("Removed from wishlist"),
+        onError: (err) => toast.error(err?.response?.data?.msg || "Failed to remove"),
+      });
     } else {
-      dispatch(addToWishlist(book._id))
-        .unwrap()
-        .then(() => toast.success("Added to wishlist"))
-        .catch((err) => toast.error(err));
+      addToWishlist.mutate(book._id, {
+        onSuccess: () => toast.success("Added to wishlist"),
+        onError: (err) => toast.error(err?.response?.data?.msg || "Failed to add"),
+      });
     }
   };
 
@@ -52,9 +54,12 @@ export default function BookCard({ book }) {
         {/* Image Container - 3D Book Effect */}
         <div className="relative aspect-[3/4] bg-gray-50 flex-shrink-0 mx-4 mt-4 rounded-r-md  overflow-hidden shadow-[4px_4px_10px_rgba(0,0,0,0.15)] group-hover:shadow-[6px_6px_15px_rgba(0,0,0,0.2)] transition-shadow duration-300 transform perspective-1000">
           <img
-            src={book.coverImage}
+            src={book.coverImage || 'https://via.placeholder.com/300x400/78350F/FEF3C7?text=No+Image'}
             alt={book.title}
             loading="lazy"
+            onError={(e) => {
+              e.target.src = 'https://via.placeholder.com/300x400/78350F/FEF3C7?text=No+Image';
+            }}
             className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
           />
           

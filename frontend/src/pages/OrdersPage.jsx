@@ -1,7 +1,8 @@
-import { useEffect, useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { fetchOrders, cancelOrder } from "@/store/slices/ordersSlice";
+import { useOrders, useCancelOrder } from "@/hooks/api/useOrders";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,34 +13,28 @@ import { formatPrice, shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
 
 export default function OrdersPage() {
-  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { orders, status } = useSelector((state) => state.orders);
+  const { data: orders = [], isLoading, error } = useOrders();
+  const cancelOrder = useCancelOrder();
   const [cancelDialog, setCancelDialog] = useState({ open: false, orderId: null });
   const [cancelReason, setCancelReason] = useState("");
-  const hasFetched = useRef(false);
-
-  useEffect(() => {
-    if (user && !hasFetched.current) {
-      hasFetched.current = true;
-      dispatch(fetchOrders());
-    }
-  }, [dispatch, user]);
 
   const handleCancelOrder = async () => {
     if (!cancelDialog.orderId) return;
     
-    try {
-      await dispatch(cancelOrder({ 
-        id: cancelDialog.orderId, 
-        reason: cancelReason 
-      })).unwrap();
-      toast.success("Order cancelled successfully");
-      setCancelDialog({ open: false, orderId: null });
-      setCancelReason("");
-    } catch (error) {
-      toast.error(error || "Failed to cancel order");
-    }
+    cancelOrder.mutate(
+      { id: cancelDialog.orderId, reason: cancelReason },
+      {
+        onSuccess: () => {
+          toast.success("Order cancelled successfully");
+          setCancelDialog({ open: false, orderId: null });
+          setCancelReason("");
+        },
+        onError: (error) => {
+          toast.error(error?.response?.data?.msg || "Failed to cancel order");
+        },
+      }
+    );
   };
 
   const getStatusColor = (status) => {
@@ -68,22 +63,27 @@ export default function OrdersPage() {
     );
   }
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="h-8 w-32 bg-gray-200 rounded mb-6 animate-pulse"></div>
+          <div className="space-y-4">
+            <LoadingSkeleton type="list" count={5} />
+          </div>
+        </div>
       </div>
     );
   }
 
-  if (status === "failed") {
+  if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Package className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Failed to load orders</h2>
-          <p className="text-gray-600 mb-6">{error || "Something went wrong"}</p>
-          <Button onClick={() => dispatch(fetchOrders())}>Try Again</Button>
+          <p className="text-gray-600 mb-6">{error?.response?.data?.msg || "Something went wrong"}</p>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
         </div>
       </div>
     );

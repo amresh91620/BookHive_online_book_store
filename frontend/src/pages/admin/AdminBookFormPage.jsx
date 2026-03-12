@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { createBook, updateBook, fetchBookById } from "@/store/slices/booksSlice";
+import { useBookDetails, useCreateBook, useUpdateBook } from "@/hooks/api/useBooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,9 +12,11 @@ import toast from "react-hot-toast";
 export default function AdminBookFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { selected: book } = useSelector((state) => state.books);
   const isEdit = Boolean(id);
+
+  const { data: book } = useBookDetails(id);
+  const createBook = useCreateBook();
+  const updateBook = useUpdateBook();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -40,13 +41,6 @@ export default function AdminBookFormPage() {
   });
 
   const [coverImage, setCoverImage] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (isEdit && id) {
-      dispatch(fetchBookById(id));
-    }
-  }, [dispatch, id, isEdit]);
 
   useEffect(() => {
     if (isEdit && book) {
@@ -88,26 +82,31 @@ export default function AdminBookFormPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
-    try {
-      const payload = { ...formData };
-      if (coverImage) {
-        payload.coverImage = coverImage;
-      }
+    const payload = { ...formData };
+    if (coverImage) {
+      payload.coverImage = coverImage;
+    }
 
-      if (isEdit) {
-        await dispatch(updateBook({ id, payload })).unwrap();
-        toast.success("Book updated successfully");
-      } else {
-        await dispatch(createBook(payload)).unwrap();
-        toast.success("Book added successfully");
-      }
-      navigate("/admin/books");
-    } catch (error) {
-      toast.error(error);
-    } finally {
-      setLoading(false);
+    if (isEdit) {
+      updateBook.mutate(
+        { id, payload },
+        {
+          onSuccess: () => {
+            toast.success("Book updated successfully");
+            navigate("/admin/books");
+          },
+          onError: (error) => toast.error(error?.response?.data?.msg || "Failed to update book"),
+        }
+      );
+    } else {
+      createBook.mutate(payload, {
+        onSuccess: () => {
+          toast.success("Book added successfully");
+          navigate("/admin/books");
+        },
+        onError: (error) => toast.error(error?.response?.data?.msg || "Failed to add book"),
+      });
     }
   };
 
@@ -390,8 +389,8 @@ export default function AdminBookFormPage() {
 
               {/* Submit */}
               <div className="flex gap-2">
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Saving..." : isEdit ? "Update Book" : "Add Book"}
+                <Button type="submit" disabled={createBook.isPending || updateBook.isPending}>
+                  {(createBook.isPending || updateBook.isPending) ? "Saving..." : isEdit ? "Update Book" : "Add Book"}
                 </Button>
                 <Button
                   type="button"

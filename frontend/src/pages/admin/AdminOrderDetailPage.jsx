@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import api from "@/services/api";
 import { endpoints } from "@/services/endpoints";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -92,8 +93,14 @@ export default function AdminOrderDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="h-10 w-32 bg-gray-200 rounded mb-6 animate-pulse"></div>
+          <div className="space-y-6">
+            <LoadingSkeleton type="detail" count={1} />
+            <LoadingSkeleton type="list" count={3} />
+          </div>
+        </div>
       </div>
     );
   }
@@ -179,7 +186,7 @@ export default function AdminOrderDetailPage() {
                         <h4 className="font-semibold text-gray-900">{item.title}</h4>
                         <p className="text-sm text-gray-600">{item.author}</p>
                         <p className="text-sm text-gray-900 mt-2">
-                          Qty: {item.quantity} Ãƒâ€” {formatPrice(item.price)}
+                          Qty: {item.quantity} × {formatPrice(item.price)}
                         </p>
                       </div>
                       <div className="text-right">
@@ -226,32 +233,48 @@ export default function AdminOrderDetailPage() {
                     <select
                       value={selectedStatus}
                       onChange={(e) => setSelectedStatus(e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border rounded-md"
+                      className="w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     >
-                      {ORDER_STATUSES.map((status) => (
+                      {ORDER_STATUSES.filter(status => {
+                        // Filter out invalid status transitions
+                        if (order.status === "Pending") {
+                          return ["Pending", "Processing", "Cancelled"].includes(status);
+                        }
+                        if (order.status === "Processing") {
+                          return ["Processing", "Shipped", "Cancelled"].includes(status);
+                        }
+                        if (order.status === "Shipped") {
+                          return ["Shipped", "Delivered"].includes(status);
+                        }
+                        return true;
+                      }).map((status) => (
                         <option key={status} value={status}>
                           {status}
                         </option>
                       ))}
                     </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Current: {order.status} → Select next status
+                    </p>
                   </div>
 
-                  {selectedStatus === "Shipped" && (
+                  {(selectedStatus === "Shipped" || order.status === "Shipped") && (
                     <>
                       <div>
-                        <Label>Tracking Number</Label>
+                        <Label>Tracking Number *</Label>
                         <Input
                           value={trackingNumber}
                           onChange={(e) => setTrackingNumber(e.target.value)}
                           placeholder="Enter tracking number"
+                          required
                         />
                       </div>
                       <div>
-                        <Label>Carrier</Label>
+                        <Label>Carrier *</Label>
                         <Input
                           value={carrier}
                           onChange={(e) => setCarrier(e.target.value)}
-                          placeholder="e.g., FedEx, UPS, DHL"
+                          placeholder="e.g., FedEx, UPS, DHL, India Post"
                         />
                       </div>
                       <div>
@@ -277,11 +300,17 @@ export default function AdminOrderDetailPage() {
 
                   <Button
                     onClick={handleUpdateOrder}
-                    disabled={updating}
-                    className="w-full"
+                    disabled={updating || (selectedStatus === "Shipped" && (!trackingNumber || !carrier))}
+                    className="w-full bg-amber-600 hover:bg-amber-700"
                   >
-                    {updating ? "Updating..." : "Update Order"}
+                    {updating ? "Updating..." : `Update to ${selectedStatus}`}
                   </Button>
+                  
+                  {selectedStatus === "Shipped" && (!trackingNumber || !carrier) && (
+                    <p className="text-sm text-red-600">
+                      * Tracking number and carrier are required for shipped status
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             )}

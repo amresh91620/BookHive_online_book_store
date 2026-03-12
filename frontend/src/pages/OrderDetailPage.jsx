@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+﻿import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchOrderById, cancelOrder } from "@/store/slices/ordersSlice";
+import { useOrderById, useCancelOrder } from "@/hooks/api/useOrders";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,17 +12,11 @@ import toast from "react-hot-toast";
 
 export default function OrderDetailPage() {
   const { id } = useParams();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { currentOrder: order, status } = useSelector((state) => state.orders);
+  const { data: order, isLoading } = useOrderById(id);
+  const cancelOrder = useCancelOrder();
   const [showCancelForm, setShowCancelForm] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
-
-  useEffect(() => {
-    if (id) {
-      dispatch(fetchOrderById(id));
-    }
-  }, [dispatch, id]);
 
   const handleCancelOrder = async () => {
     if (!cancelReason.trim()) {
@@ -30,14 +24,17 @@ export default function OrderDetailPage() {
       return;
     }
 
-    try {
-      await dispatch(cancelOrder({ id, reason: cancelReason })).unwrap();
-      toast.success("Order cancelled successfully");
-      setShowCancelForm(false);
-      setCancelReason("");
-    } catch (error) {
-      toast.error(error);
-    }
+    cancelOrder.mutate(
+      { id, reason: cancelReason },
+      {
+        onSuccess: () => {
+          toast.success("Order cancelled successfully");
+          setShowCancelForm(false);
+          setCancelReason("");
+        },
+        onError: (error) => toast.error(error?.response?.data?.msg || "Failed to cancel order"),
+      }
+    );
   };
 
   const getStatusColor = (status) => {
@@ -51,10 +48,16 @@ export default function OrderDetailPage() {
     return colors[status] || "secondary";
   };
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="h-10 w-32 bg-gray-200 rounded mb-6 animate-pulse"></div>
+          <div className="space-y-6">
+            <LoadingSkeleton type="detail" count={1} />
+            <LoadingSkeleton type="list" count={3} />
+          </div>
+        </div>
       </div>
     );
   }
@@ -118,7 +121,7 @@ export default function OrderDetailPage() {
                         <h4 className="font-semibold text-gray-900">{item.title}</h4>
                         <p className="text-sm text-gray-600">{item.author}</p>
                         <p className="text-sm text-gray-900 mt-2">
-                          Qty: {item.quantity} Ãƒâ€” {formatPrice(item.price)}
+                          Qty: {item.quantity} × {formatPrice(item.price)}
                         </p>
                       </div>
                       <div className="text-right">

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAdminMessages, deleteAdminMessage } from "@/store/slices/adminSlice";
+import { useState } from "react";
+import { useAdminMessages, useDeleteAdminMessage } from "@/hooks/api/useAdmin";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,27 +11,25 @@ import { shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
 
 export default function AdminMessagesPage() {
-  const dispatch = useDispatch();
-  const { messages = [], status } = useSelector((state) => state.admin);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteDialog, setDeleteDialog] = useState({ open: false, messageId: null });
   const [viewDialog, setViewDialog] = useState({ open: false, message: null });
+  
+  const { data: messagesData, isLoading } = useAdminMessages();
+  const deleteMessage = useDeleteAdminMessage();
 
-  useEffect(() => {
-    dispatch(fetchAdminMessages());
-  }, [dispatch]);
+  const messages = messagesData?.messages || [];
 
   const handleDelete = async () => {
     if (!deleteDialog.messageId) return;
     
-    try {
-      await dispatch(deleteAdminMessage(deleteDialog.messageId)).unwrap();
-      toast.success("Message deleted successfully");
-      setDeleteDialog({ open: false, messageId: null });
-      dispatch(fetchAdminMessages());
-    } catch (error) {
-      toast.error(error || "Failed to delete message");
-    }
+    deleteMessage.mutate(deleteDialog.messageId, {
+      onSuccess: () => {
+        toast.success("Message deleted successfully");
+        setDeleteDialog({ open: false, messageId: null });
+      },
+      onError: (error) => toast.error(error?.response?.data?.msg || "Failed to delete message"),
+    });
   };
 
   const filteredMessages = Array.isArray(messages) ? messages.filter((message) => {
@@ -66,10 +64,8 @@ export default function AdminMessagesPage() {
       </div>
 
       {/* Messages List */}
-      {status === "loading" ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
-        </div>
+      {isLoading ? (
+        <LoadingSkeleton type="list" count={5} />
       ) : filteredMessages.length === 0 ? (
         <Card className="p-12 text-center">
           <Mail className="w-16 h-16 text-gray-300 mx-auto mb-4" />

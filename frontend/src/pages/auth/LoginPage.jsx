@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema } from "@/schemas/auth";
 import { loginUser } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,19 +17,18 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { status } = useSelector((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    }
   });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     try {
-      await dispatch(loginUser(formData)).unwrap();
+      await dispatch(loginUser(data)).unwrap();
       toast.success("Login successful!");
       navigate("/");
     } catch (error) {
@@ -49,19 +51,19 @@ export default function LoginPage() {
           <CardDescription className="text-[#78350F] font-serif italic">Sign in to your BookHive account</CardDescription>
         </CardHeader>
         <CardContent className="pt-5">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1">
               <Label htmlFor="email" className="font-medium text-gray-700">Email</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
                 placeholder="your@email.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
+                {...register("email")}
                 className="focus-visible:ring-[#D97706]"
               />
+              {errors.email && (
+                <p className="text-sm text-red-600">{errors.email.message}</p>
+              )}
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-between">
@@ -76,12 +78,9 @@ export default function LoginPage() {
               <div className="relative">
                 <Input
                   id="password"
-                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
+                  {...register("password")}
                   className="focus-visible:ring-[#D97706]"
                 />
                 <button
@@ -92,6 +91,9 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-sm text-red-600">{errors.password.message}</p>
+              )}
             </div>
             <Button
               type="submit"

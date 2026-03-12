@@ -1,7 +1,6 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { fetchAdminStats, fetchAdminOrders } from "@/store/slices/adminSlice";
+import { useAdminStats, useAdminOrders } from "@/hooks/api/useAdmin";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,18 +8,23 @@ import { BookOpen, Users, ShoppingCart, DollarSign, Eye, Package } from "lucide-
 import { formatPrice, shortDate } from "@/utils/format";
 
 export default function AdminDashboard() {
-  const dispatch = useDispatch();
-  const { stats, orders, status } = useSelector((state) => state.admin);
+  const { data: stats, isLoading: statsLoading } = useAdminStats();
+  const { data: ordersData, isLoading: ordersLoading } = useAdminOrders({ limit: 10, offset: 0 });
+  
+  const orders = ordersData?.orders || [];
+  const isLoading = statsLoading || ordersLoading;
 
-  useEffect(() => {
-    dispatch(fetchAdminStats());
-    dispatch(fetchAdminOrders({ limit: 10, offset: 0 }));
-  }, [dispatch]);
-
-  if (status === "loading") {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+      <div className="space-y-6">
+        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <LoadingSkeleton type="stats" count={4} />
+        </div>
+        <div className="mt-8">
+          <div className="h-6 w-32 bg-gray-200 rounded mb-4 animate-pulse"></div>
+          <LoadingSkeleton type="table" count={1} />
+        </div>
       </div>
     );
   }
