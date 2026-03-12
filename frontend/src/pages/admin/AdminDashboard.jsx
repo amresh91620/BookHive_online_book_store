@@ -52,7 +52,7 @@ export default function AdminDashboard() {
     },
     {
       title: "Total Revenue",
-      value: `$${(stats?.totalRevenue || 0).toFixed(2)}`,
+      value: `₹${(stats?.totalRevenue || 0).toFixed(2)}`,
       icon: DollarSign,
       color: "text-amber-600",
       bgColor: "bg-amber-50",
