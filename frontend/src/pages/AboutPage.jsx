@@ -37,17 +37,17 @@ export default function AboutPage() {
 
   const team = [
     {
-      name: "Sarah Johnson",
+      name: "Nitesh Kumar",
       role: "Founder & CEO",
       description: "Book enthusiast with 15 years in publishing",
     },
     {
-      name: "Michael Chen",
+      name: "Amresh Kumar",
       role: "Head of Operations",
       description: "Logistics expert ensuring smooth deliveries",
     },
     {
-      name: "Emily Rodriguez",
+      name: "Amresh Kumar",
       role: "Customer Relations",
       description: "Dedicated to providing excellent customer service",
     },
@@ -60,7 +60,7 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-[#FEF3C7] to-transparent py-20 relative z-10 border-b border-[#E5E5E5]">
         <div className="container-shell">
-          <div className="max-w-3xl mx-auto text-center">
+          <div className=" mx-auto text-center">
             <h1 className="text-5xl font-serif font-bold text-[#451a03] mb-6 tracking-tight">About BookHive</h1>
             <p className="text-xl font-serif italic text-[#78350F] leading-relaxed">
               We're passionate about connecting readers with the books they love. Since our
@@ -73,7 +73,6 @@ export default function AboutPage() {
       {/* Mission Section */}
       <section className="py-16 relative z-10">
         <div className="container-shell">
-          <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-center gap-3 mb-6">
                <div className="h-[1px] w-12 sm:w-24 bg-[#D97706]"></div>
                <h2 className="text-3xl font-serif font-bold text-[#451a03] text-center">Our Mission</h2>
@@ -89,7 +88,6 @@ export default function AboutPage() {
               and new releases across all genres. Whether you're looking for fiction, non-fiction,
               academic texts, or children's books, we've got you covered.
             </p>
-          </div>
         </div>
       </section>
 
@@ -122,7 +120,7 @@ export default function AboutPage() {
       <section className="py-16 relative z-10">
         <div className="container-shell">
           <h2 className="text-3xl font-serif font-bold text-[#451a03] mb-12 text-center">Meet Our Team</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mx-auto">
             {team.map((member, index) => (
               <Card key={index} className="bg-white border-[#E5E5E5] shadow-sm hover:shadow-md transition-all">
                 <CardContent className="p-6 text-center">
@@ -142,36 +140,35 @@ export default function AboutPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-[#78350F] text-[#FEF3C7] relative z-10">
-        <div className="container-shell">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-serif font-bold mb-2 text-white">10,000+</div>
-              <div className="text-[#FDE68A] font-serif uppercase tracking-wider text-sm">Books Available</div>
-            </div>
-            <div>
-              <div className="text-4xl font-serif font-bold mb-2 text-white">50,000+</div>
-              <div className="text-[#FDE68A] font-serif uppercase tracking-wider text-sm">Happy Customers</div>
-            </div>
-            <div>
-              <div className="text-4xl font-serif font-bold mb-2 text-white">100+</div>
-              <div className="text-[#FDE68A] font-serif uppercase tracking-wider text-sm">Publishers</div>
-            </div>
-            <div>
-              <div className="text-4xl font-serif font-bold mb-2 text-white">24/7</div>
-              <div className="text-[#FDE68A] font-serif uppercase tracking-wider text-sm">Customer Support</div>
-            </div>
-          </div>
-        </div>
-      </section>
+<section className="py-16 bg-[#e6915f] text-[#FEF3C7] relative z-10">
+  <div className="container-shell"> 
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">   
+      <div>
+        <div className="text-4xl font-serif font-bold mb-2 text-white">10,000+</div>
+        <div className="text-[#FDE68A] font-serif uppercase tracking-wider text-sm">Books Available</div>
+      </div>
+      <div>
+        <div className="text-4xl font-serif font-bold mb-2 text-white">50,000+</div>
+        <div className="text-[#FDE68A] font-serif uppercase tracking-wider text-sm">Happy Customers</div>
+      </div>
+      <div>
+        <div className="text-4xl font-serif font-bold mb-2 text-white">100+</div>
+        <div className="text-[#FDE68A] font-serif uppercase tracking-wider text-sm">Publishers</div>
+      </div>
+      <div>
+        <div className="text-4xl font-serif font-bold mb-2 text-white">24/7</div>
+        <div className="text-[#FDE68A] font-serif uppercase tracking-wider text-sm">Customer Support</div>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Values Section */}
       <section className="py-16 relative z-10 border-t border-[#E5E5E5]">
         <div className="container-shell">
-          <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-serif font-bold text-[#451a03] mb-8 text-center">Our Values</h2>
             <div className="space-y-6">
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-[#E5E5E5]">
+              <div className="bg-white  p-6 rounded-lg shadow-sm border border-[#E5E5E5]">
                 <h3 className="text-xl font-serif font-semibold text-[#451a03] mb-2">Quality</h3>
                 <p className="text-gray-600 font-serif">
                   We ensure every book in our collection meets high standards of quality and
@@ -196,7 +193,6 @@ export default function AboutPage() {
                   We continuously improve our platform to provide the best shopping experience.
                 </p>
               </div>
-            </div>
           </div>
         </div>
       </section>

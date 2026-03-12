@@ -65,15 +65,15 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-amber-500" />
-                <span>support@bookhive.com</span>
+                <span>amresh91620@gmail.com</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-amber-500" />
-                <span>+1 (555) 123-4567</span>
+                <span>+91 91232 33736</span>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-amber-500" />
-                <span>123 Book Street, Reading City</span>
+                <span>Siwan (Bihar) Pin-841239</span>
               </li>
             </ul>
           </div>

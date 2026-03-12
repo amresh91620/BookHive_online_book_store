@@ -194,7 +194,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container-shell max-w-7xl">
+      <div className="container-shell">
         {/* Profile Header */}
         <Card className="mb-8">
           <CardContent className="pt-6">

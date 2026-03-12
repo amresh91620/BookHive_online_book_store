@@ -72,11 +72,10 @@ export default function ContactPage() {
     <div className="min-h-screen bg-[#FAF9F6] py-12 relative">
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2378350f' fill-opacity='1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E")`}}></div>
       <div className="container-shell relative z-10">
-        <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-serif font-bold text-[#451a03] mb-4">Contact Us</h1>
-            <p className="text-lg text-[#78350F] font-serif italic max-w-2xl mx-auto">
+            <p className="text-lg text-[#78350F] font-serif italic mx-auto">
               Have a question? We'd love to hear from you. Send us a message and we'll respond as
               soon as possible.
             </p>
@@ -212,7 +211,6 @@ export default function ContactPage() {
               </Card>
             </div>
           </div>
-        </div>
       </div>
     </div>
   );
