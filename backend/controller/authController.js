@@ -61,6 +61,11 @@ exports.sendForgotPasswordOtp = async (req, res) => {
       return res.status(404).json({ msg: "User not registered" });
     }
 
+    // Prevent admin password reset via forgot password
+    if (user.role === "admin") {
+      return res.status(403).json({ msg: "Admin password cannot be reset via this method. Please contact support." });
+    }
+
     const otp = generateOTP();
 
     passwordResetOtpStore[email] = {
@@ -118,6 +123,12 @@ exports.resetPassword = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ msg: "User not registered" });
+    }
+
+    // Prevent admin password reset via forgot password
+    if (user.role === "admin") {
+      delete passwordResetOtpStore[email];
+      return res.status(403).json({ msg: "Admin password cannot be reset via this method. Please contact support." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
