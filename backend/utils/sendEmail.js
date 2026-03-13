@@ -9,20 +9,28 @@ const nodemailer = require("nodemailer");
  */
 async function sendEmail({ email, subject, message }) {
   try {
-    // Create transporter with better timeout settings
+    // Create transporter (better for production servers)
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // true only for port 465
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+
+      // Timeout settings
+      connectionTimeout: 20000,
+      greetingTimeout: 20000,
+      socketTimeout: 20000,
+
       tls: {
         rejectUnauthorized: false,
       },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000,
     });
+
+    // verify connection (helpful for debugging)
+    await transporter.verify();
 
     // Send email
     const info = await transporter.sendMail({
@@ -35,11 +43,15 @@ async function sendEmail({ email, subject, message }) {
           <div style="background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); padding: 20px; text-align: center;">
             <h1 style="color: white; margin: 0;">📚 BookHive</h1>
           </div>
+
           <div style="padding: 30px; background: #f9fafb;">
             <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-              <p style="font-size: 16px; color: #374151; line-height: 1.6;">${message}</p>
+              <p style="font-size: 16px; color: #374151; line-height: 1.6;">
+                ${message}
+              </p>
             </div>
           </div>
+
           <div style="background: #1f2937; padding: 20px; text-align: center;">
             <p style="color: #9ca3af; margin: 0; font-size: 14px;">
               © ${new Date().getFullYear()} BookHive. All rights reserved.
@@ -49,8 +61,9 @@ async function sendEmail({ email, subject, message }) {
       `,
     });
 
-    console.log("Email sent: %s", info.messageId);
+    console.log("Email sent:", info.messageId);
     return info;
+
   } catch (error) {
     console.error("Error sending email:", error);
     throw new Error("Failed to send email");
