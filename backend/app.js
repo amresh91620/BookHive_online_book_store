@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors')
+const compression = require('compression');
 const app = express();
 const authRouter = require('./Routes/authRoutes');
 const adminRouter =require('./Routes/adminRoutes');
@@ -47,8 +48,19 @@ app.use(
   })
 );
 // Middleware
+app.use(compression());
 app.use(express.json({ limit: '10mb' })); 
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Health Check Endpoint (To prevent Render from sleeping)
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'BookHive Backend is running' });
+});
+
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Routes
 app.use('/api/users',authRouter);
 app.use("/api/books", bookRouter);
