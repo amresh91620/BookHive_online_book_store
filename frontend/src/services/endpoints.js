@@ -1,4 +1,24 @@
-export const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const isBrowser = typeof window !== "undefined";
+const envBase = import.meta.env.VITE_API_URL;
+const runtimeBase = isBrowser ? window.__BOOKHIVE_API_URL__ : undefined;
+const isLocalhost =
+  isBrowser && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+
+const normalizeBase = (value) => (value ? value.replace(/\/+$/, "") : value);
+const fallbackBase = isLocalhost ? "http://localhost:5000" : "";
+const resolvedBase = normalizeBase(runtimeBase || envBase || fallbackBase || "");
+const isBadProdBase =
+  !isLocalhost &&
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(resolvedBase || "");
+
+export const API_BASE = isBadProdBase ? "" : resolvedBase;
+
+if ((isBadProdBase || !API_BASE) && isBrowser) {
+  // eslint-disable-next-line no-console
+  console.error(
+    "API base URL is not configured for this deployment. Set VITE_API_URL in Vercel or define window.__BOOKHIVE_API_URL__."
+  );
+}
 
 export const endpoints = {
   auth: {

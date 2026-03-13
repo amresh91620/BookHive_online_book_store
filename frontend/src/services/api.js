@@ -2,12 +2,21 @@
 import { API_BASE } from "./endpoints";
 import { getToken, clearAuth } from "@/utils/storage";
 
+const hasApiBase = Boolean(API_BASE);
+
 const api = axios.create({
-  baseURL: API_BASE,
+  baseURL: API_BASE || undefined,
   withCredentials: false,
 });
 
 api.interceptors.request.use((config) => {
+  if (!hasApiBase) {
+    return Promise.reject(
+      new Error(
+        "API base URL is not configured. Set VITE_API_URL in your frontend deployment."
+      )
+    );
+  }
   const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

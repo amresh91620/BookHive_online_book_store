@@ -83,13 +83,19 @@ npm run dev
 
 ## Deployment
 Frontend (Vercel)
-- Set `VITE_API_URL` to your backend URL
+- Set `VITE_API_URL` to your backend HTTPS URL (no trailing slash)
+- Make sure it's set for both **Production** and **Preview** environments
 - Build command: `npm run build`
 - Output directory: `frontend/dist`
 
 Backend (Render or similar)
-- Set `CLIENT_ORIGIN` to your Vercel domain
+- Set `CLIENT_ORIGIN` to your Vercel domain (comma-separated if multiple)
+- Optional (debug only): `ALLOW_ALL_ORIGINS=true`
 - Start command: `npm start`
+
+Troubleshooting (OTP / Forgot Password not working on Vercel)
+- If Network requests go to `http://localhost:5000`, your `VITE_API_URL` is missing.
+- If you see CORS errors, your `CLIENT_ORIGIN` on Render does not match your Vercel domain.
 
 ## License
 MIT

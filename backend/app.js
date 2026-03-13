@@ -16,9 +16,10 @@ const defaultOrigins = [
   "https://book-hive-online-book-store.vercel.app",
   "https://book-hive-online-book-store-858ahai9t-amresh91620s-projects.vercel.app",
 ];
+const normalizeOrigin = (value) => (value ? value.replace(/\/$/, "") : value);
 const allowedOrigins = (process.env.CLIENT_ORIGIN || defaultOrigins.join(","))
   .split(",")
-  .map((origin) => origin.trim())
+  .map((origin) => normalizeOrigin(origin.trim()))
   .filter(Boolean);
 const isDev = process.env.NODE_ENV !== "production";
 const allowAll = process.env.ALLOW_ALL_ORIGINS === "true";
@@ -31,13 +32,14 @@ const isVercelProjectOrigin = (origin) =>
 app.use(
   cors({
     origin: (origin, callback) => {
+      const normalizedOrigin = normalizeOrigin(origin);
       if (
         allowAll ||
         !origin ||
         origin === "null" ||
-        allowedOrigins.includes(origin) ||
-        isVercelProjectOrigin(origin) ||
-        isDevOrigin(origin) ||
+        allowedOrigins.includes(normalizedOrigin) ||
+        isVercelProjectOrigin(normalizedOrigin) ||
+        isDevOrigin(normalizedOrigin) ||
         (isDev && origin)
       ) {
         return callback(null, true);

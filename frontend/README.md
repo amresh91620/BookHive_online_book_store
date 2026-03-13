@@ -103,7 +103,10 @@ npm run preview
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `VITE_API_URL` | Backend API URL | `http://localhost:5000` |
+| `VITE_API_URL` | Backend API URL | `http://localhost:5000` (development) |
+
+Production deployment note:
+Set `VITE_API_URL` in your Vercel project (Production + Preview) to your Render backend HTTPS URL.
 
 ## Redux Store Structure
 
