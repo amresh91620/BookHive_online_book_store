@@ -32,13 +32,22 @@ exports.sendRegisterOtp = async (req, res) => {
       verified: false,
     };
 
-    await sendEmail({
-      email,
-      subject: "Book Store Email Verification",
-      message: `Your OTP is ${otp}. It expires in 5 minutes.`,
-    });
-
-    res.json({ msg: "OTP sent to your email" });
+    try {
+      await sendEmail({
+        email,
+        subject: "Book Store Email Verification",
+        message: `Your OTP is ${otp}. It expires in 5 minutes.`,
+      });
+      res.json({ msg: "OTP sent to your email" });
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError);
+      // Still allow registration to proceed - log OTP for debugging
+      console.log(`OTP for ${email}: ${otp}`);
+      res.json({ 
+        msg: "OTP generated (email service temporarily unavailable)",
+        debug: process.env.NODE_ENV === 'development' ? otp : undefined
+      });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Failed to send OTP" });
@@ -73,13 +82,22 @@ exports.sendForgotPasswordOtp = async (req, res) => {
       expiresAt: Date.now() + 5 * 60 * 1000, // 5 min
     };
 
-    await sendEmail({
-      email,
-      subject: "Book Store Password Reset",
-      message: `Your password reset OTP is ${otp}. It expires in 5 minutes.`,
-    });
-
-    res.json({ msg: "OTP sent to your email" });
+    try {
+      await sendEmail({
+        email,
+        subject: "Book Store Password Reset",
+        message: `Your password reset OTP is ${otp}. It expires in 5 minutes.`,
+      });
+      res.json({ msg: "OTP sent to your email" });
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError);
+      // Still allow password reset to proceed - log OTP for debugging
+      console.log(`Password Reset OTP for ${email}: ${otp}`);
+      res.json({ 
+        msg: "OTP generated (email service temporarily unavailable)",
+        debug: process.env.NODE_ENV === 'development' ? otp : undefined
+      });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Failed to send OTP" });

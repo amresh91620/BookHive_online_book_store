@@ -12,23 +12,28 @@ async function sendEmail({ email, subject, message }) {
     // Create transporter (production-friendly)
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com", // Gmail SMTP
-      port: 587,              // 587 for TLS, 465 for SSL
-      secure: false,          // true only for port 465
-      requireTLS: true,       // ensures TLS is used
+      port: 465,              // Use 465 for SSL (more reliable on Render)
+      secure: true,           // true for port 465
       auth: {
         user: process.env.EMAIL_USER, // Gmail address
         pass: process.env.EMAIL_PASS, // App Password
       },
-      connectionTimeout: 30000, // 30 sec
+      connectionTimeout: 60000, // 60 sec
       greetingTimeout: 30000,
-      socketTimeout: 30000,
+      socketTimeout: 60000,
       tls: {
         rejectUnauthorized: false,
+        minVersion: 'TLSv1.2'
       },
+      pool: true, // Use pooled connections
+      maxConnections: 5,
+      maxMessages: 10,
     });
 
-    // Verify connection before sending (good for debugging)
-    await transporter.verify();
+    // Skip verify in production to avoid timeout issues
+    if (process.env.NODE_ENV !== 'production') {
+      await transporter.verify();
+    }
 
     // Send email
     const info = await transporter.sendMail({
