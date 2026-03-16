@@ -4,18 +4,8 @@ const BREVO_API_URL =
   process.env.BREVO_API_URL || "https://api.brevo.com/v3/smtp/email";
 
 const resolveSender = () => {
-  const email =
-    process.env.BREVO_SENDER_EMAIL ||
-    process.env.EMAIL_FROM ||
-    process.env.SMTP_FROM_EMAIL ||
-    process.env.SENDGRID_FROM_EMAIL ||
-    process.env.EMAIL_USER ||
-    process.env.SMTP_USER ||
-    "";
-  const name =
-    process.env.BREVO_SENDER_NAME ||
-    process.env.EMAIL_FROM_NAME ||
-    "BookHive";
+  const email = process.env.BREVO_SENDER_EMAIL || "";
+  const name = process.env.BREVO_SENDER_NAME || "BookHive";
   return { email, name };
 };
 
@@ -38,19 +28,24 @@ const escapeHtml = (value) =>
   });
 
 const buildHtml = (safeMessage) => `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); padding: 20px; text-align: center;">
-            <h1 style="color: white; margin: 0;">BookHive</h1>
-          </div>
-          <div style="padding: 30px; background: #f9fafb;">
-            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-              <p style="font-size: 16px; color: #374151; line-height: 1.6;">${safeMessage}</p>
+        <div style="margin: 0; padding: 24px; background: #f5f7fb; font-family: Arial, sans-serif;">
+          <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb;">
+            <div style="background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); padding: 24px;">
+              <div style="font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px;">BookHive</div>
+              <div style="font-size: 13px; color: #fff7ed; margin-top: 4px;">Your reading journey, delivered</div>
             </div>
-          </div>
-          <div style="background: #1f2937; padding: 20px; text-align: center;">
-            <p style="color: #9ca3af; margin: 0; font-size: 14px;">
-              Copyright ${new Date().getFullYear()} BookHive. All rights reserved.
-            </p>
+            <div style="padding: 24px;">
+              <h2 style="margin: 0 0 12px 0; font-size: 18px; color: #111827;">Hello!</h2>
+              <p style="margin: 0; font-size: 16px; color: #374151; line-height: 1.7;">${safeMessage}</p>
+              <div style="margin-top: 20px; padding: 14px 16px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; color: #9a3412; font-size: 12px;">
+                If you didn’t request this, you can safely ignore this email.
+              </div>
+            </div>
+            <div style="padding: 16px 24px; background: #111827; text-align: center;">
+              <p style="color: #9ca3af; margin: 0; font-size: 12px;">
+                Copyright ${new Date().getFullYear()} BookHive. All rights reserved.
+              </p>
+            </div>
           </div>
         </div>
       `;
@@ -122,7 +117,7 @@ async function sendEmail({ email, subject, message }) {
   const sender = resolveSender();
   if (!sender.email) {
     throw new Error(
-      "Sender email is not configured. Set BREVO_SENDER_EMAIL or EMAIL_FROM."
+      "Sender email is not configured. Set BREVO_SENDER_EMAIL."
     );
   }
 
