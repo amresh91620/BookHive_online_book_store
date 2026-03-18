@@ -4,7 +4,6 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container-shell">
-        <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
           <p className="text-gray-600 mb-8">Last updated: {new Date().toLocaleDateString()}</p>
 
@@ -123,19 +122,18 @@ export default function PrivacyPolicyPage() {
                 </p>
                 <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                   <p className="text-gray-700">
-                    <strong>Email:</strong> privacy@bookhive.com
+                    <strong>Email:</strong> amresh91620@gmail.com
                   </p>
                   <p className="text-gray-700">
-                    <strong>Phone:</strong> +1 (555) 123-4567
+                    <strong>Phone:</strong> +91 91232 33736
                   </p>
                   <p className="text-gray-700">
-                    <strong>Address:</strong> 123 Book Street, Reading City, RC 12345
+                    <strong>Address:</strong> Miarwa, Siwan (Bihar)
                   </p>
                 </div>
               </section>
             </CardContent>
           </Card>
-        </div>
       </div>
     </div>
   );
