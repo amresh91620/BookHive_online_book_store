@@ -10,6 +10,8 @@ const cartRouter =require('./Routes/cartRoutes');
 const wishlistRouter = require("./Routes/wishlistRoutes");
 const addressRouter = require("./Routes/addressRoutes");
 const orderRouter = require("./Routes/orderRoutes");
+const blogRouter = require("./Routes/blogRoutes");
+const blogCommentRouter = require("./Routes/blogCommentRoutes");
 
 const defaultOrigins = [
   "http://localhost:5173",
@@ -72,5 +74,7 @@ app.use("/api/cart", cartRouter);
 app.use("/api/wishlist", wishlistRouter);
 app.use("/api/address", addressRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/blogs", blogRouter);
+app.use("/api/blog-comments", blogCommentRouter);
 
 module.exports = app;
