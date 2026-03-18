@@ -24,6 +24,11 @@ const AdminOrdersPage = lazy(() => import("@/pages/admin/AdminOrdersPage"));
 const AdminOrderDetailPage = lazy(() => import("@/pages/admin/AdminOrderDetailPage"));
 const AdminReviewsPage = lazy(() => import("@/pages/admin/AdminReviewsPage"));
 const AdminMessagesPage = lazy(() => import("@/pages/admin/AdminMessagesPage"));
+const AdminBlogsPage = lazy(() => import("@/pages/admin/AdminBlogsPage"));
+const AdminBlogFormPage = lazy(() => import("@/pages/admin/AdminBlogFormPage"));
+const AdminCommentsPage = lazy(() => import("@/pages/admin/AdminCommentsPage"));
+const BlogPage = lazy(() => import("@/pages/BlogPage"));
+const BlogDetailPage = lazy(() => import("@/pages/BlogDetailPage"));
 const ContactPage = lazy(() => import("@/pages/ContactPage"));
 const AboutPage = lazy(() => import("@/pages/AboutPage"));
 const FAQPage = lazy(() => import("@/pages/FAQPage"));
@@ -81,6 +86,8 @@ export default function AppRoutes() {
         <Route path="/books/:id" element={<BookDetailPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:id" element={<BlogDetailPage />} />
         <Route path="/faq" element={<FAQPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsPage />} />
@@ -237,6 +244,38 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute adminOnly>
               <AdminMessagesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/blogs"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminBlogsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/blogs/add"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminBlogFormPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/blogs/edit/:id"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminBlogFormPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/comments"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminCommentsPage />
             </ProtectedRoute>
           }
         />
