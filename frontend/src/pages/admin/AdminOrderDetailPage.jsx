@@ -117,8 +117,7 @@ export default function AdminOrderDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container-shell">
+    <div className="p-6">
         <Button variant="ghost" onClick={() => navigate("/admin/orders")} className="mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Orders
@@ -454,7 +453,6 @@ export default function AdminOrderDetailPage() {
             )}
           </div>
         </div>
-      </div>
     </div>
   );
 }

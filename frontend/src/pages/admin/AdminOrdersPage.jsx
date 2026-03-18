@@ -51,9 +51,8 @@ export default function AdminOrdersPage() {
   const statuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container-shell">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Manage Orders</h1>
+    <div className="p-6">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Manage Orders</h1>
 
         {/* Filters */}
         <div className="mb-6 flex flex-col md:flex-row gap-4">
@@ -196,7 +195,6 @@ export default function AdminOrdersPage() {
             </div>
           </Card>
         )}
-      </div>
     </div>
   );
 }

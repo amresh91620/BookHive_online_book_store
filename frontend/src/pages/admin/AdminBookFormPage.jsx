@@ -111,16 +111,15 @@ export default function AdminBookFormPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container-shell max-w-4xl">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/admin/books")}
-          className="mb-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Books
-        </Button>
+    <div className="p-6">
+      <Button
+        variant="ghost"
+        onClick={() => navigate("/admin/books")}
+        className="mb-6"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Back to Books
+      </Button>
 
         <Card>
           <CardHeader>
@@ -403,7 +402,6 @@ export default function AdminBookFormPage() {
             </form>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }
