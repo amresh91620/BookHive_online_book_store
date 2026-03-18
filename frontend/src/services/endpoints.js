@@ -88,4 +88,22 @@ export const endpoints = {
   contact: {
     send: "/api/contact",
   },
+  blogs: {
+    list: "/api/blogs",
+    categories: "/api/blogs/categories",
+    detail: (id) => `/api/blogs/${id}`,
+    create: "/api/blogs",
+    update: (id) => `/api/blogs/${id}`,
+    remove: (id) => `/api/blogs/${id}`,
+  },
+  blogComments: {
+    list: (blogId) => `/api/blog-comments/blog/${blogId}`,
+    create: (blogId) => `/api/blog-comments/blog/${blogId}`,
+    update: (commentId) => `/api/blog-comments/${commentId}`,
+    remove: (commentId) => `/api/blog-comments/${commentId}`,
+    like: (commentId) => `/api/blog-comments/${commentId}/like`,
+    dislike: (commentId) => `/api/blog-comments/${commentId}/dislike`,
+    adminList: "/api/blog-comments/admin/all",
+    adminRemove: (commentId) => `/api/blog-comments/admin/${commentId}`,
+  },
 };
