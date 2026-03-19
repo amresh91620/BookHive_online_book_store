@@ -3,6 +3,8 @@ import api from "@/services/api";
 import { endpoints } from "@/services/endpoints";
 import { useSelector } from "react-redux";
 
+const getWishlistQueryKey = (userId) => ["wishlist", userId || "guest"];
+
 export const useCart = () => {
   const { user, token } = useSelector((state) => state.auth);
   
@@ -23,53 +25,65 @@ export const useCart = () => {
 };
 
 export const useAddToCart = () => {
+  const { user } = useSelector((state) => state.auth);
   const queryClient = useQueryClient();
+  const wishlistQueryKey = getWishlistQueryKey(user?._id);
+
   return useMutation({
     mutationFn: async (bookId) => {
       const { data } = await api.post(endpoints.cart.add, { bookId });
       return data;
     },
     onMutate: async (bookId) => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ["cart"] });
+      await queryClient.cancelQueries({ queryKey: wishlistQueryKey });
 
-      // Snapshot the previous value
       const previousCart = queryClient.getQueryData(["cart"]);
+      const previousWishlist = queryClient.getQueryData(wishlistQueryKey);
 
-      // Optimistically update to the new value
       queryClient.setQueryData(["cart"], (old) => {
         if (!old || !old.items) return old;
-        
-        // Check if item already exists
-        const existingItem = old.items.find(item => item.book._id === bookId);
-        
+
+        const existingItem = old.items.find((item) => item.book._id === bookId);
+
         if (existingItem) {
-          // Increment quantity if exists
           return {
             ...old,
-            items: old.items.map(item =>
+            items: old.items.map((item) =>
               item.book._id === bookId
                 ? { ...item, quantity: item.quantity + 1 }
                 : item
-            )
+            ),
           };
-        } else {
-          // Add new item (we don't have full book data, server will return it)
-          return old;
         }
+
+        return old;
       });
 
-      return { previousCart };
+      queryClient.setQueryData(wishlistQueryKey, (old) => {
+        if (!Array.isArray(old)) return old;
+        return old.filter((item) => item._id !== bookId);
+      });
+
+      return { previousCart, previousWishlist };
     },
     onError: (err, bookId, context) => {
-      // Rollback to the previous value on error
       if (context?.previousCart) {
         queryClient.setQueryData(["cart"], context.previousCart);
       }
+      if (context?.previousWishlist !== undefined) {
+        queryClient.setQueryData(wishlistQueryKey, context.previousWishlist);
+      }
     },
-    onSuccess: (data) => {
-      // Update with server response
+    onSuccess: (data, bookId) => {
       queryClient.setQueryData(["cart"], data);
+      queryClient.setQueryData(wishlistQueryKey, (old) => {
+        if (!Array.isArray(old)) return old;
+        return old.filter((item) => item._id !== bookId);
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: wishlistQueryKey });
     },
   });
 };
