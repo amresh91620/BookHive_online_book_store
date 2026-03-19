@@ -1,12 +1,19 @@
 import { Link } from "react-router-dom";
-import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useAddToCart } from "@/hooks/api/useCart";
-import { useWishlist, useAddToWishlist, useRemoveFromWishlist } from "@/hooks/api/useWishlist";
+import {
+  useWishlist,
+  useAddToWishlist,
+  useRemoveFromWishlist,
+} from "@/hooks/api/useWishlist";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/utils/format";
 import toast from "react-hot-toast";
+
+const FALLBACK_IMAGE =
+  "https://via.placeholder.com/300x400/78350F/FEF3C7?text=No+Image";
 
 export default function BookCard({ book }) {
   const { user } = useSelector((state) => state.auth);
@@ -16,6 +23,14 @@ export default function BookCard({ book }) {
   const removeFromWishlist = useRemoveFromWishlist();
 
   const isInWishlist = wishlistItems?.some((item) => item._id === book._id);
+  
+  // Safe rating calculation
+  const rating = book?.averageRating || book?.rating || 0;
+  const reviewCount = book?.totalReviews || book?.reviewCount || 0;
+  const roundedRating = Math.max(0, Math.min(5, Math.round(Number(rating))));
+  
+  const hasDiscount = Number(book.originalPrice || 0) > Number(book.price || 0);
+  const isOutOfStock = book.stock === 0;
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -50,116 +65,121 @@ export default function BookCard({ book }) {
 
   return (
     <Link to={`/books/${book._id}`} className="group block">
-      <div className="bg-white border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col">
-        {/* Image Container - 3D Book Effect */}
-        <div className="relative aspect-[3/4] bg-gray-50 flex-shrink-0 mx-4 mt-4 rounded-r-md  overflow-hidden shadow-[4px_4px_10px_rgba(0,0,0,0.15)] group-hover:shadow-[6px_6px_15px_rgba(0,0,0,0.2)] transition-shadow duration-300 transform perspective-1000">
-          <img
-            src={book.coverImage || 'https://via.placeholder.com/300x400/78350F/FEF3C7?text=No+Image'}
-            alt={book.title}
-            loading="lazy"
-            onError={(e) => {
-              e.target.src = 'https://via.placeholder.com/300x400/78350F/FEF3C7?text=No+Image';
-            }}
-            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-          />
-          
-          {/* 3D Spine and Edge Overlays */}
-          <div className="absolute inset-0 pointer-events-none rounded-r-md rounded-l-sm opacity-60">
-            {/* Spine Highlight/Shadow */}
-            <div className="absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-black/20 via-white/10 to-transparent"></div>
-            {/* Page edge highlight (right) */}
-            <div className="absolute inset-y-0 right-0 w-[2px] bg-gradient-to-l from-white/40 to-transparent"></div>
-            {/* Top and Bottom edge highlights */}
-            <div className="absolute inset-x-0 top-0 h-[1px] bg-white/20"></div>
-            <div className="absolute inset-x-0 bottom-0 h-[1px] bg-black/10"></div>
-          </div>
-          
-          <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10">
-            {book.bestseller && (
-              <Badge className="bg-[#f54343] text-[#FEF3C7] font-serif font-bold text-[9px] sm:text-[10px] px-2 py-0.5 shadow-md border border-[#D97706] uppercase tracking-wider w-fit">
-                ★ Best Seller
-              </Badge>
-            )}
-            {book.discount > 0 && (
-              <Badge className="bg-[#F59E0B] text-white font-bold text-[9px] sm:text-[10px] px-2 py-0.5 shadow-md border-0 w-fit">
-                {book.discount}% OFF
-              </Badge>
-            )}
-            {book.newArrival && (
-              <Badge className="bg-[#10B981] text-white font-bold text-[10px] sm:text-xs px-2.5 py-1 shadow-md border-0 w-fit">
-                New Arrival
-              </Badge>
-            )}
-          </div>
-
-          
-          {/* Wishlist Button - Top Right */}
-          <button
-            onClick={handleWishlistToggle}
-            className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-1.5 shadow-md hover:bg-white hover:scale-110 transition-all duration-200 z-10"
-          >
-            <Heart
-              className={`w-3.5 h-3.5 ${isInWishlist ? "fill-red-500 text-red-500" : "text-gray-600"}`}
-            />
-          </button>
-
-          {/* Hover Overlay with Quick Add */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#451a03]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4 z-10">
-            <Button
-              onClick={handleAddToCart}
-              className="bg-[#D97706] hover:bg-[#B45309] text-white font-serif tracking-wide shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"
-              size="sm"
-              disabled={book.stock === 0}
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl">
+        {/* Image Section with 3D Book Effect */}
+        <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 p-2 sm:p-4">
+          {/* 3D Book Container */}
+          <div className="relative mx-auto h-full w-[85%] transition-transform duration-300 group-hover:scale-105">
+            <div 
+              className="relative h-full w-full rounded-sm shadow-2xl transition-transform duration-300"
+              style={{ 
+                transform: 'perspective(1000px) rotateY(-12deg)',
+                boxShadow: '10px 10px 30px rgba(0,0,0,0.3), -3px 0 10px rgba(0,0,0,0.15)'
+              }}
             >
-              {book.stock === 0 ? (
-                "Out of Stock"
-              ) : (
-                <>
-                  <ShoppingCart className="w-4 h-4 mr-1" />
-                  Quick Add
-                </>
-              )}
-            </Button>
+              {/* Book Cover */}
+              <img
+                src={book.coverImage || FALLBACK_IMAGE}
+                alt={book.title}
+                loading="lazy"
+                onError={(e) => {
+                  e.target.src = FALLBACK_IMAGE;
+                }}
+                className="h-full w-full rounded-sm object-cover"
+              />
+              
+              {/* Book Spine Shadow */}
+              <div className="absolute left-0 top-0 h-full w-2 sm:w-3 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
+              
+              {/* Book Edge Highlight */}
+              <div className="absolute right-0 top-0 h-full w-0.5 sm:w-1 bg-gradient-to-l from-white/40 to-transparent" />
+              
+              {/* Book Pages Effect - Right Side */}
+              <div className="absolute -right-0.5 sm:-right-1 top-1 h-[calc(100%-8px)] w-1 sm:w-1.5 rounded-r-sm bg-white shadow-sm" />
+              <div className="absolute -right-1 sm:-right-2 top-2 h-[calc(100%-16px)] w-1 sm:w-1.5 rounded-r-sm bg-gray-100 shadow-sm" />
+            </div>
           </div>
-        </div>
-
-        {/* Content */}
-        <div className="p-4 flex-1 flex flex-col">
-          {/* Title */}
-          <h3 className="font-serif font-bold text-[#451a03] text-base lg:text-lg line-clamp-2 mb-1 group-hover:text-[#D97706] transition-colors leading-snug">
-            {book.title}
-          </h3>
           
-          {/* Author */}
-          <p className="text-sm text-gray-600 mb-2">{book.author}</p>
-
-          {/* Rating */}
-          {book.rating > 0 && (
-            <div className="flex items-center gap-1 mb-3">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-3.5 h-3.5 ${
-                    i < Math.floor(book.rating)
-                      ? "fill-[#F59E0B] text-[#F59E0B]"
-                      : "fill-gray-200 text-gray-200"
-                  }`}
-                />
-              ))}
-              <span className="text-xs text-gray-500 ml-1">({book.totalReviews || 0})</span>
+          {/* Badges */}
+          {(book.discount > 0 || book.bestseller || book.newArrival) && (
+            <div className="absolute left-1 sm:left-2 top-1 sm:top-2 z-10 flex flex-col gap-0.5 sm:gap-1">
+              {book.discount > 0 && (
+                <Badge className="bg-red-500 px-1.5 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-md">
+                  -{book.discount}%
+                </Badge>
+              )}
+              {book.bestseller && (
+                <Badge className="bg-yellow-500 px-1.5 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-md">
+                  Bestseller
+                </Badge>
+              )}
+              {book.newArrival && (
+                <Badge className="bg-green-500 px-1.5 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-md">
+                  New Arrival
+                </Badge>
+              )}
             </div>
           )}
 
-          {/* Price */}
-          <div className="flex items-baseline gap-2 mt-auto pt-3 border-t border-gray-100">
-            <span className="text-xl font-bold text-[#78350F]">
-              {formatPrice(book.price)}
+          {/* Wishlist Button */}
+          <button
+            type="button"
+            onClick={handleWishlistToggle}
+            aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+            className="absolute right-1 sm:right-2 top-1 sm:top-2 z-10 rounded-full bg-white p-1.5 sm:p-2 shadow-md transition-all hover:scale-110"
+          >
+            <Heart
+              className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isInWishlist ? "fill-red-500 text-red-500" : "text-gray-600"}`}
+            />
+          </button>
+        </div>
+
+        {/* Content Section */}
+        <div className="p-2 sm:p-3">
+          {/* Title & Author */}
+          <h3 className="line-clamp-2 text-xs sm:text-sm font-semibold text-gray-900 group-hover:text-[#D97706] leading-tight">
+            {book.title}
+          </h3>
+          <p className="mt-0.5 text-[10px] sm:text-xs text-gray-500 truncate">{book.author}</p>
+
+          {/* Rating */}
+          <div className="mt-1.5 sm:mt-2 flex items-center gap-1 sm:gap-1.5">
+            <div className="flex items-center gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`h-3 w-3 sm:h-4 sm:w-4 ${
+                    i < roundedRating
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "fill-gray-100 text-gray-300 stroke-2"
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-[11px] sm:text-sm font-bold text-gray-900">
+              {rating > 0 ? Number(rating).toFixed(1) : "0.0"}
             </span>
-            {book.originalPrice && book.originalPrice > book.price && (
-              <span className="text-sm text-gray-400 line-through">
-                {formatPrice(book.originalPrice)}
-              </span>
-            )}
+            <span className="hidden sm:inline text-xs text-gray-500">({reviewCount})</span>
+          </div>
+
+          {/* Price & Button */}
+          <div className="mt-2 sm:mt-3 flex items-center justify-between gap-2">
+            <div className="flex-shrink-0">
+              <p className="text-sm sm:text-lg font-bold text-gray-900">{formatPrice(book.price)}</p>
+              {hasDiscount && (
+                <p className="text-[10px] sm:text-xs text-gray-400 line-through">
+                  {formatPrice(book.originalPrice)}
+                </p>
+              )}
+            </div>
+            <Button
+              onClick={handleAddToCart}
+              className="rounded-md bg-[#F59E0B] hover:bg-[#D97706] px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium text-white transition-colors flex-shrink-0"
+              size="sm"
+              disabled={isOutOfStock}
+            >
+              {isOutOfStock ? "Out" : "Add"}
+            </Button>
           </div>
         </div>
       </div>
