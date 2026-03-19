@@ -5,7 +5,7 @@ import AdminLayout from "@/layouts/AdminLayout";
 import { lazy, Suspense, useEffect } from "react";
 const HomePage = lazy(() => import("@/pages/HomePage"));
 const BooksPage = lazy(() => import("@/pages/BooksPage"));
-const NewArrivalsPage = lazy(() => import("@/pages/NewArrivalsPage"));
+const DealsPage = lazy(() => import("@/pages/DealsPage"));
 const BookDetailPage = lazy(() => import("@/pages/BookDetailPage"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
 const WishlistPage = lazy(() => import("@/pages/WishlistPage"));
@@ -82,7 +82,7 @@ export default function AppRoutes() {
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/books" element={<BooksPage />} />
-        <Route path="/new-arrivals" element={<NewArrivalsPage />} />
+        <Route path="/deals" element={<DealsPage />} />
         <Route path="/books/:id" element={<BookDetailPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/about" element={<AboutPage />} />
