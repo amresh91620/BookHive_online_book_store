@@ -18,7 +18,6 @@ export default function BooksPage() {
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [statusFilter, setStatusFilter] = useState(searchParams.get("filter") || "");
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
-  const [showFilters, setShowFilters] = useState(false);
 
   // Debounce search query to reduce API calls
   const debouncedSearch = useDebounce(searchQuery, 500);
@@ -41,21 +40,19 @@ export default function BooksPage() {
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
-    const params = { page: "1" };
-    if (searchQuery) params.q = searchQuery;
-    if (category) params.category = category;
-    if (statusFilter) params.filter = statusFilter;
-    setSearchParams(params);
+    updateURL({ page: "1", q: searchQuery, category, filter: statusFilter });
   };
 
   const handleCategoryChange = (newCategory) => {
     setCategory(newCategory);
     setCurrentPage(1);
-    const params = { page: "1" };
-    if (searchQuery) params.q = searchQuery;
-    if (newCategory) params.category = newCategory;
-    if (statusFilter) params.filter = statusFilter;
-    setSearchParams(params);
+    updateURL({ page: "1", q: searchQuery, category: newCategory, filter: statusFilter });
+  };
+
+  const handleStatusFilterChange = (newFilter) => {
+    setStatusFilter(newFilter);
+    setCurrentPage(1);
+    updateURL({ page: "1", q: searchQuery, category, filter: newFilter });
   };
 
   const handleClearFilters = () => {
@@ -68,149 +65,172 @@ export default function BooksPage() {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    const params = { page: page.toString() };
-    if (searchQuery) params.q = searchQuery;
+    updateURL({ page: page.toString(), q: searchQuery, category, filter: statusFilter });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const updateURL = ({ page, q, category, filter }) => {
+    const params = { page };
+    if (q) params.q = q;
     if (category) params.category = category;
-    if (statusFilter) params.filter = statusFilter;
+    if (filter) params.filter = filter;
     setSearchParams(params);
   };
 
   const hasActiveFilters = searchQuery || category || statusFilter;
 
+  const getPageTitle = () => {
+    if (statusFilter === 'newArrival') return 'New Arrivals';
+    if (statusFilter === 'bestseller') return 'Best Sellers';
+    if (statusFilter === 'featured') return 'Featured Books';
+    return 'All Books';
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container-shell py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {statusFilter === 'newArrival' ? 'New Arrivals' : 
-             statusFilter === 'bestseller' ? 'Best Sellers' : 
-             statusFilter === 'featured' ? 'Featured Books' : 'Explore Books'}
-          </h1>
-          <p className="text-gray-600">
-            Discover from our collection of {totalBooks} books
-          </p>
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Hero Header with Gradient */}
+      <div className="relative z-10 bg-gradient-to-r from-[#1F2937] via-[#374151] to-[#1F2937] text-white overflow-hidden">
+        {/* Decorative Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}></div>
         </div>
-
-        {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <form onSubmit={handleSearch} className="flex gap-4 mb-4">
-            <div className="flex-1">
-              <Input
-                type="text"
-                placeholder="Search by title or author..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full"
-              />
+        
+        <div className="container-shell py-8 sm:py-12 relative z-10">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-sm text-gray-300 mb-4">
+            <span className="hover:text-white transition-colors cursor-pointer">Home</span>
+            <span>/</span>
+            <span className="text-white font-medium">{getPageTitle()}</span>
+          </div>
+          
+          {/* Title & Description */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                {getPageTitle()}
+              </h1>
+              <p className="text-base sm:text-lg text-gray-300 flex items-center gap-2">
+                <span className="inline-block w-2 h-2 bg-[#F59E0B] rounded-full animate-pulse"></span>
+                Discover from our collection of <span className="font-bold text-[#F59E0B]">{totalBooks}</span> amazing books
+              </p>
             </div>
-            <Button type="submit">
-              <Search className="w-4 h-4 mr-2" />
-              Search
-            </Button>
-          </form>
+          </div>
+        </div>
+      </div>
 
-          {/* Category Filter Toggle */}
-          <div className="flex items-center justify-between mb-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Filter className="w-4 h-4 mr-2" />
-              {showFilters ? "Hide" : "Show"} Categories
-            </Button>
+      <div className="relative z-10 container-shell py-6 sm:py-8">
+        {/* Compact Filter Bar */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
+            {/* Book Type Filter */}
+            <div className="w-full sm:w-auto sm:min-w-[180px]">
+              <label className="text-xs font-medium text-gray-600 mb-1.5 block">Book Type</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => handleStatusFilterChange(e.target.value)}
+                className="w-full h-11 px-4 border border-gray-300 rounded-lg text-sm focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/20 focus:outline-none bg-white transition-all"
+              >
+                <option value="">All Books</option>
+                <option value="featured">Featured</option>
+                <option value="bestseller">Best Sellers</option>
+                <option value="newArrival">New Arrivals</option>
+              </select>
+            </div>
+
+            {/* Category Filter */}
+            <div className="w-full sm:w-auto sm:min-w-[180px]">
+              <label className="text-xs font-medium text-gray-600 mb-1.5 block">Category</label>
+              <select
+                value={category}
+                onChange={(e) => handleCategoryChange(e.target.value)}
+                className="w-full h-11 px-4 border border-gray-300 rounded-lg text-sm focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/20 focus:outline-none bg-white transition-all"
+              >
+                <option value="">All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Search Bar */}
+            <div className="flex-1 w-full">
+              <label className="text-xs font-medium text-gray-600 mb-1.5 block">Search</label>
+              <form onSubmit={handleSearch} className="flex gap-2">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Search books..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 h-11 border-gray-300 focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/20 rounded-lg"
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  className="bg-[#F59E0B] hover:bg-[#D97706] h-11 px-5 rounded-lg"
+                >
+                  <Search className="w-4 h-4" />
+                </Button>
+              </form>
+            </div>
+
+            {/* Clear Filters */}
             {hasActiveFilters && (
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={handleClearFilters}
+                className="h-11 px-4 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 rounded-lg whitespace-nowrap"
               >
-                <X className="w-4 h-4 mr-2" />
-                Clear Filters
+                <X className="w-4 h-4 mr-1.5" />
+                Clear
               </Button>
             )}
           </div>
 
-          {/* Active Filters */}
+          {/* Active Filter Tags */}
           {hasActiveFilters && (
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
               {searchQuery && (
-                <Badge variant="secondary" className="px-3 py-1">
-                  Search: {searchQuery}
+                <Badge className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1.5 rounded-full">
+                  {searchQuery}
                   <X
-                    className="w-3 h-3 ml-2 cursor-pointer"
+                    className="w-3 h-3 ml-1.5 cursor-pointer inline-block"
                     onClick={() => {
                       setSearchQuery("");
-                      setCurrentPage(1);
-                      const params = { page: "1" };
-                      if (category) params.category = category;
-                      setSearchParams(params);
-                    }}
-                  />
-                </Badge>
-              )}
-              {category && (
-                <Badge variant="secondary" className="px-3 py-1">
-                  Category: {category}
-                  <X
-                    className="w-3 h-3 ml-2 cursor-pointer"
-                    onClick={() => {
-                      setCategory("");
-                      setCurrentPage(1);
-                      const params = { page: "1" };
-                      if (searchQuery) params.q = searchQuery;
-                      setSearchParams(params);
+                      updateURL({ page: "1", q: "", category, filter: statusFilter });
                     }}
                   />
                 </Badge>
               )}
               {statusFilter && (
-                <Badge variant="secondary" className="px-3 py-1 bg-amber-100 text-amber-900 border-amber-200">
-                  Type: {statusFilter === 'newArrival' ? 'New Arrival' : statusFilter}
+                <Badge className="bg-purple-500 hover:bg-purple-600 text-white text-xs px-3 py-1.5 rounded-full">
+                  {statusFilter === 'newArrival' ? 'New Arrival' : statusFilter}
                   <X
-                    className="w-3 h-3 ml-2 cursor-pointer"
-                    onClick={() => {
-                      setStatusFilter("");
-                      setCurrentPage(1);
-                      const params = { page: "1" };
-                      if (searchQuery) params.q = searchQuery;
-                      if (category) params.category = category;
-                      setSearchParams(params);
-                    }}
+                    className="w-3 h-3 ml-1.5 cursor-pointer inline-block"
+                    onClick={() => handleStatusFilterChange("")}
                   />
                 </Badge>
               )}
-            </div>
-          )}
-
-          {/* Category Filter */}
-          {showFilters && (
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant={category === "" ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleCategoryChange("")}
-              >
-                All Categories
-              </Button>
-              {categories.map((cat) => (
-                <Button
-                  key={cat}
-                  variant={category === cat ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handleCategoryChange(cat)}
-                >
-                  {cat}
-                </Button>
-              ))}
+              {category && (
+                <Badge className="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-full">
+                  {category}
+                  <X
+                    className="w-3 h-3 ml-1.5 cursor-pointer inline-block"
+                    onClick={() => handleCategoryChange("")}
+                  />
+                </Badge>
+              )}
             </div>
           )}
         </div>
 
         {/* Loading State */}
         {isLoading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {[...Array(8)].map((_, i) => (
               <BookSkeleton key={i} />
             ))}
@@ -220,7 +240,7 @@ export default function BooksPage() {
         {/* Books Grid */}
         {!isLoading && books.length > 0 && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
               {books.map((book) => (
                 <BookCard key={book._id} book={book} />
               ))}
@@ -228,7 +248,10 @@ export default function BooksPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex justify-center">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 p-6 bg-white rounded-xl border border-gray-200">
+                <div className="text-sm text-gray-600">
+                  Page {currentPage} of {totalPages}
+                </div>
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -241,10 +264,25 @@ export default function BooksPage() {
 
         {/* No Results */}
         {!isLoading && books.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-gray-500 text-lg mb-4">No books found</p>
+          <div className="text-center py-16 sm:py-24 bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-dashed border-gray-300 shadow-lg">
+            <div className="mb-6 relative">
+              <div className="w-24 h-24 mx-auto bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                <Search className="w-12 h-12 text-gray-400" />
+              </div>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-[#F59E0B]/10 rounded-full blur-3xl -z-10"></div>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">No books found</h3>
+            <p className="text-gray-500 mb-8 max-w-md mx-auto">
+              We couldn't find any books matching your search criteria. Try adjusting your filters or search terms.
+            </p>
             {hasActiveFilters && (
-              <Button onClick={handleClearFilters}>Clear Filters</Button>
+              <Button 
+                onClick={handleClearFilters} 
+                className="bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:from-[#D97706] hover:to-[#B45309] shadow-lg hover:shadow-xl transition-all"
+              >
+                <X className="w-4 h-4 mr-2" />
+                Clear All Filters
+              </Button>
             )}
           </div>
         )}
