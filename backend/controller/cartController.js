@@ -1,5 +1,6 @@
 // controllers/cartController.js
 const Cart = require("../models/Cart");
+const User = require("../models/User");
 
 exports.getCart = async (req, res) => {
   const cart = await Cart.findOne({ user: req.user.id }).populate(
@@ -18,9 +19,7 @@ exports.addToCart = async (req, res) => {
       items: [{ book: bookId, quantity: 1 }],
     });
   } else {
-    const item = cart.items.find(
-      (i) => i.book.toString() === bookId
-    );
+    const item = cart.items.find((i) => i.book.toString() === bookId);
     if (item) {
       item.quantity += 1;
     } else {
@@ -29,21 +28,21 @@ exports.addToCart = async (req, res) => {
     await cart.save();
   }
 
-  // ✅ ADD THIS - Populate book details before sending response
-  await cart.populate('items.book');
+  await User.findByIdAndUpdate(req.user.id, {
+    $pull: { wishlist: bookId },
+  });
+
+  await cart.populate("items.book");
 
   res.json(cart);
 };
 
 exports.removeFromCart = async (req, res) => {
   const cart = await Cart.findOne({ user: req.user.id });
-  cart.items = cart.items.filter(
-    (i) => i._id.toString() !== req.params.itemId
-  );
+  cart.items = cart.items.filter((i) => i._id.toString() !== req.params.itemId);
   await cart.save();
 
-  // ✅ ADD THIS - Populate book details before sending response
-  await cart.populate('items.book');
+  await cart.populate("items.book");
 
   res.json(cart);
 };
@@ -56,8 +55,7 @@ exports.updateQuantity = async (req, res) => {
   item.quantity = quantity;
   await cart.save();
 
-  // ✅ ADD THIS - Populate book details before sending response
-  await cart.populate('items.book');
+  await cart.populate("items.book");
 
   res.json(cart);
 };
