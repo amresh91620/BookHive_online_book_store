@@ -43,9 +43,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const queryFilter = new URLSearchParams(location.search).get("filter");
-  const isNewReleaseActive = location.pathname === "/new-arrivals";
-  const isBooksActive =
-    location.pathname.startsWith("/books") && !isNewReleaseActive;
+  const isBooksActive = location.pathname.startsWith("/books");
 
   const handleLogout = () => {
     dispatch(logout());
@@ -126,21 +124,23 @@ export default function Header() {
               <Link to="/books" className={getDesktopNavClass(isBooksActive)}>
                 Books
               </Link>
-              <Link
-                to="/new-arrivals"
-                className={getDesktopNavClass(isNewReleaseActive)}
-              >
-                New Release
-              </Link>
-              <NavLink to="/about" className={({ isActive }) => getDesktopNavClass(isActive)}>
-                About
+              
+              <NavLink to="/deals" className={({ isActive }) => getDesktopNavClass(isActive)}>
+                Deals
               </NavLink>
-              <NavLink to="/contact" className={({ isActive }) => getDesktopNavClass(isActive)}>
-                Contact
-              </NavLink>
+              
               <NavLink to="/blog" className={({ isActive }) => getDesktopNavClass(isActive)}>
                 Blog
               </NavLink>
+              
+              <NavLink to="/about" className={({ isActive }) => getDesktopNavClass(isActive)}>
+                About
+              </NavLink>
+              
+              <NavLink to="/contact" className={({ isActive }) => getDesktopNavClass(isActive)}>
+                Contact
+              </NavLink>
+              
               {user?.role === "admin" && (
                 <NavLink
                   to="/admin"
@@ -234,13 +234,7 @@ export default function Header() {
               >
                 Home
               </NavLink>
-              <NavLink
-                to="/about"
-                className={({ isActive }) => getMobileNavClass(isActive)}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                About Us
-              </NavLink>
+              
               <Link
                 to="/books"
                 className={getMobileNavClass(isBooksActive)}
@@ -248,20 +242,15 @@ export default function Header() {
               >
                 Books
               </Link>
-              <Link
-                to="/new-arrivals"
-                className={getMobileNavClass(isNewReleaseActive)}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                New Release
-              </Link>
+              
               <NavLink
-                to="/contact"
+                to="/deals"
                 className={({ isActive }) => getMobileNavClass(isActive)}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Contact Us
+                Deals
               </NavLink>
+              
               <NavLink
                 to="/blog"
                 className={({ isActive }) => getMobileNavClass(isActive)}
@@ -269,6 +258,23 @@ export default function Header() {
               >
                 Blog
               </NavLink>
+              
+              <NavLink
+                to="/about"
+                className={({ isActive }) => getMobileNavClass(isActive)}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                About
+              </NavLink>
+              
+              <NavLink
+                to="/contact"
+                className={({ isActive }) => getMobileNavClass(isActive)}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Contact
+              </NavLink>
+              
               {user?.role === "admin" && (
                 <NavLink
                   to="/admin"
@@ -320,7 +326,7 @@ export default function Header() {
                     </Button>
                   </Link>
                 </div>
-              )}
+              )}  
             </nav>
           </div>
         </div>
