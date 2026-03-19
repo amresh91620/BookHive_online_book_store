@@ -2,6 +2,31 @@ const mongoose = require("mongoose");
 const Review = require("../models/Review");
 const Book = require("../models/Book");
 
+// Helper function to update book rating
+const updateBookRating = async (bookId) => {
+    try {
+        const stats = await Review.aggregate([
+            { $match: { book: new mongoose.Types.ObjectId(bookId) } },
+            {
+                $group: {
+                    _id: null,
+                    avgRating: { $avg: "$rating" },
+                    totalReviews: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const { avgRating = 0, totalReviews = 0 } = stats[0] || {};
+        
+        await Book.findByIdAndUpdate(bookId, {
+            rating: avgRating,
+            totalReviews: totalReviews
+        });
+    } catch (error) {
+        console.error("Update book rating error:", error);
+    }
+};
+
 exports.addReview = async (req, res) => {
     try {
         const { bookId, rating, comment } = req.body;
@@ -29,6 +54,9 @@ exports.addReview = async (req, res) => {
         });
 
         await review.save();
+        
+        // ✅ Update book rating
+        await updateBookRating(bookId);
         
         // ✅ Populate user info immediately
         const populatedReview = await Review.findById(review._id).populate("user", "name email");
@@ -62,6 +90,9 @@ exports.updateReview = async (req, res) => {
 
     await review.save();
     
+    // ✅ Update book rating
+    await updateBookRating(review.book);
+    
     // ✅ Fetch updated review with populated user info
     const updatedReview = await Review.findById(review._id).populate("user", "name email");
     
@@ -87,8 +118,13 @@ exports.deleteReview = async (req, res) => {
       return res.status(403).json({ msg: "Not authorized to delete this review" });
     }
 
+    const bookId = review.book;
+
     // ✅ Use deleteOne() instead of deprecated remove()
     await Review.deleteOne({ _id: req.params.id }); 
+    
+    // ✅ Update book rating
+    await updateBookRating(bookId);
     
     res.json({ msg: "Review deleted successfully" });
   } catch (error) {
@@ -224,10 +260,18 @@ exports.getAllReviews = async (req, res) => {
 
 exports.deleteUserReview = async (req, res) => {
   try {
-    const review = await Review.findByIdAndDelete(req.params.id);
+    const review = await Review.findById(req.params.id);
     if (!review) {
       return res.status(404).json({ msg: "Review not found" });
     }
+    
+    const bookId = review.book;
+    
+    await Review.findByIdAndDelete(req.params.id);
+    
+    // ✅ Update book rating
+    await updateBookRating(bookId);
+    
     res.json({ msg: "Review deleted successfully" });
   } catch (error) {
     console.error("Delete review error:", error);
