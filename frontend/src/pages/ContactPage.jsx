@@ -1,11 +1,16 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight, Clock, Headphones, HelpCircle, Mail, MapPin, MessageSquare, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import toast from "react-hot-toast";
+
+const fieldClassName =
+  "h-12 rounded-2xl border-amber-100 bg-white/90 text-[#451a03] placeholder:text-[#9b7b5f] focus-visible:ring-[#d97706]";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -25,7 +30,6 @@ export default function ContactPage() {
     setLoading(true);
 
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success("Message sent successfully! We'll get back to you soon.");
       setFormData({
@@ -44,139 +48,262 @@ export default function ContactPage() {
   const contactInfo = [
     {
       icon: Mail,
-      title: "Email",
+      title: "Email Us",
       content: "support@bookhive.com",
+      note: "Best for orders, account help, and general questions",
       link: "mailto:support@bookhive.com",
     },
     {
       icon: Phone,
-      title: "Phone",
+      title: "Call Support",
       content: "+1 (555) 123-4567",
+      note: "Talk to us during our business hours",
       link: "tel:+15551234567",
     },
     {
       icon: MapPin,
-      title: "Address",
+      title: "Visit Office",
       content: "123 Book Street, Reading City, RC 12345",
+      note: "Our fulfillment and support coordination center",
       link: null,
     },
     {
       icon: Clock,
       title: "Business Hours",
       content: "Mon-Fri: 9AM-6PM, Sat-Sun: 10AM-4PM",
+      note: "Typical response time is within one business day",
       link: null,
     },
   ];
 
-  return (
-    <div className="min-h-screen bg-[#FAF9F6] py-12 relative">
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2378350f' fill-opacity='1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E")`}}></div>
-      <div className="container-shell relative z-10">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-serif font-bold text-[#451a03] mb-4">Contact Us</h1>
-            <p className="text-lg text-[#78350F] font-serif italic mx-auto">
-              Have a question? We'd love to hear from you. Send us a message and we'll respond as
-              soon as possible.
-            </p>
-          </div>
+  const quickAnswers = [
+    {
+      question: "How long does shipping take?",
+      answer: "Standard shipping usually takes 3-5 business days depending on your location.",
+    },
+    {
+      question: "What is your return policy?",
+      answer: "We accept returns within 30 days of purchase for eligible orders.",
+    },
+    {
+      question: "Do you ship internationally?",
+      answer: "At the moment, we only ship within the United States.",
+    },
+  ];
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Contact Form */}
-            <div className="lg:col-span-2">
-              <Card className="bg-white border-[#E5E5E5] shadow-md">
-                <CardHeader className="border-b border-gray-100 pb-4">
-                  <CardTitle className="font-serif text-2xl text-[#451a03]">Send us a Message</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  <form onSubmit={handleSubmit} className="space-y-5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="name" className="text-gray-700 font-medium">Name *</Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          required
-                          placeholder="Your name"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="email" className="text-gray-700 font-medium">Email *</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          required
-                          placeholder="your@email.com"
-                          className="focus-visible:ring-[#D97706]"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="subject" className="text-gray-700 font-medium">Subject *</Label>
-                      <Input
-                        id="subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        required
-                        placeholder="What is this about?"
-                        className="focus-visible:ring-[#D97706]"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="message" className="text-gray-700 font-medium">Message *</Label>
-                      <Textarea
-                        id="message"
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        required
-                        rows={6}
-                        placeholder="Tell us more..."
-                        className="focus-visible:ring-[#D97706]"
-                      />
-                    </div>
-                    <Button type="submit" disabled={loading} className="w-full md:w-auto bg-[#78350F] hover:bg-[#92400E] text-[#FEF3C7] font-serif tracking-wide px-8 transition-colors">
-                      {loading ? "Sending..." : "Send Message"}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+  const supportHighlights = [
+    { value: "<24h", label: "Average reply window" },
+    { value: "7 days", label: "Weekly support coverage" },
+    { value: "Human", label: "Reader-first help" },
+  ];
+
+  return (
+    <div className="min-h-screen">
+      <section className="border-b border-amber-100/80 py-10 sm:py-10 lg:py-10">
+        <div className="container-shell">
+          <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12">
+            <div>
+              <Badge className="mb-5 border-0 bg-[#1f2937] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-100">
+                Contact BookHive
+              </Badge>
+              <h1 className="max-w-3xl font-serif text-4xl font-bold leading-tight text-[#451a03] sm:text-5xl lg:text-6xl">
+                Questions, order help, or just want to say hello?
+              </h1>
+              <p className="mt-5 max-w-2xl text-base leading-8 text-[#6b4a2a] sm:text-lg">
+                We are here to help with book recommendations, order updates, account questions, and anything else you need. Reach out through the form or use the contact options below.
+              </p>
+
+              <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                {supportHighlights.map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-2xl border border-amber-100 bg-white/80 px-4 py-4 shadow-sm"
+                  >
+                    <p className="text-2xl font-bold text-[#451a03]">{item.value}</p>
+                    <p className="mt-1 text-sm text-[#7c5b3d]">{item.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Contact Information */}
+            <Card className="overflow-hidden rounded-[32px] border-amber-100 bg-white/90 shadow-[0_20px_60px_rgba(120,53,15,0.12)] backdrop-blur">
+              <CardContent className="p-0">
+                <div className="border-b border-amber-100 bg-[#1f2937] px-6 py-6 text-white sm:px-8">
+                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">Support Promise</p>
+                  <h2 className="mt-3 font-serif text-2xl font-semibold leading-snug text-white sm:text-3xl">
+                    Friendly support designed around real readers.
+                  </h2>
+                </div>
+                <div className="space-y-4 px-6 py-6 sm:px-8">
+                  <div className="rounded-2xl border border-amber-100 bg-[#fff8ef] p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#fff1d8] text-[#b45309]">
+                        <Headphones className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="font-serif text-lg font-semibold text-[#451a03]">Personal Assistance</p>
+                        <p className="text-sm text-[#7c5b3d]">Order support, delivery questions, and product help.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-amber-100 bg-white p-5">
+                    <div className="flex items-start gap-3">
+                      <MessageSquare className="mt-1 h-5 w-5 text-[#b45309]" />
+                      <div>
+                        <p className="font-serif text-lg font-semibold text-[#451a03]">Fast Follow-up</p>
+                        <p className="mt-1 text-sm leading-7 text-[#6b4a2a]">
+                          We try to respond quickly so your next read is never held up by unanswered questions.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <Link
+                    to="/faq"
+                    className="flex items-center justify-between rounded-2xl border border-amber-100 bg-white px-5 py-4 text-sm font-semibold text-[#78350f] transition-colors hover:bg-amber-50"
+                  >
+                    Browse frequently asked questions
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-14 sm:py-16 lg:py-20">
+        <div className="container-shell">
+          <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+            <Card className="rounded-[30px] border-amber-100 bg-white/90 shadow-[0_14px_40px_rgba(120,53,15,0.08)]">
+              <CardHeader className="border-b border-amber-100 bg-[linear-gradient(180deg,#fff7e8_0%,#fffdf8_100%)] pb-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b45309]">
+                  Send a Message
+                </p>
+                <CardTitle className="font-serif text-3xl text-[#451a03]">
+                  We would love to hear from you.
+                </CardTitle>
+                <p className="text-sm leading-7 text-[#6b4a2a]">
+                  Share your question and our team will get back to you as soon as possible.
+                </p>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-sm font-semibold text-[#5b3a1e]">
+                        Full Name
+                      </Label>
+                      <Input
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        placeholder="Your name"
+                        className={fieldClassName}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-sm font-semibold text-[#5b3a1e]">
+                        Email Address
+                      </Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        placeholder="your@email.com"
+                        className={fieldClassName}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="subject" className="text-sm font-semibold text-[#5b3a1e]">
+                      Subject
+                    </Label>
+                    <Input
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      required
+                      placeholder="What can we help you with?"
+                      className={fieldClassName}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="message" className="text-sm font-semibold text-[#5b3a1e]">
+                      Message
+                    </Label>
+                    <Textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      required
+                      rows={7}
+                      placeholder="Tell us more about your question, order, or request..."
+                      className="min-h-[180px] rounded-3xl border-amber-100 bg-white/90 text-[#451a03] placeholder:text-[#9b7b5f] focus-visible:ring-[#d97706]"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm leading-7 text-[#7c5b3d]">
+                      By sending this form, you agree that our team may contact you about your request.
+                    </p>
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="h-12 rounded-full bg-[#78350f] px-7 text-sm font-semibold text-white hover:bg-[#5f280a]"
+                    >
+                      {loading ? "Sending..." : "Send Message"}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+
             <div className="space-y-6">
-              <Card className="bg-white border-[#E5E5E5] shadow-sm">
-                <CardHeader className="border-b border-gray-100 pb-4">
-                  <CardTitle className="font-serif text-xl text-[#451a03]">Contact Information</CardTitle>
+              <Card className="rounded-[28px] border-amber-100 bg-white/90 shadow-sm">
+                <CardHeader className="border-b border-amber-100 pb-5">
+                  <CardTitle className="font-serif text-2xl text-[#451a03]">
+                    Contact Information
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-5 pt-6">
-                  {contactInfo.map((info, index) => {
+                <CardContent className="space-y-4 pt-6">
+                  {contactInfo.map((info) => {
                     const Icon = info.icon;
                     const content = info.link ? (
                       <a
                         href={info.link}
-                        className="text-[#D97706] hover:text-[#B45309] transition-colors"
+                        className="font-medium text-[#b45309] transition-colors hover:text-[#92400e]"
                       >
                         {info.content}
                       </a>
                     ) : (
-                      <span className="text-gray-700">{info.content}</span>
+                      <span className="font-medium text-[#451a03]">{info.content}</span>
                     );
 
                     return (
-                      <div key={index} className="flex items-start gap-4">
-                        <div className="bg-[#FEF3C7] p-2.5 rounded-lg border border-[#FDE68A]">
-                          <Icon className="w-5 h-5 text-[#D97706]" />
-                        </div>
-                        <div>
-                          <p className="font-serif font-semibold text-[#451a03]">{info.title}</p>
-                          <div className="text-sm text-gray-600 mt-0.5">{content}</div>
+                      <div
+                        key={info.title}
+                        className="rounded-2xl border border-amber-100 bg-[#fffaf2] p-4"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fff1d8] text-[#b45309]">
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-serif text-lg font-semibold text-[#451a03]">
+                              {info.title}
+                            </p>
+                            <div className="mt-1 text-sm">{content}</div>
+                            <p className="mt-1 text-sm leading-6 text-[#7c5b3d]">{info.note}</p>
+                          </div>
                         </div>
                       </div>
                     );
@@ -184,34 +311,35 @@ export default function ContactPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white border-[#E5E5E5] shadow-sm">
-                <CardHeader className="border-b border-gray-100 pb-4">
-                  <CardTitle className="font-serif text-xl text-[#451a03]">FAQ</CardTitle>
+              <Card className="rounded-[28px] border-amber-100 bg-[linear-gradient(180deg,#fff7e8_0%,#fffdf8_100%)] shadow-sm">
+                <CardHeader className="border-b border-amber-100 pb-5">
+                  <CardTitle className="font-serif text-2xl text-[#451a03]">
+                    Quick Answers
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 pt-6">
-                  <div>
-                    <p className="font-serif font-semibold text-[#451a03] mb-1">How long does shipping take?</p>
-                    <p className="text-sm text-gray-600">
-                      Standard shipping takes 3-5 business days.
-                    </p>
-                  </div>
-                  <div className="pt-2 border-t border-gray-50">
-                    <p className="font-serif font-semibold text-[#451a03] mb-1">What is your return policy?</p>
-                    <p className="text-sm text-gray-600">
-                      We accept returns within 30 days of purchase.
-                    </p>
-                  </div>
-                  <div className="pt-2 border-t border-gray-50">
-                    <p className="font-serif font-semibold text-[#451a03] mb-1">Do you ship internationally?</p>
-                    <p className="text-sm text-gray-600">
-                      Currently, we only ship within the United States.
-                    </p>
-                  </div>
+                  {quickAnswers.map((item) => (
+                    <div
+                      key={item.question}
+                      className="rounded-2xl border border-amber-100 bg-white/85 p-4"
+                    >
+                      <div className="flex items-start gap-3">
+                        <HelpCircle className="mt-1 h-5 w-5 text-[#b45309]" />
+                        <div>
+                          <p className="font-serif text-lg font-semibold text-[#451a03]">
+                            {item.question}
+                          </p>
+                          <p className="mt-1 text-sm leading-7 text-[#6b4a2a]">{item.answer}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </CardContent>
               </Card>
             </div>
           </div>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
