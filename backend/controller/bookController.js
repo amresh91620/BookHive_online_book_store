@@ -191,7 +191,7 @@ exports.addBook = async (req, res) => {
       book,
     });
   } catch (error) {
-    console.error('❌ Error adding book:', error);
+    console.error('Error adding book:', error);
     
     // Handle duplicate ISBN error
     if (error.code === 11000 && error.keyPattern?.isbn) {
@@ -394,24 +394,20 @@ exports.bulkUploadBooks = async (req, res) => {
           try {
             // Generate About Book
             if (book.aboutBook && book.aboutBook.length < 100) {
-              console.log(`🤖 [Attempt ${geminiAttempts + 1}] Expanding short About Book for: ${book.title}`);
               if (genAI) {
                 const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
                 const prompt = `Write a detailed 200-word description about the book "${book.title}" by ${book.author}. Include the plot summary, main themes, character development, and why this book is significant in literature. Make it engaging and informative for readers. Expand on this hint: ${book.aboutBook}`;
                 const result = await model.generateContent(prompt);
                 const fullText = result.response.text();
                 book.aboutBook = fullText.replace(/\*\*/g, '').replace(/\*/g, '').replace(/#{1,6}\s/g, '').replace(/`/g, '').trim();
-                console.log(`✅ Generated ${book.aboutBook.split(' ').length} words for About Book`);
               }
             } else if (!book.aboutBook || book.aboutBook.length < 20) {
-              console.log(`🤖 [Attempt ${geminiAttempts + 1}] Generating About Book for: ${book.title}`);
               if (genAI) {
                 const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
                 const prompt = `Write a comprehensive 200-word description about the book "${book.title}" by ${book.author}. Include the plot summary, main themes, character development, writing style, and why this book is significant in literature. Make it engaging and informative for readers.`;
                 const result = await model.generateContent(prompt);
                 const fullText = result.response.text();
                 book.aboutBook = fullText.replace(/\*\*/g, '').replace(/\*/g, '').replace(/#{1,6}\s/g, '').replace(/`/g, '').trim();
-                console.log(`✅ Generated ${book.aboutBook.split(' ').length} words for About Book`);
               } else {
                 book.aboutBook = `${book.title} by ${book.author} is a notable work in literature.`;
               }
@@ -419,14 +415,12 @@ exports.bulkUploadBooks = async (req, res) => {
 
             // Generate About Author
             if (!book.aboutAuthor || book.aboutAuthor.length < 50) {
-              console.log(`🤖 [Attempt ${geminiAttempts + 1}] Generating About Author for: ${book.author}`);
               if (genAI) {
                 const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
                 const prompt = `Write a detailed 100-word biography about the author ${book.author}. Include their birth/death dates if known, educational background, major literary works, writing style, awards and recognition, and their lasting impact on literature. Make it informative and engaging.`;
                 const result = await model.generateContent(prompt);
                 const fullText = result.response.text();
                 book.aboutAuthor = fullText.replace(/\*\*/g, '').replace(/\*/g, '').replace(/#{1,6}\s/g, '').replace(/`/g, '').trim();
-                console.log(`✅ Generated ${book.aboutAuthor.split(' ').length} words for About Author`);
               } else {
                 book.aboutAuthor = `${book.author} is a renowned author.`;
               }
@@ -437,11 +431,10 @@ exports.bulkUploadBooks = async (req, res) => {
             
           } catch (geminiError) {
             geminiAttempts++;
-            console.error(`❌ Gemini generation error (attempt ${geminiAttempts}/${maxGeminiAttempts}):`, geminiError.message);
+            console.error(`Gemini generation error (attempt ${geminiAttempts}/${maxGeminiAttempts}):`, geminiError.message);
             
             if (geminiAttempts >= maxGeminiAttempts) {
               // Max attempts reached - use fallback
-              console.log(`⚠️ Using fallback descriptions for: ${book.title}`);
               if (!book.aboutBook || book.aboutBook.length < 100) {
                 book.aboutBook = `${book.title} by ${book.author} is a notable work in literature. This book has captivated readers with its compelling narrative and profound themes. It explores important aspects of human experience and has earned its place in literary history.`;
               }
@@ -450,7 +443,6 @@ exports.bulkUploadBooks = async (req, res) => {
               }
             } else {
               // Wait before retry
-              console.log(`⏳ Waiting 2 seconds before retry...`);
               await new Promise(resolve => setTimeout(resolve, 2000));
             }
           }

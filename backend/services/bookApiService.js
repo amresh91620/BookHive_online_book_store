@@ -32,8 +32,7 @@ async function generateAboutBookWithAI(title, author, existingDescription) {
     
     return cleanText;
   } catch (error) {
-    console.error('❌ Gemini Error (About Book):', error.message);
-    console.error('📋 Full error:', error);
+    console.error('Gemini Error (About Book):', error.message);
     return existingDescription || `${title} by ${author} is a notable work.`;
   }
 }
@@ -64,8 +63,7 @@ async function generateAboutAuthorWithAI(author) {
     
     return cleanText;
   } catch (error) {
-    console.error('❌ Gemini Error (About Author):', error.message);
-    console.error('📋 Full error:', error);
+    console.error('Gemini Error (About Author):', error.message);
     return `${author} is a renowned author.`;
   }
 }
@@ -188,27 +186,209 @@ async function fetchFromOpenLibrary(isbn) {
 }
 
 /**
- * Fetch book data from both APIs and return the best result
+ * Fetch book data from ISBNdb API (alternative source)
+ */
+async function fetchFromISBNdb(isbn) {
+  // ISBNdb requires API key - skip if not configured
+  if (!process.env.ISBNDB_API_KEY) {
+    return null;
+  }
+  
+  try {
+    const response = await axios.get(
+      `https://api2.isbndb.com/book/${isbn}`,
+      {
+        headers: {
+          'Authorization': process.env.ISBNDB_API_KEY
+        }
+      }
+    );
+
+    if (!response.data || !response.data.book) {
+      return null;
+    }
+
+    const bookData = response.data.book;
+    const title = bookData.title || '';
+    const author = bookData.authors ? bookData.authors.join(', ') : '';
+    
+    // Generate descriptions with AI if available
+    const aboutBook = await generateAboutBookWithAI(title, author, bookData.synopsis || '');
+    const aboutAuthor = await generateAboutAuthorWithAI(author);
+    
+    return {
+      title: title,
+      subtitle: bookData.title_long || '',
+      author: author,
+      aboutBook: aboutBook,
+      aboutAuthor: aboutAuthor,
+      publisher: bookData.publisher || '',
+      publishedDate: bookData.date_published ? `${bookData.date_published}-01-01` : '',
+      pages: bookData.pages || 0,
+      language: bookData.language || 'English',
+      categories: bookData.subjects ? bookData.subjects[0] : '',
+      coverImage: bookData.image || '',
+      isbn: isbn,
+      source: 'ISBNdb'
+    };
+  } catch (error) {
+    console.error('ISBNdb API Error:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch book cover image from various sources
+ */
+async function fetchBookCoverImage(isbn) {
+  const cleanISBN = isbn.replace(/[-\s]/g, '');
+  
+  // Try multiple cover image sources
+  const coverSources = [
+    // Google Books cover (best quality)
+    `https://books.google.com/books/content?id=&printsec=frontcover&img=1&zoom=1&isbn=${cleanISBN}`,
+    // Open Library cover (multiple sizes)
+    `https://covers.openlibrary.org/b/isbn/${cleanISBN}-L.jpg`,
+    // Alternative Open Library
+    `https://covers.openlibrary.org/b/isbn/${cleanISBN}-M.jpg`,
+  ];
+  
+  // Try each source and return first valid image
+  for (const url of coverSources) {
+    try {
+      const response = await axios.head(url, { timeout: 3000 });
+      if (response.status === 200) {
+        return url;
+      }
+    } catch (error) {
+      // Continue to next source
+      continue;
+    }
+  }
+  
+  return '';
+}
+
+/**
+ * Generate complete book data using Gemini AI when not found in any API
+ */
+async function generateBookDataWithAI(isbn) {
+  if (!genAI) {
+    return null;
+  }
+  
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+    
+    // Ask Gemini to provide book information based on ISBN including cover image URL
+    const prompt = `I have an ISBN: ${isbn}. Please provide the following information about this book in JSON format:
+{
+  "title": "Book title",
+  "author": "Author name",
+  "publisher": "Publisher name",
+  "publishedYear": "YYYY",
+  "pages": number,
+  "language": "Language",
+  "category": "Main category/genre",
+  "coverImageUrl": "Direct URL to book cover image (try Google Books, Open Library, or Amazon)",
+  "aboutBook": "200-word description about the book, plot, themes, and significance",
+  "aboutAuthor": "100-word biography about the author"
+}
+
+For coverImageUrl, try these formats:
+- Google Books: https://books.google.com/books/content?id=BOOK_ID&printsec=frontcover&img=1&zoom=1&isbn=ISBN
+- Open Library: https://covers.openlibrary.org/b/isbn/ISBN-L.jpg
+- If you know the book, provide the actual working cover image URL
+
+If you cannot find information about this ISBN, respond with: {"found": false}
+
+Important: Return ONLY valid JSON, no markdown formatting, no explanations.`;
+    
+    const result = await model.generateContent(prompt);
+    let text = result.response.text();
+    
+    // Clean markdown code blocks if present
+    text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    
+    // Parse JSON response
+    const bookInfo = JSON.parse(text);
+    
+    if (bookInfo.found === false) {
+      return null;
+    }
+    
+    // Format the data
+    const publishedDate = bookInfo.publishedYear ? `${bookInfo.publishedYear}-01-01` : '';
+    
+    // Use Gemini-provided cover URL or fallback to our fetch function
+    let coverImage = bookInfo.coverImageUrl || '';
+    
+    // If Gemini didn't provide a valid URL, try our fallback sources
+    if (!coverImage || coverImage === '' || coverImage === 'N/A') {
+      coverImage = await fetchBookCoverImage(isbn);
+    }
+    
+    return {
+      title: bookInfo.title || '',
+      subtitle: '',
+      author: bookInfo.author || '',
+      aboutBook: bookInfo.aboutBook || '',
+      aboutAuthor: bookInfo.aboutAuthor || '',
+      publisher: bookInfo.publisher || '',
+      publishedDate: publishedDate,
+      pages: parseInt(bookInfo.pages) || 0,
+      language: bookInfo.language || 'English',
+      categories: bookInfo.category || '',
+      coverImage: coverImage,
+      isbn: isbn,
+      source: 'Gemini AI + Cover APIs'
+    };
+  } catch (error) {
+    // Check if it's a quota error
+    if (error.message && error.message.includes('quota')) {
+      console.error('Gemini AI Quota Exceeded - Please generate a new API key');
+    } else {
+      console.error('Gemini AI Error:', error.message);
+    }
+    return null;
+  }
+}
+
+/**
+ * Fetch book data with sequential fallback system
+ * Priority: Google Books → Open Library → ISBNdb → Gemini AI → Manual
  */
 async function fetchBookByISBN(isbn) {
   // Clean ISBN (remove hyphens and spaces)
   const cleanISBN = isbn.replace(/[-\s]/g, '');
 
-  // Try Open Library first (no rate limit), then Google Books
-  const [openLibData, googleData] = await Promise.all([
-    fetchFromOpenLibrary(cleanISBN),
-    fetchFromGoogleBooks(cleanISBN)
-  ]);
-
-  // Prefer Google Books if available (better data), fallback to Open Library
+  // Step 1: Try Google Books first
+  const googleData = await fetchFromGoogleBooks(cleanISBN);
   if (googleData) {
     return googleData;
   }
-  
+
+  // Step 2: Try Open Library
+  const openLibData = await fetchFromOpenLibrary(cleanISBN);
   if (openLibData) {
     return openLibData;
   }
 
+  // Step 3: Try ISBNdb (if API key configured)
+  if (process.env.ISBNDB_API_KEY) {
+    const isbndbData = await fetchFromISBNdb(cleanISBN);
+    if (isbndbData) {
+      return isbndbData;
+    }
+  }
+
+  // Step 4: Try Gemini AI as fallback (only if quota available)
+  const aiData = await generateBookDataWithAI(cleanISBN);
+  if (aiData) {
+    return aiData;
+  }
+
+  // Step 5: All sources failed
   return null;
 }
 
@@ -264,5 +444,8 @@ module.exports = {
   fetchBookByISBN,
   fetchFromGoogleBooks,
   fetchFromOpenLibrary,
-  fetchBookByTitle
+  fetchFromISBNdb,
+  fetchBookByTitle,
+  generateBookDataWithAI,
+  fetchBookCoverImage
 };
