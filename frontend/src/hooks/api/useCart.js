@@ -30,11 +30,11 @@ export const useAddToCart = () => {
   const wishlistQueryKey = getWishlistQueryKey(user?._id);
 
   return useMutation({
-    mutationFn: async (bookId) => {
-      const { data } = await api.post(endpoints.cart.add, { bookId });
+    mutationFn: async ({ bookId, quantity = 1 }) => {
+      const { data } = await api.post(endpoints.cart.add, { bookId, quantity });
       return data;
     },
-    onMutate: async (bookId) => {
+    onMutate: async ({ bookId, quantity = 1 }) => {
       await queryClient.cancelQueries({ queryKey: ["cart"] });
       await queryClient.cancelQueries({ queryKey: wishlistQueryKey });
 
@@ -51,7 +51,7 @@ export const useAddToCart = () => {
             ...old,
             items: old.items.map((item) =>
               item.book._id === bookId
-                ? { ...item, quantity: item.quantity + 1 }
+                ? { ...item, quantity: item.quantity + quantity }
                 : item
             ),
           };
@@ -67,7 +67,7 @@ export const useAddToCart = () => {
 
       return { previousCart, previousWishlist };
     },
-    onError: (err, bookId, context) => {
+    onError: (err, variables, context) => {
       if (context?.previousCart) {
         queryClient.setQueryData(["cart"], context.previousCart);
       }
@@ -75,11 +75,11 @@ export const useAddToCart = () => {
         queryClient.setQueryData(wishlistQueryKey, context.previousWishlist);
       }
     },
-    onSuccess: (data, bookId) => {
+    onSuccess: (data, variables) => {
       queryClient.setQueryData(["cart"], data);
       queryClient.setQueryData(wishlistQueryKey, (old) => {
         if (!Array.isArray(old)) return old;
-        return old.filter((item) => item._id !== bookId);
+        return old.filter((item) => item._id !== variables.bookId);
       });
     },
     onSettled: () => {

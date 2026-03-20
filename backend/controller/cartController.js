@@ -10,20 +10,20 @@ exports.getCart = async (req, res) => {
 };
 
 exports.addToCart = async (req, res) => {
-  const { bookId } = req.body;
+  const { bookId, quantity = 1 } = req.body;
 
   let cart = await Cart.findOne({ user: req.user.id });
   if (!cart) {
     cart = await Cart.create({
       user: req.user.id,
-      items: [{ book: bookId, quantity: 1 }],
+      items: [{ book: bookId, quantity }],
     });
   } else {
     const item = cart.items.find((i) => i.book.toString() === bookId);
     if (item) {
-      item.quantity += 1;
+      item.quantity += quantity;
     } else {
-      cart.items.push({ book: bookId, quantity: 1 });
+      cart.items.push({ book: bookId, quantity });
     }
     await cart.save();
   }

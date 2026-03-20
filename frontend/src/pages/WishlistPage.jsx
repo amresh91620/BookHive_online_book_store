@@ -22,7 +22,7 @@ export default function WishlistPage() {
   };
 
   const handleAddToCart = (bookId) => {
-    addToCart.mutate(bookId, {
+    addToCart.mutate({ bookId, quantity: 1 }, {
       onSuccess: () => toast.success("Added to cart"),
       onError: (err) => toast.error(err?.response?.data?.msg || "Failed to add to cart"),
     });

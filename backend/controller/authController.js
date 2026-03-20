@@ -41,8 +41,7 @@ exports.sendRegisterOtp = async (req, res) => {
       res.json({ msg: "OTP sent to your email" });
     } catch (emailError) {
       console.error("Email sending failed:", emailError);
-      // Still allow registration to proceed - log OTP for debugging
-      console.log(`OTP for ${email}: ${otp}`);
+      // Still allow registration to proceed
       res.json({ 
         msg: "OTP generated (email service temporarily unavailable)",
         debug: process.env.NODE_ENV === 'development' ? otp : undefined
@@ -91,8 +90,7 @@ exports.sendForgotPasswordOtp = async (req, res) => {
       res.json({ msg: "OTP sent to your email" });
     } catch (emailError) {
       console.error("Email sending failed:", emailError);
-      // Still allow password reset to proceed - log OTP for debugging
-      console.log(`Password Reset OTP for ${email}: ${otp}`);
+      // Still allow password reset to proceed
       res.json({ 
         msg: "OTP generated (email service temporarily unavailable)",
         debug: process.env.NODE_ENV === 'development' ? otp : undefined
@@ -189,7 +187,6 @@ exports.verifyRegisterOtp = async (req, res) => {
     const providedOtp = String(otp).trim();
 
     if (storedOtp !== providedOtp) {
-      console.log("OTP mismatch:", { stored: storedOtp, provided: providedOtp });
       return res.status(400).json({ msg: "Invalid OTP. Please check and try again" });
     }
 

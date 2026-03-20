@@ -24,8 +24,6 @@ export default function CommentSection({ blogId }) {
   const { user } = useSelector((state) => state.auth);
   const [newComment, setNewComment] = useState("");
 
-  console.log('Current logged in user:', user);
-
   const { data, isLoading } = useBlogComments(blogId);
   const createMutation = useCreateComment();
   const deleteMutation = useDeleteComment();
@@ -155,15 +153,6 @@ export default function CommentSection({ blogId }) {
             
             const userLiked = comment.likes.includes(currentUserId);
             const userDisliked = comment.dislikes.includes(currentUserId);
-
-            console.log('Debug:', { 
-              commentUserId, 
-              currentUserId, 
-              isOwner,
-              user,
-              commentUserType: typeof comment.user,
-              commentUser: comment.user
-            });
 
             return (
               <Card key={comment._id} className="border border-gray-200">

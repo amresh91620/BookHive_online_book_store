@@ -38,7 +38,7 @@ export default function BookCard({ book }) {
       toast.error("Please login to add items to cart");
       return;
     }
-    addToCart.mutate(book._id, {
+    addToCart.mutate({ bookId: book._id, quantity: 1 }, {
       onSuccess: () => toast.success("Added to cart"),
       onError: (err) => toast.error(err?.response?.data?.msg || "Failed to add to cart"),
     });
