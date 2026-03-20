@@ -22,9 +22,14 @@ User Features
 Admin Features
 - Dashboard overview
 - Manage books, users, and orders
+- **ISBN Lookup & Barcode Scanning** - Auto-fill book data from Google Books/Open Library APIs
+- **Bulk Upload** - Add multiple books via CSV file
+- **Auto New Arrival Tagging** - Books created in last 7 days automatically tagged
 - Update order and payment status
 - Moderate reviews
 - View and delete customer messages
+
+📚 [View Admin Features Documentation](docs/ADMIN_BOOK_FEATURES.md)
 
 ## Tech Stack
 - React 18, Vite, Redux Toolkit

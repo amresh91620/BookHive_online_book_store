@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { useBooksList, useDeleteBook } from "@/hooks/api/useBooks";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,9 @@ import toast from "react-hot-toast";
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminBooksPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   const params = {
     limit: ITEMS_PER_PAGE,
@@ -30,6 +31,23 @@ export default function AdminBooksPage() {
   const books = booksData?.books || booksData?.items || [];
   const total = booksData?.totalBooks || booksData?.total || 0;
 
+  // Get current URL with search params for return navigation
+  const getCurrentUrl = () => {
+    const params = new URLSearchParams();
+    if (currentPage > 1) params.set("page", currentPage.toString());
+    if (searchQuery.trim()) params.set("q", searchQuery.trim());
+    const queryString = params.toString();
+    return `/admin/books${queryString ? `?${queryString}` : ''}`;
+  };
+
+  // Sync search query with URL on mount
+  useEffect(() => {
+    const urlQuery = searchParams.get("q") || "";
+    if (urlQuery !== searchQuery) {
+      setSearchQuery(urlQuery);
+    }
+  }, []);
+
   const handleDelete = (bookId) => {
     if (window.confirm("Are you sure you want to delete this book?")) {
       deleteBook.mutate(bookId, {
@@ -41,11 +59,19 @@ export default function AdminBooksPage() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setCurrentPage(1); // Reset to first page on search
+    const newParams = { page: "1" };
+    if (searchQuery.trim()) {
+      newParams.q = searchQuery.trim();
+    }
+    setSearchParams(newParams);
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    const newParams = { page: page.toString() };
+    if (searchQuery.trim()) {
+      newParams.q = searchQuery.trim();
+    }
+    setSearchParams(newParams);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -145,7 +171,10 @@ export default function AdminBooksPage() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
-                          <Link to={`/admin/books/edit/${book._id}`}>
+                          <Link 
+                            to={`/admin/books/edit/${book._id}`}
+                            state={{ from: getCurrentUrl() }}
+                          >
                             <Button variant="ghost" size="sm">
                               <Pencil className="w-4 h-4" />
                             </Button>

@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useBlogsList, useBlogCategories } from "@/hooks/api/useBlogs";
+import { useBlogCategories } from "@/hooks/api/useBlogs";
+import { useInfiniteBlogs } from "@/hooks/api/useInfiniteBlogs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Pagination } from "@/components/ui/pagination";
 import BookSkeleton from "@/components/common/BookSkeleton";
-import { Search, Clock, Eye, Calendar, X, PenLine } from "lucide-react";
+import { Search, Clock, Eye, Calendar, X, PenLine, Loader2 } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 
 const ITEMS_PER_PAGE = 9;
@@ -59,51 +59,70 @@ export default function BlogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
-  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
+  const loadMoreRef = useRef(null);
 
   const debouncedSearch = useDebounce(searchQuery, 500);
 
   const params = {
     limit: ITEMS_PER_PAGE,
-    offset: (currentPage - 1) * ITEMS_PER_PAGE,
   };
   if (debouncedSearch) params.q = debouncedSearch;
   if (category) params.category = category;
 
-  const { data, isLoading } = useBlogsList(params);
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfiniteBlogs(params);
+
   const { data: categories = [] } = useBlogCategories();
 
-  const blogs = data?.blogs || [];
-  const total = data?.total || 0;
-  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+  const blogs = data?.pages.flatMap(page => page.blogs || []) || [];
+  const total = data?.pages[0]?.total || 0;
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setCurrentPage(1);
-    updateURL({ page: "1", q: searchQuery, category });
+    updateURL({ q: searchQuery, category });
   };
 
   const handleCategoryChange = (newCategory) => {
     setCategory(newCategory);
-    setCurrentPage(1);
-    updateURL({ page: "1", q: searchQuery, category: newCategory });
+    updateURL({ q: searchQuery, category: newCategory });
   };
 
   const handleClearFilters = () => {
     setSearchQuery("");
     setCategory("");
-    setCurrentPage(1);
     setSearchParams({});
   };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    updateURL({ page: page.toString(), q: searchQuery, category });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const updateURL = ({ page, q, category }) => {
-    const params = { page };
+  const updateURL = ({ q, category }) => {
+    const params = {};
     if (q) params.q = q;
     if (category) params.category = category;
     setSearchParams(params);
@@ -209,7 +228,7 @@ export default function BlogPage() {
                     className="w-3 h-3 ml-1.5 cursor-pointer inline-block"
                     onClick={() => {
                       setSearchQuery("");
-                      updateURL({ page: "1", q: "", category });
+                      updateURL({ q: "", category });
                     }}
                   />
                 </Badge>
@@ -245,17 +264,22 @@ export default function BlogPage() {
               ))}
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 p-6 bg-white rounded-xl border border-gray-200">
-                <div className="text-sm text-gray-600">
-                  Page {currentPage} of {totalPages}
-                </div>
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+            {/* Load More Trigger */}
+            {hasNextPage && (
+              <div ref={loadMoreRef} className="flex justify-center py-8">
+                {isFetchingNextPage && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Loading more articles...</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* End of Results */}
+            {!hasNextPage && blogs.length > 0 && (
+              <div className="text-center py-6 text-gray-500 text-sm">
+                You've reached the end of the list
               </div>
             )}
           </>

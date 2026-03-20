@@ -49,10 +49,21 @@ export const useCreateBook = () => {
     mutationFn: async (payload) => {
       const formData = new FormData();
       Object.entries(payload).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== "") {
-          formData.append(key, value);
+        // For aboutBook and aboutAuthor, always include them (even if empty)
+        if (key === 'aboutBook' || key === 'aboutAuthor') {
+          formData.append(key, value || '');
+        }
+        // Skip undefined, null, and empty strings for other fields
+        else if (value !== undefined && value !== null && value !== "") {
+          // Handle boolean values properly
+          if (typeof value === 'boolean') {
+            formData.append(key, value.toString());
+          } else {
+            formData.append(key, value);
+          }
         }
       });
+      
       const { data } = await api.post(endpoints.books.create, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -62,6 +73,10 @@ export const useCreateBook = () => {
       queryClient.invalidateQueries({ queryKey: ["books", "list"] });
       queryClient.invalidateQueries({ queryKey: ["books", "stats"] });
     },
+    onError: (error) => {
+      console.error('Mutation error:', error);
+      console.error('Error response:', error?.response?.data);
+    }
   });
 };
 
@@ -74,7 +89,12 @@ export const useUpdateBook = () => {
       if (payload?.coverImage instanceof File) {
         const formData = new FormData();
         Object.entries(payload).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && value !== "") {
+          // For aboutBook and aboutAuthor, always include them
+          if (key === 'aboutBook' || key === 'aboutAuthor') {
+            formData.append(key, value || '');
+          }
+          // Skip undefined, null, and empty strings for other fields
+          else if (value !== undefined && value !== null && value !== "") {
             formData.append(key, value);
           }
         });

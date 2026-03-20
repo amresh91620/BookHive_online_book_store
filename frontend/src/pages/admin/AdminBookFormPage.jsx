@@ -1,18 +1,25 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useBookDetails, useCreateBook, useUpdateBook } from "@/hooks/api/useBooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
+import ISBNLookup from "@/components/admin/ISBNLookup";
+import BulkUpload from "@/components/admin/BulkUpload";
 
 export default function AdminBookFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const isEdit = Boolean(id);
+
+  // Get return URL from location state or default to /admin/books
+  const returnUrl = location.state?.from || "/admin/books";
 
   const { data: book } = useBookDetails(id);
   const createBook = useCreateBook();
@@ -21,7 +28,8 @@ export default function AdminBookFormPage() {
   const [formData, setFormData] = useState({
     title: "",
     author: "",
-    description: "",
+    aboutBook: "",
+    aboutAuthor: "",
     categories: "",
     price: "",
     originalPrice: "",
@@ -30,8 +38,6 @@ export default function AdminBookFormPage() {
     publisher: "",
     language: "English",
     format: "Paperback",
-    edition: "",
-    genre: "",
     stock: "",
     publishedDate: "",
     featured: false,
@@ -41,13 +47,16 @@ export default function AdminBookFormPage() {
   });
 
   const [coverImage, setCoverImage] = useState(null);
+  const [coverImageUrl, setCoverImageUrl] = useState("");
+  const [isApiData, setIsApiData] = useState(false);
 
   useEffect(() => {
     if (isEdit && book) {
       setFormData({
         title: book.title || "",
         author: book.author || "",
-        description: book.description || "",
+        aboutBook: book.aboutBook || book.description || "",
+        aboutAuthor: book.aboutAuthor || "",
         categories: book.categories || "",
         price: book.price || "",
         originalPrice: book.originalPrice || "",
@@ -56,8 +65,6 @@ export default function AdminBookFormPage() {
         publisher: book.publisher || "",
         language: book.language || "English",
         format: book.format || "Paperback",
-        edition: book.edition || "",
-        genre: book.genre || "",
         stock: book.stock || "",
         publishedDate: book.publishedDate ? book.publishedDate.split("T")[0] : "",
         featured: book.featured || false,
@@ -78,14 +85,60 @@ export default function AdminBookFormPage() {
 
   const handleFileChange = (e) => {
     setCoverImage(e.target.files[0]);
+    setCoverImageUrl("");
+  };
+
+  const handleISBNDataFetched = (data) => {
+    setIsApiData(true);
+    setFormData({
+      ...formData,
+      title: data.title || "",
+      author: data.author || "",
+      aboutBook: data.aboutBook || "",
+      aboutAuthor: data.aboutAuthor || "",
+      categories: data.categories || "",
+      pages: data.pages || "",
+      isbn: data.isbn || "",
+      publisher: data.publisher || "",
+      language: data.language || "English",
+      publishedDate: data.publishedDate ? data.publishedDate.split('T')[0] : "",
+    });
+    
+    // Set cover image URL from API
+    if (data.coverImage) {
+      setCoverImageUrl(data.coverImage);
+    }
+    
+    // Don't show another toast here - success toast already shown in ISBNLookup
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate required fields
+    if (!formData.price || !formData.stock) {
+      toast.error("Please fill in price and stock");
+      return;
+    }
+
+    // Validate aboutBook is not empty
+    if (!formData.aboutBook || formData.aboutBook.trim() === '') {
+      toast.error("About Book is required");
+      return;
+    }
+
     const payload = { ...formData };
+    
+    // Ensure aboutBook and aboutAuthor are included even if empty
+    if (!payload.aboutBook) payload.aboutBook = '';
+    if (!payload.aboutAuthor) payload.aboutAuthor = '';
+    
+    // Handle cover image
     if (coverImage) {
       payload.coverImage = coverImage;
+    } else if (coverImageUrl && !isEdit) {
+      // Use URL from API
+      payload.coverImageUrl = coverImageUrl;
     }
 
     if (isEdit) {
@@ -94,7 +147,7 @@ export default function AdminBookFormPage() {
         {
           onSuccess: () => {
             toast.success("Book updated successfully");
-            navigate("/admin/books");
+            navigate(returnUrl);
           },
           onError: (error) => toast.error(error?.response?.data?.msg || "Failed to update book"),
         }
@@ -103,9 +156,21 @@ export default function AdminBookFormPage() {
       createBook.mutate(payload, {
         onSuccess: () => {
           toast.success("Book added successfully");
-          navigate("/admin/books");
+          navigate(returnUrl);
         },
-        onError: (error) => toast.error(error?.response?.data?.msg || "Failed to add book"),
+        onError: (error) => {
+          console.error('Book creation error:', error);
+          const errorMsg = error?.response?.data?.error || 
+                          error?.response?.data?.msg || 
+                          "Failed to add book";
+          
+          // Show specific error for duplicate ISBN
+          if (errorMsg.includes('ISBN')) {
+            toast.error(`Duplicate ISBN: ${formData.isbn || 'Unknown'} already exists`);
+          } else {
+            toast.error(errorMsg);
+          }
+        },
       });
     }
   };
@@ -114,23 +179,72 @@ export default function AdminBookFormPage() {
     <div className="p-6">
       <Button
         variant="ghost"
-        onClick={() => navigate("/admin/books")}
+        onClick={() => navigate(returnUrl)}
         className="mb-6"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
         Back to Books
       </Button>
 
+      {!isEdit && (
+        <Tabs defaultValue="single" className="mb-6">
+          <TabsList className="grid w-full grid-cols-2 max-w-md">
+            <TabsTrigger value="single">Single Book</TabsTrigger>
+            <TabsTrigger value="bulk">Bulk Upload</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="single">
+            {/* ISBN Lookup Section */}
+            <div className="mb-6">
+              <ISBNLookup onDataFetched={handleISBNDataFetched} />
+            </div>
+
+            {isApiData && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded flex items-start gap-2">
+                <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-semibold text-yellow-800">Data loaded from external API</p>
+                  <p className="text-yellow-700">Please review all fields and add pricing, stock, and tags manually. You can edit any incorrect information.</p>
+                </div>
+              </div>
+            )}
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Add New Book</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">{renderForm()}</form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="bulk">
+            <BulkUpload onUploadComplete={() => navigate(returnUrl)} />
+          </TabsContent>
+        </Tabs>
+      )}
+
+      {isEdit && (
         <Card>
           <CardHeader>
-            <CardTitle>{isEdit ? "Edit Book" : "Add New Book"}</CardTitle>
+            <CardTitle>Edit Book</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Basic Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Basic Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-6">{renderForm()}</form>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+
+  function renderForm() {
+    return (
+      <>
+        {/* Basic Information */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Basic Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="title">Title *</Label>
                     <Input
@@ -152,14 +266,26 @@ export default function AdminBookFormPage() {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <Label htmlFor="description">Description *</Label>
+                    <Label htmlFor="aboutBook">About Book *</Label>
                     <Textarea
-                      id="description"
-                      name="description"
-                      value={formData.description}
+                      id="aboutBook"
+                      name="aboutBook"
+                      value={formData.aboutBook}
                       onChange={handleChange}
                       rows={4}
                       required
+                      placeholder="Describe what the book is about..."
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <Label htmlFor="aboutAuthor">About Author</Label>
+                    <Textarea
+                      id="aboutAuthor"
+                      name="aboutAuthor"
+                      value={formData.aboutAuthor}
+                      onChange={handleChange}
+                      rows={3}
+                      placeholder="Information about the author (optional)..."
                     />
                   </div>
                   <div>
@@ -171,16 +297,6 @@ export default function AdminBookFormPage() {
                       onChange={handleChange}
                       placeholder="e.g., Fiction"
                       required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="genre">Genre</Label>
-                    <Input
-                      id="genre"
-                      name="genre"
-                      value={formData.genre}
-                      onChange={handleChange}
-                      placeholder="e.g., Mystery"
                     />
                   </div>
                 </div>
@@ -232,13 +348,15 @@ export default function AdminBookFormPage() {
                 <h3 className="text-lg font-semibold">Book Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="isbn">ISBN</Label>
+                    <Label htmlFor="isbn">ISBN (Optional - Must be unique)</Label>
                     <Input
                       id="isbn"
                       name="isbn"
                       value={formData.isbn}
                       onChange={handleChange}
+                      placeholder="e.g., 9780451524935"
                     />
+                    <p className="text-xs text-gray-500 mt-1">Leave empty if not available. Each ISBN must be unique.</p>
                   </div>
                   <div>
                     <Label htmlFor="publisher">Publisher</Label>
@@ -261,14 +379,13 @@ export default function AdminBookFormPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="publishedDate">Published Date *</Label>
+                    <Label htmlFor="publishedDate">Published Date</Label>
                     <Input
                       id="publishedDate"
                       name="publishedDate"
                       type="date"
                       value={formData.publishedDate}
                       onChange={handleChange}
-                      required
                     />
                   </div>
                   <div>
@@ -296,15 +413,6 @@ export default function AdminBookFormPage() {
                     </select>
                   </div>
                   <div>
-                    <Label htmlFor="edition">Edition</Label>
-                    <Input
-                      id="edition"
-                      name="edition"
-                      value={formData.edition}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div>
                     <Label htmlFor="ageGroup">Age Group</Label>
                     <select
                       id="ageGroup"
@@ -328,16 +436,27 @@ export default function AdminBookFormPage() {
                 <h3 className="text-lg font-semibold">Cover Image</h3>
                 <div>
                   <Label htmlFor="coverImage">
-                    Upload Cover Image {!isEdit && "*"}
+                    Upload Cover Image {!isEdit && !coverImageUrl && "*"}
                   </Label>
                   <Input
                     id="coverImage"
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    required={!isEdit}
+                    required={!isEdit && !coverImageUrl}
                   />
-                  {isEdit && book?.coverImage && !coverImage && (
+                  {coverImageUrl && !coverImage && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600 mb-1">Cover from API:</p>
+                      <img
+                        src={coverImageUrl}
+                        alt="API cover"
+                        className="w-32 h-40 object-cover rounded"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">You can upload a different image if needed</p>
+                    </div>
+                  )}
+                  {isEdit && book?.coverImage && !coverImage && !coverImageUrl && (
                     <div className="mt-2">
                       <img
                         src={book.coverImage}
@@ -394,14 +513,13 @@ export default function AdminBookFormPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate("/admin/books")}
+                  onClick={() => navigate(returnUrl)}
                 >
                   Cancel
                 </Button>
               </div>
-            </form>
-          </CardContent>
-        </Card>
-    </div>
-  );
-}
+            </>
+          );
+        }
+      }
+    

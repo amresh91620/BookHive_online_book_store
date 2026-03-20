@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useBooksList, useBookCategories } from "@/hooks/api/useBooks";
+import { useBookCategories } from "@/hooks/api/useBooks";
+import { useInfiniteBooks } from "@/hooks/api/useInfiniteBooks";
 import BookCard from "@/components/common/BookCard";
 import BookSkeleton from "@/components/common/BookSkeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pagination } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, X } from "lucide-react";
+import { Search, Filter, X, Loader2 } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 
 const ITEMS_PER_PAGE = 12;
@@ -17,60 +17,79 @@ export default function BooksPage() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [statusFilter, setStatusFilter] = useState(searchParams.get("filter") || "");
-  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
+  const loadMoreRef = useRef(null);
 
   // Debounce search query to reduce API calls
   const debouncedSearch = useDebounce(searchQuery, 500);
 
   const params = {
     limit: ITEMS_PER_PAGE,
-    offset: (currentPage - 1) * ITEMS_PER_PAGE,
   };
   if (debouncedSearch) params.q = debouncedSearch;
   if (category) params.category = category;
   if (statusFilter) params.status = statusFilter;
 
-  const { data: booksData, isLoading } = useBooksList(params);
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfiniteBooks(params);
+
   const { data: categories = [] } = useBookCategories();
 
-  const books = booksData?.books || booksData?.items || [];
-  const totalBooks = booksData?.totalBooks || booksData?.total || books.length;
-  const totalPages = Math.ceil(totalBooks / ITEMS_PER_PAGE);
+  // Flatten all pages into single array
+  const books = data?.pages.flatMap(page => page.books || []) || [];
+  const totalBooks = data?.pages[0]?.totalBooks || 0;
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setCurrentPage(1);
-    updateURL({ page: "1", q: searchQuery, category, filter: statusFilter });
+    updateURL({ q: searchQuery, category, filter: statusFilter });
   };
 
   const handleCategoryChange = (newCategory) => {
     setCategory(newCategory);
-    setCurrentPage(1);
-    updateURL({ page: "1", q: searchQuery, category: newCategory, filter: statusFilter });
+    updateURL({ q: searchQuery, category: newCategory, filter: statusFilter });
   };
 
   const handleStatusFilterChange = (newFilter) => {
     setStatusFilter(newFilter);
-    setCurrentPage(1);
-    updateURL({ page: "1", q: searchQuery, category, filter: newFilter });
+    updateURL({ q: searchQuery, category, filter: newFilter });
   };
 
   const handleClearFilters = () => {
     setSearchQuery("");
     setCategory("");
     setStatusFilter("");
-    setCurrentPage(1);
     setSearchParams({});
   };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    updateURL({ page: page.toString(), q: searchQuery, category, filter: statusFilter });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const updateURL = ({ page, q, category, filter }) => {
-    const params = { page };
+  const updateURL = ({ q, category, filter }) => {
+    const params = {};
     if (q) params.q = q;
     if (category) params.category = category;
     if (filter) params.filter = filter;
@@ -246,17 +265,22 @@ export default function BooksPage() {
               ))}
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 p-6 bg-white rounded-xl border border-gray-200">
-                <div className="text-sm text-gray-600">
-                  Page {currentPage} of {totalPages}
-                </div>
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+            {/* Load More Trigger */}
+            {hasNextPage && (
+              <div ref={loadMoreRef} className="flex justify-center py-8">
+                {isFetchingNextPage && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Loading more books...</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* End of Results */}
+            {!hasNextPage && books.length > 0 && (
+              <div className="text-center py-6 text-gray-500 text-sm">
+                You've reached the end of the list
               </div>
             )}
           </>

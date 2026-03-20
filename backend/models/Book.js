@@ -21,9 +21,19 @@ const bookSchema = new mongoose.Schema(
     },
 
     // ============ DESCRIPTION ============
-    description: {
+    aboutBook: {
       type: String,
       required: true,
+      trim: true,
+    },
+    aboutAuthor: {
+      type: String,
+      trim: true,
+    },
+
+    // Keeping old description field for backward compatibility
+    description: {
+      type: String,
       trim: true,
     },
 
@@ -67,19 +77,12 @@ const bookSchema = new mongoose.Schema(
     },
     publishedDate: {
       type: Date,
-      required: true,
-    },
-    edition: {
-      type: String,
     },
 
     // ============ CATEGORIZATION ============
     categories: {
       type: String,
       required: true,
-    },
-    genre: {
-      type: String,
     },
     tags: {
       type: [String],
@@ -156,12 +159,27 @@ bookSchema.index({ bestseller: 1 });
 bookSchema.index({ newArrival: 1 });
 bookSchema.index({ title: "text", author: "text" }); // For optimized text search (optional, but good for large datasets)
 
-// Auto-calculate discount percentage
+// Auto-calculate discount percentage and set newArrival
 bookSchema.pre('save', function (next) {
   if (this.originalPrice && this.price < this.originalPrice) {
     this.discount = Math.round(((this.originalPrice - this.price) / this.originalPrice) * 100);
   }
+  
+  // Auto-set newArrival if book created in last 7 days
+  if (this.isNew) {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    this.newArrival = true;
+  }
+  
   next();
+});
+
+// Virtual field to check if book is truly a new arrival
+bookSchema.virtual('isNewArrival').get(function() {
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  return this.createdAt >= sevenDaysAgo;
 });
 
 module.exports = mongoose.model("Book", bookSchema);

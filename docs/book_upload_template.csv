@@ -1,0 +1,23 @@
+title,author,aboutBook,aboutAuthor,categories,price,originalPrice,pages,publishedDate,coverImage,isbn,publisher,language,format,stock,ageGroup,featured,bestseller,newArrival
+"The Great Gatsby","F. Scott Fitzgerald","A classic novel about the Jazz Age and the American Dream","","Fiction",15.99,19.99,180,"1925-04-10","https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg","9780743273565","Scribner","English","Paperback",50,"Adult",false,true,false
+"To Kill a Mockingbird","Harper Lee","A story of racial injustice in the American South","","Fiction",14.99,18.99,324,"1960-07-11","https://covers.openlibrary.org/b/isbn/9780061120084-L.jpg","9780061120084","Harper Perennial","English","Paperback",30,"Young Adult",true,false,false
+"Harry Potter and the Sorcerer's Stone","J.K. Rowling","A young wizard discovers his magical heritage","","Fantasy",14.99,18.99,309,"1997-06-26","https://covers.openlibrary.org/b/isbn/9780439708180-L.jpg","9780439708180","Scholastic","English","Hardcover",75,"Children",true,true,true
+"1984","George Orwell","A dystopian novel about totalitarianism","","Fiction",12.99,16.99,328,"1949-06-08","https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg","9780451524935","Signet Classic","English","Paperback",100,"Adult",false,true,false
+"Pride and Prejudice","Jane Austen","A romance novel set in Regency England","","Romance",11.99,14.99,279,"1813-01-28","https://covers.openlibrary.org/b/isbn/9780141439518-L.jpg","9780141439518","Penguin Classics","English","Paperback",60,"Adult",true,true,false
+
+INSTRUCTIONS:
+1. aboutBook: Write a SHORT description (1-2 sentences). Gemini AI will expand it to 200 words automatically!
+2. aboutAuthor: Leave EMPTY. Gemini AI will generate 100-word biography automatically!
+3. ageGroup: Use "Children", "Young Adult", "Adult", "All Ages" (or shortcuts: 16+, All, Kids, Teen, YA)
+4. ISBN: Must be unique. Duplicate ISBNs will show [Delete] button to remove existing book
+5. Dates: Use YYYY-MM-DD format
+6. Booleans: Use "true" or "false" (lowercase)
+
+GEMINI AI FEATURES:
+- Short aboutBook (< 100 chars) → Gemini expands to 200 words
+- Empty aboutBook → Gemini generates from title/author
+- Empty aboutAuthor → Gemini generates 100-word biography
+- Long aboutBook (> 100 chars) → Uses your description as-is
+
+EXAMPLE WITH MINIMAL DATA (Gemini generates everything):
+"The Hobbit","J.R.R. Tolkien","","","Fantasy",13.99,17.99,310,"1937-09-21","https://example.com/hobbit.jpg","9780547928227","Houghton Mifflin","English","Paperback",80,"Children",true,false,true

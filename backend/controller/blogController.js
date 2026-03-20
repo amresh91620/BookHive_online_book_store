@@ -5,6 +5,8 @@ exports.getAllBlogs = async (req, res) => {
   try {
     const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
     const limit = Math.max(parseInt(req.query.limit, 10) || 9, 1);
+    const cursorMode = Object.prototype.hasOwnProperty.call(req.query, "cursor");
+    const cursor = req.query.cursor || null;
     const q = (req.query.q || "").trim();
     const category = (req.query.category || "").trim();
     const isAdmin = req.query.admin === "true";
@@ -19,13 +21,35 @@ exports.getAllBlogs = async (req, res) => {
     if (category) filter.category = { $regex: category, $options: "i" };
 
     const total = await Blog.countDocuments(filter);
-    const blogs = await Blog.find(filter)
-      .select("-content")
-      .sort({ createdAt: -1 })
-      .skip(offset)
-      .limit(limit);
 
-    res.status(200).json({ total, offset, limit, blogs });
+    const mongoose = require("mongoose");
+    let blogs = [];
+    let nextCursor = null;
+    let hasMore = false;
+
+    if (cursorMode) {
+      // Cursor-based pagination
+      let cursorFilter = filter;
+      if (mongoose.Types.ObjectId.isValid(cursor)) {
+        cursorFilter = { ...filter, _id: { $lt: cursor } };
+      }
+      const page = await Blog.find(cursorFilter)
+        .select("-content")
+        .sort({ _id: -1 })
+        .limit(limit + 1);
+      hasMore = page.length > limit;
+      blogs = hasMore ? page.slice(0, limit) : page;
+      nextCursor = blogs.length > 0 ? blogs[blogs.length - 1]._id : null;
+    } else {
+      // Offset-based pagination
+      blogs = await Blog.find(filter)
+        .select("-content")
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit);
+    }
+
+    res.status(200).json({ total, offset, limit, blogs, nextCursor, hasMore });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

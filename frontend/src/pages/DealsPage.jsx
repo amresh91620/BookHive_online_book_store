@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useBooksList, useBookCategories } from "@/hooks/api/useBooks";
+import { useBookCategories } from "@/hooks/api/useBooks";
+import { useInfiniteBooks } from "@/hooks/api/useInfiniteBooks";
 import BookCard from "@/components/common/BookCard";
 import BookSkeleton from "@/components/common/BookSkeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pagination } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, X, Tag } from "lucide-react";
+import { Search, X, Tag, Loader2 } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 
 const ITEMS_PER_PAGE = 12;
@@ -16,57 +16,72 @@ export default function DealsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
-  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
+  const loadMoreRef = useRef(null);
 
   const debouncedSearch = useDebounce(searchQuery, 500);
 
   const params = {
     limit: ITEMS_PER_PAGE,
-    offset: (currentPage - 1) * ITEMS_PER_PAGE,
   };
   if (debouncedSearch) params.q = debouncedSearch;
   if (category) params.category = category;
 
-  const { data: booksData, isLoading } = useBooksList(params);
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfiniteBooks(params);
+
   const { data: categories = [] } = useBookCategories();
 
-  // Filter books with discounts
-  const allBooks = booksData?.books || booksData?.items || [];
+  // Flatten all pages and filter books with discounts
+  const allBooks = data?.pages.flatMap(page => page.books || []) || [];
   const books = allBooks.filter(book => book.discount > 0);
   const totalBooks = books.length;
-  const totalPages = Math.ceil(totalBooks / ITEMS_PER_PAGE);
 
-  // Paginate filtered books
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedBooks = books.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setCurrentPage(1);
-    updateURL({ page: "1", q: searchQuery, category });
+    updateURL({ q: searchQuery, category });
   };
 
   const handleCategoryChange = (newCategory) => {
     setCategory(newCategory);
-    setCurrentPage(1);
-    updateURL({ page: "1", q: searchQuery, category: newCategory });
+    updateURL({ q: searchQuery, category: newCategory });
   };
 
   const handleClearFilters = () => {
     setSearchQuery("");
     setCategory("");
-    setCurrentPage(1);
     setSearchParams({});
   };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    updateURL({ page: page.toString(), q: searchQuery, category });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const updateURL = ({ page, q, category }) => {
-    const params = { page };
+  const updateURL = ({ q, category }) => {
+    const params = {};
     if (q) params.q = q;
     if (category) params.category = category;
     setSearchParams(params);
@@ -180,7 +195,7 @@ export default function DealsPage() {
                     className="w-3 h-3 ml-1.5 cursor-pointer inline-block"
                     onClick={() => {
                       setSearchQuery("");
-                      updateURL({ page: "1", q: "", category });
+                      updateURL({ q: "", category });
                     }}
                   />
                 </Badge>
@@ -208,32 +223,37 @@ export default function DealsPage() {
         )}
 
         {/* Books Grid */}
-        {!isLoading && paginatedBooks.length > 0 && (
+        {!isLoading && books.length > 0 && (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
-              {paginatedBooks.map((book) => (
+              {books.map((book) => (
                 <BookCard key={book._id} book={book} />
               ))}
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 p-6 bg-white rounded-xl border border-gray-200">
-                <div className="text-sm text-gray-600">
-                  Page {currentPage} of {totalPages}
-                </div>
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+            {/* Load More Trigger */}
+            {hasNextPage && (
+              <div ref={loadMoreRef} className="flex justify-center py-8">
+                {isFetchingNextPage && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Loading more deals...</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* End of Results */}
+            {!hasNextPage && books.length > 0 && (
+              <div className="text-center py-6 text-gray-500 text-sm">
+                You've reached the end of the list
               </div>
             )}
           </>
         )}
 
         {/* No Results */}
-        {!isLoading && paginatedBooks.length === 0 && (
+        {!isLoading && books.length === 0 && (
           <div className="text-center py-16 sm:py-20 bg-white rounded-xl border border-gray-200">
             <div className="mb-4">
               <Tag className="w-16 h-16 mx-auto text-gray-300" />
