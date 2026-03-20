@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Search, Loader2, Camera } from "lucide-react";
+import { Search, Loader2, Camera, X } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/services/api";
+import { BrowserMultiFormatReader } from '@zxing/library';
 
 export default function ISBNLookup({ onDataFetched }) {
   const [isbn, setIsbn] = useState("");
   const [loading, setLoading] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const videoRef = useRef(null);
+  const codeReaderRef = useRef(null);
 
   const handleLookup = async () => {
     if (!isbn.trim()) {
@@ -39,46 +42,47 @@ export default function ISBNLookup({ onDataFetched }) {
   };
 
   const handleBarcodeScan = async () => {
-    // Check if browser supports barcode detection
-    if (!('BarcodeDetector' in window)) {
-      toast.error("Barcode scanning not supported in this browser. Please use Chrome or Edge.");
-      return;
-    }
-
     try {
       setScanning(true);
       
-      // Request camera access
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
-      });
+      // Initialize code reader
+      const codeReader = new BrowserMultiFormatReader();
+      codeReaderRef.current = codeReader;
+
+      // Get available video devices
+      const videoInputDevices = await codeReader.listVideoInputDevices();
       
-      // Create video element
-      const video = document.createElement('video');
-      video.srcObject = stream;
-      video.play();
+      if (videoInputDevices.length === 0) {
+        toast.error("No camera found on this device");
+        setScanning(false);
+        return;
+      }
 
-      // Create barcode detector
-      const barcodeDetector = new BarcodeDetector({ formats: ['ean_13', 'ean_8'] });
+      // Use back camera if available, otherwise use first camera
+      const selectedDeviceId = videoInputDevices.find(device => 
+        device.label.toLowerCase().includes('back') || 
+        device.label.toLowerCase().includes('rear')
+      )?.deviceId || videoInputDevices[0].deviceId;
 
-      // Scan for barcode
-      const detectBarcode = async () => {
-        try {
-          const barcodes = await barcodeDetector.detect(video);
-          
-          if (barcodes.length > 0) {
-            const detectedISBN = barcodes[0].rawValue;
+      // Start decoding from video device
+      codeReader.decodeFromVideoDevice(
+        selectedDeviceId,
+        videoRef.current,
+        async (result, error) => {
+          if (result) {
+            const detectedISBN = result.getText();
             
-            // Stop camera
-            stream.getTracks().forEach(track => track.stop());
+            // Stop scanning
+            codeReader.reset();
             setScanning(false);
             
-            toast.success("Barcode detected!");
+            toast.success(`Barcode detected: ${detectedISBN}`);
             
-            // Set ISBN and trigger lookup with the detected value
+            // Set ISBN
             setIsbn(detectedISBN);
             
-            // Call lookup directly with detected ISBN instead of relying on state
+            // Lookup the ISBN
+            setLoading(true);
             try {
               const response = await api.get(`/api/books/lookup/${detectedISBN.trim()}`);
               
@@ -94,35 +98,44 @@ export default function ISBNLookup({ onDataFetched }) {
               } else {
                 toast.error(err.response?.data?.msg || "Failed to lookup ISBN");
               }
+            } finally {
+              setLoading(false);
             }
-          } else {
-            // Keep scanning
-            requestAnimationFrame(detectBarcode);
           }
-        } catch (err) {
-          console.error('Barcode detection error:', err);
+          
+          if (error && error.name !== 'NotFoundException') {
+            console.error('Barcode scan error:', error);
+          }
         }
-      };
-
-      // Start detection after video is ready
-      video.onloadedmetadata = () => {
-        detectBarcode();
-      };
+      );
 
       // Timeout after 30 seconds
       setTimeout(() => {
         if (scanning) {
-          stream.getTracks().forEach(track => track.stop());
+          codeReader.reset();
           setScanning(false);
-          toast.error("Barcode scan timeout");
+          toast.error("Barcode scan timeout. Please try again.");
         }
       }, 30000);
 
     } catch (error) {
       console.error('Camera access error:', error);
-      toast.error("Camera access denied or not available");
+      if (error.name === 'NotAllowedError') {
+        toast.error("Camera access denied. Please allow camera permission.");
+      } else if (error.name === 'NotFoundError') {
+        toast.error("No camera found on this device.");
+      } else {
+        toast.error("Failed to start camera. Please enter ISBN manually.");
+      }
       setScanning(false);
     }
+  };
+
+  const stopScanning = () => {
+    if (codeReaderRef.current) {
+      codeReaderRef.current.reset();
+    }
+    setScanning(false);
   };
 
   return (
@@ -131,6 +144,33 @@ export default function ISBNLookup({ onDataFetched }) {
       <p className="text-sm text-gray-600">
         Enter ISBN or scan barcode to auto-fill book details from Google Books or Open Library
       </p>
+      
+      {/* Camera Preview */}
+      {scanning && (
+        <div className="relative bg-black rounded-lg overflow-hidden">
+          <video 
+            ref={videoRef}
+            className="w-full h-64 object-cover"
+            autoPlay
+            playsInline
+          />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="border-2 border-yellow-400 w-64 h-32 rounded-lg"></div>
+          </div>
+          <Button
+            type="button"
+            onClick={stopScanning}
+            className="absolute top-2 right-2 bg-red-500 hover:bg-red-600"
+            size="sm"
+          >
+            <X className="w-4 h-4 mr-1" />
+            Stop
+          </Button>
+          <p className="absolute bottom-2 left-0 right-0 text-center text-white text-sm bg-black/50 py-2">
+            Position barcode within the yellow frame
+          </p>
+        </div>
+      )}
       
       <div className="flex gap-2">
         <div className="flex-1">
@@ -141,6 +181,7 @@ export default function ISBNLookup({ onDataFetched }) {
             onChange={(e) => setIsbn(e.target.value)}
             placeholder="Enter ISBN (e.g., 9780134685991)"
             onKeyPress={(e) => e.key === 'Enter' && handleLookup()}
+            disabled={scanning}
           />
         </div>
       </div>
@@ -187,7 +228,8 @@ export default function ISBNLookup({ onDataFetched }) {
       </div>
 
       <p className="text-xs text-gray-500">
-        Note: Barcode scanning requires Chrome or Edge browser with camera access
+        <strong>Tip:</strong> Works on all modern browsers with camera access. 
+        Hold barcode steady within the frame for best results.
       </p>
     </div>
   );
