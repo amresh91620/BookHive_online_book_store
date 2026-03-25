@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useBookCategories } from "@/hooks/api/useBooks";
 import { useInfiniteBooks } from "@/hooks/api/useInfiniteBooks";
 import BookCard from "@/components/common/BookCard";
 import BookSkeleton from "@/components/common/BookSkeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Search, X, Tag, Loader2 } from "lucide-react";
+import { Search, X, Tag, Loader2, ChevronRight, SlidersHorizontal } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 
 const ITEMS_PER_PAGE = 12;
@@ -92,130 +91,88 @@ export default function DealsPage() {
   const maxDiscount = Math.max(...books.map(b => b.discount || 0), 0);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      {/* Hero Header */}
-      <div className="relative z-10 bg-gradient-to-r from-[#1F2937] via-[#374151] to-[#1F2937] text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}></div>
-        </div>
-        
-        <div className="container-shell py-8 sm:py-12 relative z-10">
-          <div className="flex items-center gap-2 text-sm text-gray-300 mb-4">
-            <span className="hover:text-white transition-colors cursor-pointer">Home</span>
-            <span>/</span>
-            <span className="text-white font-medium">Deals & Offers</span>
+    <div className="min-h-screen bg-[#FAFAFA] pb-20">
+      {/* Premium Editorial Header */}
+      <div className="bg-white border-b border-gray-100 pt-8 pb-10">
+        <div className="container-shell">
+          <div className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-gray-400 mb-6">
+            <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-gray-900">Deals & Offers</span>
           </div>
           
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-            <div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Deals & Offers
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="max-w-3xl">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight mb-6 flex flex-wrap items-center gap-4">
+                Special <span className="text-amber-600 font-serif italic font-normal">Offers</span>
+                {maxDiscount > 0 && (
+                  <span className="inline-flex items-center justify-center bg-gray-900 text-amber-400 text-lg md:text-xl font-bold px-4 py-2 rounded-full shadow-md transform -rotate-2">
+                    Up to {maxDiscount}% OFF
+                  </span>
+                )}
               </h1>
-              <p className="text-base sm:text-lg text-gray-300 flex items-center gap-2">
-                <Tag className="w-5 h-5 text-[#F59E0B]" />
-                Save big on <span className="font-bold text-[#F59E0B]">{totalBooks}</span> discounted books
+              <p className="text-lg md:text-xl text-gray-500 leading-relaxed flex items-center gap-3">
+                <Tag className="w-5 h-5 text-amber-500" />
+                Curated deals on <span className="font-semibold text-gray-900">{totalBooks}</span> beautifully crafted editions.
               </p>
             </div>
-            
-            {maxDiscount > 0 && (
-              <div className="bg-[#F59E0B] rounded-xl px-6 py-3 shadow-lg">
-                <div className="text-sm text-white/90">Up to</div>
-                <div className="text-3xl font-bold text-white">{maxDiscount}% OFF</div>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      <div className="relative z-10 container-shell py-6 sm:py-8">
-        {/* Compact Filter Bar */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
-            {/* Category Filter */}
-            <div className="w-full sm:w-auto sm:min-w-[200px]">
-              <label className="text-xs font-medium text-gray-600 mb-1.5 block">Category</label>
-              <select
-                value={category}
-                onChange={(e) => handleCategoryChange(e.target.value)}
-                className="w-full h-11 px-4 border border-gray-300 rounded-lg text-sm focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/20 focus:outline-none bg-white transition-all"
-              >
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
+      <div className="container-shell py-10">
+        {/* Refined Filter Section */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+          
+          {/* Dropdown Filters */}
+          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+            <div className="flex items-center gap-2 text-sm font-semibold tracking-widest uppercase text-gray-400 mr-2 hidden md:flex">
+              <SlidersHorizontal className="w-4 h-4" />
+              Filters
             </div>
 
-            {/* Search Bar */}
-            <div className="flex-1 w-full">
-              <label className="text-xs font-medium text-gray-600 mb-1.5 block">Search</label>
-              <form onSubmit={handleSearch} className="flex gap-2">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    type="text"
-                    placeholder="Search deals..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 h-11 border-gray-300 focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/20 rounded-lg"
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  className="bg-[#F59E0B] hover:bg-[#D97706] h-11 px-5 rounded-lg"
-                >
-                  <Search className="w-4 h-4" />
-                </Button>
-              </form>
-            </div>
+            <select
+              value={category}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              className="h-12 px-6 rounded-full border border-gray-200 bg-white text-gray-700 text-sm font-medium focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all cursor-pointer hover:bg-gray-50 appearance-none pr-10 relative shadow-sm"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
 
-            {/* Clear Filters */}
+            {/* Clear Filters Button */}
             {hasActiveFilters && (
-              <Button
-                variant="outline"
-                size="sm"
+              <button
                 onClick={handleClearFilters}
-                className="h-11 px-4 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 rounded-lg whitespace-nowrap"
+                className="h-12 px-6 rounded-full text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center gap-2"
               >
-                <X className="w-4 h-4 mr-1.5" />
+                <X className="w-4 h-4" />
                 Clear
-              </Button>
+              </button>
             )}
           </div>
 
-          {/* Active Filter Tags */}
-          {hasActiveFilters && (
-            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
-              {searchQuery && (
-                <Badge className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1.5 rounded-full">
-                  {searchQuery}
-                  <X
-                    className="w-3 h-3 ml-1.5 cursor-pointer inline-block"
-                    onClick={() => {
-                      setSearchQuery("");
-                      updateURL({ q: "", category });
-                    }}
-                  />
-                </Badge>
-              )}
-              {category && (
-                <Badge className="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-full">
-                  {category}
-                  <X
-                    className="w-3 h-3 ml-1.5 cursor-pointer inline-block"
-                    onClick={() => handleCategoryChange("")}
-                  />
-                </Badge>
-              )}
-            </div>
-          )}
+          {/* Minimal Search Bar */}
+          <div className="w-full lg:w-auto">
+            <form onSubmit={handleSearch} className="relative w-full lg:w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search deals..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-11 h-12 bg-white border border-gray-200 rounded-full focus:border-gray-900 focus:ring-1 focus:ring-gray-900 w-full shadow-sm"
+              />
+            </form>
+          </div>
         </div>
 
         {/* Loading State */}
         {isLoading && (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
             {[...Array(8)].map((_, i) => (
               <BookSkeleton key={i} />
             ))}
@@ -225,7 +182,7 @@ export default function DealsPage() {
         {/* Books Grid */}
         {!isLoading && books.length > 0 && (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
               {books.map((book) => (
                 <BookCard key={book._id} book={book} />
               ))}
@@ -233,20 +190,24 @@ export default function DealsPage() {
 
             {/* Load More Trigger */}
             {hasNextPage && (
-              <div ref={loadMoreRef} className="flex justify-center py-8">
-                {isFetchingNextPage && (
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Loading more deals...</span>
+              <div ref={loadMoreRef} className="flex justify-center mt-20">
+                {isFetchingNextPage ? (
+                  <div className="flex items-center gap-3 text-gray-500 bg-white px-6 py-3 rounded-full border border-gray-100 shadow-sm">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="text-sm font-medium uppercase tracking-wider">Loading deals</span>
                   </div>
+                ) : (
+                  <div className="h-12" /> 
                 )}
               </div>
             )}
 
             {/* End of Results */}
             {!hasNextPage && books.length > 0 && (
-              <div className="text-center py-6 text-gray-500 text-sm">
-                You've reached the end of the list
+              <div className="text-center mt-20 pt-8 border-t border-gray-200">
+                <p className="text-gray-400 text-sm uppercase tracking-widest font-medium">
+                  End of Offers
+                </p>
               </div>
             )}
           </>
@@ -254,19 +215,21 @@ export default function DealsPage() {
 
         {/* No Results */}
         {!isLoading && books.length === 0 && (
-          <div className="text-center py-16 sm:py-20 bg-white rounded-xl border border-gray-200">
-            <div className="mb-4">
-              <Tag className="w-16 h-16 mx-auto text-gray-300" />
+          <div className="text-center py-24 bg-white rounded-3xl border border-gray-100 shadow-sm mt-8">
+            <div className="mb-6 relative">
+              <div className="w-20 h-20 mx-auto bg-gray-50 rounded-full flex items-center justify-center border border-gray-100">
+                <Tag className="w-8 h-8 text-gray-400" />
+              </div>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No deals found</h3>
-            <p className="text-gray-500 mb-6">
-              {hasActiveFilters 
-                ? "We couldn't find any deals matching your criteria"
-                : "No discounted books available at the moment"}
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">No deals found</h3>
+            <p className="text-gray-500 mb-8 max-w-md mx-auto">
+              We couldn't find any discounted books matching your criteria. Try adjusting your filters.
             </p>
             {hasActiveFilters && (
-              <Button onClick={handleClearFilters} className="bg-[#F59E0B] hover:bg-[#D97706]">
-                <X className="w-4 h-4 mr-2" />
+              <Button 
+                onClick={handleClearFilters} 
+                className="bg-gray-900 hover:bg-gray-800 text-white rounded-full px-8 py-6 h-auto"
+              >
                 Clear All Filters
               </Button>
             )}

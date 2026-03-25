@@ -119,14 +119,14 @@ export default function FAQPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen py-12">
       <div className="container-shell">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl font-bold font-serif text-[#451a03] mb-4">
               Frequently Asked Questions
             </h1>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-[#6b4a2a]">
               Find answers to common questions about BookHive
             </p>
           </div>
@@ -135,32 +135,32 @@ export default function FAQPage() {
           <div className="space-y-8">
             {faqs.map((category, categoryIndex) => (
               <div key={categoryIndex}>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{category.category}</h2>
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">{category.category}</h2>
                 <div className="space-y-3">
                   {category.questions.map((faq, questionIndex) => {
                     const index = `${categoryIndex}-${questionIndex}`;
                     const isOpen = openIndex === index;
 
                     return (
-                      <Card key={questionIndex} className="overflow-hidden">
+                      <Card key={questionIndex} className="overflow-hidden border-amber-100 bg-white/90 backdrop-blur rounded-[28px] shadow-sm">
                         <button
                           onClick={() => toggleQuestion(categoryIndex, questionIndex)}
-                          className="w-full text-left p-6 hover:bg-gray-50 transition"
+                          className="w-full text-left p-6 hover:bg-amber-50 transition"
                         >
                           <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-gray-900 pr-4">
+                            <h3 className="text-lg font-semibold text-[#451a03] pr-4">
                               {faq.q}
                             </h3>
                             {isOpen ? (
                               <ChevronUp className="w-5 h-5 text-amber-600 flex-shrink-0" />
                             ) : (
-                              <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                              <ChevronDown className="w-5 h-5 text-[#7c5b3d] flex-shrink-0" />
                             )}
                           </div>
                         </button>
                         {isOpen && (
                           <CardContent className="px-6 pb-6 pt-0">
-                            <p className="text-gray-600 leading-relaxed">{faq.a}</p>
+                            <p className="text-[#6b4a2a] leading-relaxed">{faq.a}</p>
                           </CardContent>
                         )}
                       </Card>
@@ -172,17 +172,17 @@ export default function FAQPage() {
           </div>
 
           {/* Contact CTA */}
-          <Card className="mt-12 bg-amber-50 border-amber-200">
+          <Card className="mt-12 bg-[linear-gradient(180deg,#fff7e8_0%,#fffdf8_100%)] border-amber-100">
             <CardContent className="p-8 text-center">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              <h3 className="text-2xl font-bold font-serif text-[#451a03] mb-2">
                 Still have questions?
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-[#6b4a2a] mb-6">
                 Can't find the answer you're looking for? Please contact our customer support team.
               </p>
               <a
                 href="/contact"
-                className="inline-block bg-amber-600 text-white px-6 py-3 rounded-md font-medium hover:bg-amber-700 transition"
+                className="inline-block bg-[#78350f] text-white px-6 py-3 rounded-md font-medium hover:bg-[#5f280a] transition"
               >
                 Contact Support
               </a>

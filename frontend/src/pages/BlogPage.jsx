@@ -4,50 +4,68 @@ import { useBlogCategories } from "@/hooks/api/useBlogs";
 import { useInfiniteBlogs } from "@/hooks/api/useInfiniteBlogs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import BookSkeleton from "@/components/common/BookSkeleton";
-import { Search, Clock, Eye, Calendar, X, PenLine, Loader2 } from "lucide-react";
+import { Search, Clock, Eye, Calendar, X, Loader2, ChevronRight } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 
 const ITEMS_PER_PAGE = 9;
 
 function BlogCard({ blog }) {
   return (
-    <Link to={`/blog/${blog._id}`} className="group block">
-      <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow h-full flex flex-col">
-        <div className="relative overflow-hidden aspect-[16/9]">
+    <Link to={`/blog/${blog._id}`} className="group block h-full">
+      <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 h-full flex flex-col">
+        {/* Image Container */}
+        <div className="relative overflow-hidden aspect-[4/3]">
           <img
             src={blog.coverImage}
             alt={blog.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          
           {blog.featured && (
-            <span className="absolute top-3 left-3 bg-[#F59E0B] text-white text-xs font-semibold px-2 py-1 rounded-full">
+            <span className="absolute top-4 left-4 bg-gray-900/90 backdrop-blur-sm text-white text-[10px] uppercase tracking-widest font-semibold px-3 py-1.5 rounded-full">
               Featured
             </span>
           )}
         </div>
-        <div className="p-5 flex flex-col flex-1">
-          <div className="flex items-center gap-2 mb-3">
-            <Badge variant="secondary" className="text-xs">{blog.category}</Badge>
+        
+        {/* Content */}
+        <div className="p-6 flex flex-col flex-1">
+          <div className="mb-4">
+            <span className="text-amber-600 text-xs font-bold uppercase tracking-wider">
+              {blog.category}
+            </span>
           </div>
-          <h3 className="font-semibold text-gray-900 text-lg leading-snug mb-2 group-hover:text-[#D97706] transition-colors line-clamp-2">
+          
+          <h3 className="font-bold text-gray-900 text-xl leading-tight mb-3 group-hover:text-amber-600 transition-colors line-clamp-2">
             {blog.title}
           </h3>
-          <p className="text-gray-500 text-sm line-clamp-2 flex-1 mb-4">{blog.excerpt}</p>
-          <div className="flex items-center justify-between text-xs text-gray-400 mt-auto pt-3 border-t border-gray-100">
-            <span className="flex items-center gap-1">
-              <Calendar className="w-3 h-3" />
-              {new Date(blog.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+          
+          <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 flex-1 mb-6">
+            {blog.excerpt}
+          </p>
+          
+          {/* Meta Info */}
+          <div className="flex items-center justify-between text-xs text-gray-400 font-medium mt-auto pt-4 border-t border-gray-50">
+            <span className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              {new Date(blog.createdAt).toLocaleDateString("en-IN", { 
+                day: "numeric", 
+                month: "short", 
+                year: "numeric" 
+              })}
             </span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {blog.readTime} min
-            </span>
-            <span className="flex items-center gap-1">
-              <Eye className="w-3 h-3" />
-              {blog.views}
-            </span>
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                {blog.readTime} min
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5" />
+                {blog.views}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -82,7 +100,6 @@ export default function BlogPage() {
   const blogs = data?.pages.flatMap(page => page.blogs || []) || [];
   const total = data?.pages[0]?.total || 0;
 
-  // Intersection Observer for infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -131,124 +148,86 @@ export default function BlogPage() {
   const hasActiveFilters = searchQuery || category;
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      <div className="pointer-events-none absolute inset-0" />
-      <div className="pointer-events-none absolute inset-0 opacity-[0.05]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='36' height='36' viewBox='0 0 36 36' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2378350f' fill-opacity='1'%3E%3Ccircle cx='4' cy='4' r='1.2'/%3E%3Ccircle cx='20' cy='20' r='1.2'/%3E%3C/g%3E%3C/svg%3E")` }} />
-
-      {/* Hero Header */}
-      <div className="relative z-10 bg-gradient-to-r from-[#1F2937] via-[#374151] to-[#1F2937] text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}></div>
-        </div>
-        
-        <div className="container-shell py-8 sm:py-12 relative z-10">
-          <div className="flex items-center gap-2 text-sm text-gray-300 mb-4">
-            <span className="hover:text-white transition-colors cursor-pointer">Home</span>
-            <span>/</span>
-            <span className="text-white font-medium">Blog</span>
+    <div className="min-h-screen bg-[#FAFAFA] pb-20">
+      {/* Premium Editorial Header */}
+      <div className="bg-white border-b border-gray-100 pt-8 pb-10">
+        <div className="container-shell">
+          <div className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-gray-400 mb-6">
+            <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-gray-900">Journal</span>
           </div>
           
-          <div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              BookHive Blog
+          <div className="max-w-3xl">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight mb-6">
+              The BookHive <span className="text-amber-600 font-serif italic font-normal">Journal</span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-300 flex items-center gap-2">
-              <PenLine className="w-5 h-5 text-[#F59E0B]" />
-              Discover <span className="font-bold text-[#F59E0B]">{total}</span> articles about books and reading
+            <p className="text-lg md:text-xl text-gray-500 leading-relaxed">
+              Explore our curated collection of {total > 0 ? total : 'insightful'} articles, literary analyses, and reading recommendations.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="relative z-10 container-shell py-6 sm:py-8">
-        {/* Compact Filter Bar */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
-            {/* Category Filter */}
-            <div className="w-full sm:w-auto sm:min-w-[200px]">
-              <label className="text-xs font-medium text-gray-600 mb-1.5 block">Category</label>
-              <select
-                value={category}
-                onChange={(e) => handleCategoryChange(e.target.value)}
-                className="w-full h-11 px-4 border border-gray-300 rounded-lg text-sm focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/20 focus:outline-none bg-white transition-all"
+      <div className="container-shell py-12">
+        {/* Refined Filter Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+          {/* Categories Pill Scroller */}
+          <div className="flex-1 w-full overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+            <div className="flex gap-2 min-w-max">
+              <button
+                onClick={() => handleCategoryChange("")}
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+                  category === "" 
+                    ? "bg-gray-900 text-white shadow-md" 
+                    : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                }`}
               >
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Search Bar */}
-            <div className="flex-1 w-full">
-              <label className="text-xs font-medium text-gray-600 mb-1.5 block">Search</label>
-              <form onSubmit={handleSearch} className="flex gap-2">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    type="text"
-                    placeholder="Search articles..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 h-11 border-gray-300 focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/20 rounded-lg"
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  className="bg-[#F59E0B] hover:bg-[#D97706] h-11 px-5 rounded-lg"
+                All Articles
+              </button>
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => handleCategoryChange(cat)}
+                  className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+                    category === cat 
+                      ? "bg-gray-900 text-white shadow-md" 
+                      : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                  }`}
                 >
-                  <Search className="w-4 h-4" />
-                </Button>
-              </form>
+                  {cat}
+                </button>
+              ))}
             </div>
-
-            {/* Clear Filters */}
-            {hasActiveFilters && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClearFilters}
-                className="h-11 px-4 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 rounded-lg whitespace-nowrap"
-              >
-                <X className="w-4 h-4 mr-1.5" />
-                Clear
-              </Button>
-            )}
           </div>
 
-          {/* Active Filter Tags */}
-          {hasActiveFilters && (
-            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
-              {searchQuery && (
-                <Badge className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1.5 rounded-full">
-                  {searchQuery}
-                  <X
-                    className="w-3 h-3 ml-1.5 cursor-pointer inline-block"
-                    onClick={() => {
-                      setSearchQuery("");
-                      updateURL({ q: "", category });
-                    }}
-                  />
-                </Badge>
-              )}
-              {category && (
-                <Badge className="bg-purple-500 hover:bg-purple-600 text-white text-xs px-3 py-1.5 rounded-full">
-                  {category}
-                  <X
-                    className="w-3 h-3 ml-1.5 cursor-pointer inline-block"
-                    onClick={() => handleCategoryChange("")}
-                  />
-                </Badge>
-              )}
-            </div>
-          )}
+          {/* Minimal Search */}
+          <div className="w-full md:w-auto flex items-center gap-3">
+            <form onSubmit={handleSearch} className="relative w-full md:w-72">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search journal..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-11 h-12 bg-white border-gray-200 rounded-full focus:border-gray-900 focus:ring-1 focus:ring-gray-900 w-full"
+              />
+            </form>
+            {hasActiveFilters && (
+              <button
+                onClick={handleClearFilters}
+                className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                title="Clear filters"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Loading State */}
         {isLoading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(6)].map((_, i) => (
               <BookSkeleton key={i} />
             ))}
@@ -258,7 +237,7 @@ export default function BlogPage() {
         {/* Blogs Grid */}
         {!isLoading && blogs.length > 0 && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {blogs.map((blog) => (
                 <BlogCard key={blog._id} blog={blog} />
               ))}
@@ -266,20 +245,24 @@ export default function BlogPage() {
 
             {/* Load More Trigger */}
             {hasNextPage && (
-              <div ref={loadMoreRef} className="flex justify-center py-8">
-                {isFetchingNextPage && (
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Loading more articles...</span>
+              <div ref={loadMoreRef} className="flex justify-center mt-16">
+                {isFetchingNextPage ? (
+                  <div className="flex items-center gap-3 text-gray-500 bg-white px-6 py-3 rounded-full border border-gray-100 shadow-sm">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="text-sm font-medium uppercase tracking-wider">Loading more</span>
                   </div>
+                ) : (
+                  <div className="h-10" /> 
                 )}
               </div>
             )}
 
             {/* End of Results */}
             {!hasNextPage && blogs.length > 0 && (
-              <div className="text-center py-6 text-gray-500 text-sm">
-                You've reached the end of the list
+              <div className="text-center mt-16 pt-8 border-t border-gray-200">
+                <p className="text-gray-400 text-sm uppercase tracking-widest font-medium">
+                  End of Journal
+                </p>
               </div>
             )}
           </>
@@ -287,19 +270,16 @@ export default function BlogPage() {
 
         {/* No Results */}
         {!isLoading && blogs.length === 0 && (
-          <div className="text-center py-16 sm:py-20 bg-white rounded-xl border border-gray-200">
-            <div className="mb-4">
-              <PenLine className="w-16 h-16 mx-auto text-gray-300" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No articles found</h3>
-            <p className="text-gray-500 mb-6">
-              {hasActiveFilters 
-                ? "We couldn't find any articles matching your criteria"
-                : "No articles available at the moment"}
+          <div className="text-center py-24 bg-white rounded-3xl border border-gray-100 shadow-sm mt-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">No articles found</h3>
+            <p className="text-gray-500 mb-8 max-w-md mx-auto">
+              We couldn't find any articles matching your search criteria. Try adjusting your filters or search term.
             </p>
             {hasActiveFilters && (
-              <Button onClick={handleClearFilters} className="bg-[#F59E0B] hover:bg-[#D97706]">
-                <X className="w-4 h-4 mr-2" />
+              <Button 
+                onClick={handleClearFilters} 
+                className="bg-gray-900 hover:bg-gray-800 text-white rounded-full px-8 py-6 h-auto"
+              >
                 Clear All Filters
               </Button>
             )}

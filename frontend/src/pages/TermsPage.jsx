@@ -2,22 +2,22 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen py-12">
       <div className="container-shell">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold font-serif text-[#451a03] mb-4">
             Terms of Service
           </h1>
-          <p className="text-gray-600 mb-8">
+          <p className="text-[#7c5b3d] mb-8">
             Last updated: {new Date().toLocaleDateString()}
           </p>
 
-          <Card className="mb-6">
+          <Card className="mb-6 border-amber-100 bg-white/90 shadow-[0_14px_40px_rgba(120,53,15,0.08)] rounded-[30px]">
             <CardContent className="p-8 space-y-6">
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   1. Acceptance of Terms
                 </h2>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-[#6b4a2a] leading-relaxed">
                   By accessing and using BookHive, you accept and agree to be
                   bound by the terms and provision of this agreement. If you do
                   not agree to these terms, please do not use our service.
@@ -25,14 +25,14 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   2. Use of Service
                 </h2>
-                <p className="text-gray-700 leading-relaxed mb-3">
+                <p className="text-[#6b4a2a] leading-relaxed mb-3">
                   You agree to use BookHive only for lawful purposes and in
                   accordance with these Terms. You agree not to:
                 </p>
-                <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+                <ul className="list-disc list-inside space-y-2 text-[#6b4a2a] ml-4">
                   <li>
                     Use the service in any way that violates any applicable law
                     or regulation
@@ -54,10 +54,10 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   3. Account Registration
                 </h2>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-[#6b4a2a] leading-relaxed">
                   To access certain features, you must register for an account.
                   You agree to provide accurate, current, and complete
                   information during registration and to update such information
@@ -68,13 +68,13 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   4. Orders and Payment
                 </h2>
-                <p className="text-gray-700 leading-relaxed mb-3">
+                <p className="text-[#6b4a2a] leading-relaxed mb-3">
                   When you place an order through BookHive:
                 </p>
-                <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+                <ul className="list-disc list-inside space-y-2 text-[#6b4a2a] ml-4">
                   <li>All orders are subject to acceptance and availability</li>
                   <li>We reserve the right to refuse or cancel any order</li>
                   <li>Prices are subject to change without notice</li>
@@ -87,10 +87,10 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   5. Shipping and Delivery
                 </h2>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-[#6b4a2a] leading-relaxed">
                   We will make reasonable efforts to deliver your order within
                   the estimated timeframe. However, we are not responsible for
                   delays caused by circumstances beyond our control. Risk of
@@ -99,10 +99,10 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   6. Returns and Refunds
                 </h2>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-[#6b4a2a] leading-relaxed">
                   We accept returns within 30 days of purchase for items in
                   original condition. Refunds will be processed within 5-7
                   business days of receiving the returned item. Shipping costs
@@ -111,10 +111,10 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   7. Intellectual Property
                 </h2>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-[#6b4a2a] leading-relaxed">
                   The service and its original content, features, and
                   functionality are owned by BookHive and are protected by
                   international copyright, trademark, patent, trade secret, and
@@ -123,10 +123,10 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   8. Limitation of Liability
                 </h2>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-[#6b4a2a] leading-relaxed">
                   BookHive shall not be liable for any indirect, incidental,
                   special, consequential, or punitive damages resulting from
                   your use of or inability to use the service. Our total
@@ -136,10 +136,10 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   9. Indemnification
                 </h2>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-[#6b4a2a] leading-relaxed">
                   You agree to indemnify and hold BookHive harmless from any
                   claims, damages, losses, liabilities, and expenses arising out
                   of your use of the service or violation of these Terms.
@@ -147,10 +147,10 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   10. Termination
                 </h2>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-[#6b4a2a] leading-relaxed">
                   We may terminate or suspend your account and access to the
                   service immediately, without prior notice, for any reason,
                   including breach of these Terms. Upon termination, your right
@@ -159,10 +159,10 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   11. Changes to Terms
                 </h2>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-[#6b4a2a] leading-relaxed">
                   We reserve the right to modify these Terms at any time. We
                   will notify you of any changes by posting the new Terms on
                   this page. Your continued use of the service after such
@@ -172,10 +172,10 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   12. Governing Law
                 </h2>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-[#6b4a2a] leading-relaxed">
                   These Terms shall be governed by and construed in accordance
                   with the laws of the United States, without regard to its
                   conflict of law provisions.
@@ -183,21 +183,21 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
                   13. Contact Information
                 </h2>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-[#6b4a2a] leading-relaxed">
                   If you have any questions about these Terms, please contact us
                   at:
                 </p>
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-gray-700">
+                <div className="mt-4 p-4 bg-[#fff8ef] border border-amber-100 rounded-lg">
+                  <p className="text-[#6b4a2a]">
                     <strong>Email:</strong> amresh91620@gmail.com
                   </p>
-                  <p className="text-gray-700">
+                  <p className="text-[#6b4a2a]">
                     <strong>Phone:</strong> +91 91232 33736
                   </p>
-                  <p className="text-gray-700">
+                  <p className="text-[#6b4a2a]">
                     <strong>Address:</strong> Miarwa, Siwan (Bihar)
                   </p>
                 </div>
