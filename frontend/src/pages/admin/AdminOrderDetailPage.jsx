@@ -117,8 +117,9 @@ export default function AdminOrderDetailPage() {
   }
 
   return (
-    <div className="p-6">
-        <Button variant="ghost" onClick={() => navigate("/admin/orders")} className="mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        <Button variant="ghost" onClick={() => navigate("/admin/orders")} className="mb-6 hover:bg-amber-100 transition-colors animate-fade-in-up">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Orders
         </Button>
@@ -127,18 +128,18 @@ export default function AdminOrderDetailPage() {
           {/* Order Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Order Header */}
-            <Card>
+            <Card className="border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up bg-white/80 backdrop-blur-sm">
               <CardHeader>
-                <div className="flex flex-col md:flex-row md:items-center justify-between">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <CardTitle className="text-2xl mb-2">
+                    <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent mb-2">
                       Order #{order.orderNumber}
                     </CardTitle>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-stone-600">
                       Placed on {shortDate(order.createdAt)}
                     </p>
                   </div>
-                  <Badge variant={getStatusColor(order.status)} className="mt-2 md:mt-0">
+                  <Badge variant={getStatusColor(order.status)} className="mt-2 md:mt-0 shadow-sm text-sm px-4 py-2">
                     {order.status}
                   </Badge>
                 </div>
@@ -146,50 +147,57 @@ export default function AdminOrderDetailPage() {
             </Card>
 
             {/* Customer Info */}
-            <Card>
+            <Card className="border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-in-right stagger-1 bg-white/80 backdrop-blur-sm">
               <CardHeader>
-                <div className="flex items-center gap-2">
-                  <User className="w-5 h-5 text-amber-600" />
-                  <CardTitle>Customer Information</CardTitle>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg shadow-md">
+                    <User className="w-5 h-5 text-amber-700" />
+                  </div>
+                  <CardTitle className="text-xl font-bold text-stone-900">Customer Information</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  <div>
-                    <span className="text-gray-600">Name: </span>
-                    <span className="font-medium">{order.user?.name || "N/A"}</span>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2">
+                    <span className="text-stone-600 min-w-[60px]">Name:</span>
+                    <span className="font-semibold text-stone-900">{order.user?.name || "N/A"}</span>
                   </div>
-                  <div>
-                    <span className="text-gray-600">Email: </span>
-                    <span className="font-medium">{order.user?.email || "N/A"}</span>
+                  <div className="flex items-start gap-2">
+                    <span className="text-stone-600 min-w-[60px]">Email:</span>
+                    <span className="font-semibold text-stone-900 break-all">{order.user?.email || "N/A"}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Order Items */}
-            <Card>
+            <Card className="border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-in-right stagger-2 bg-white/80 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle>Order Items</CardTitle>
+                <CardTitle className="text-xl font-bold text-stone-900">Order Items</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {order.items.map((item, index) => (
-                    <div key={index} className="flex gap-4 pb-4 border-b last:border-0">
-                      <img
-                        src={item.coverImage}
-                        alt={item.title}
-                        className="w-20 h-28 object-cover rounded"
-                      />
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900">{item.title}</h4>
-                        <p className="text-sm text-gray-600">{item.author}</p>
-                        <p className="text-sm text-gray-900 mt-2">
+                    <div key={index} className="flex gap-4 pb-4 border-b last:border-0 hover:bg-amber-50/50 p-3 rounded-lg transition-colors">
+                      <div className="w-16 h-24 sm:w-20 sm:h-28 flex-shrink-0">
+                        <img
+                          src={item.coverImage}
+                          alt={item.title}
+                          className="w-full h-full object-cover rounded shadow-md"
+                          onError={(e) => {
+                            e.target.src = 'https://via.placeholder.com/120x160?text=No+Image';
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-stone-900 line-clamp-2">{item.title}</h4>
+                        <p className="text-sm text-stone-600 mt-1">{item.author}</p>
+                        <p className="text-sm text-stone-900 mt-2 font-semibold">
                           Qty: {item.quantity} × {formatPrice(item.price)}
                         </p>
                       </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-900">
+                      <div className="text-right flex-shrink-0">
+                        <p className="font-bold text-lg text-amber-700">
                           {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
@@ -200,39 +208,41 @@ export default function AdminOrderDetailPage() {
             </Card>
 
             {/* Delivery Address */}
-            <Card>
+            <Card className="border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-in-right stagger-3 bg-white/80 backdrop-blur-sm">
               <CardHeader>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-amber-600" />
-                  <CardTitle>Delivery Address</CardTitle>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg shadow-md">
+                    <MapPin className="w-5 h-5 text-amber-700" />
+                  </div>
+                  <CardTitle className="text-xl font-bold text-stone-900">Delivery Address</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="font-semibold text-gray-900">{order.address.fullName}</p>
-                <p className="text-gray-600">{order.address.phone}</p>
-                <p className="text-gray-600 mt-2">
-                  {order.address.street}
-                  <br />
-                  {order.address.city}, {order.address.state}
-                  <br />
-                  {order.address.pincode}
-                </p>
+                <div className="space-y-2">
+                  <p className="font-bold text-stone-900 text-lg">{order.address.fullName}</p>
+                  <p className="text-stone-700 font-semibold">{order.address.phone}</p>
+                  <p className="text-stone-600 mt-3 leading-relaxed">
+                    {order.address.street}<br />
+                    {order.address.city}, {order.address.state}<br />
+                    {order.address.pincode}
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
             {/* Update Order Status */}
             {order.status !== "Cancelled" && order.status !== "Delivered" && (
-              <Card>
+              <Card className="border-2 border-amber-300 shadow-lg hover:shadow-xl transition-all duration-300 animate-scale-up stagger-4 bg-gradient-to-br from-amber-50/50 to-white backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>Update Order Status</CardTitle>
+                  <CardTitle className="text-xl font-bold text-stone-900">Update Order Status</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label>Order Status</Label>
+                    <Label className="text-stone-700 font-semibold">Order Status</Label>
                     <select
                       value={selectedStatus}
                       onChange={(e) => setSelectedStatus(e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                      className="w-full mt-2 px-4 py-3 border-2 border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white font-medium"
                     >
                       {ORDER_STATUSES.filter(status => {
                         // Filter out invalid status transitions
@@ -252,61 +262,65 @@ export default function AdminOrderDetailPage() {
                         </option>
                       ))}
                     </select>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-stone-500 mt-2 font-medium">
                       Current: {order.status} → Select next status
                     </p>
                   </div>
 
                   {(selectedStatus === "Shipped" || order.status === "Shipped") && (
-                    <>
+                    <div className="space-y-4 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
                       <div>
-                        <Label>Tracking Number *</Label>
+                        <Label className="text-stone-700 font-semibold">Tracking Number *</Label>
                         <Input
                           value={trackingNumber}
                           onChange={(e) => setTrackingNumber(e.target.value)}
                           placeholder="Enter tracking number"
                           required
+                          className="mt-2 border-2 border-stone-200 focus:border-blue-500"
                         />
                       </div>
                       <div>
-                        <Label>Carrier *</Label>
+                        <Label className="text-stone-700 font-semibold">Carrier *</Label>
                         <Input
                           value={carrier}
                           onChange={(e) => setCarrier(e.target.value)}
                           placeholder="e.g., FedEx, UPS, DHL, India Post"
+                          className="mt-2 border-2 border-stone-200 focus:border-blue-500"
                         />
                       </div>
                       <div>
-                        <Label>Tracking URL (Optional)</Label>
+                        <Label className="text-stone-700 font-semibold">Tracking URL (Optional)</Label>
                         <Input
                           value={trackingUrl}
                           onChange={(e) => setTrackingUrl(e.target.value)}
                           placeholder="https://..."
+                          className="mt-2 border-2 border-stone-200 focus:border-blue-500"
                         />
                       </div>
-                    </>
+                    </div>
                   )}
 
                   <div>
-                    <Label>Note (Optional)</Label>
+                    <Label className="text-stone-700 font-semibold">Note (Optional)</Label>
                     <Textarea
                       value={statusNote}
                       onChange={(e) => setStatusNote(e.target.value)}
                       placeholder="Add a note about this status update..."
                       rows={3}
+                      className="mt-2 border-2 border-stone-200 focus:border-amber-500"
                     />
                   </div>
 
                   <Button
                     onClick={handleUpdateOrder}
                     disabled={updating || (selectedStatus === "Shipped" && (!trackingNumber || !carrier))}
-                    className="w-full bg-amber-600 hover:bg-amber-700"
+                    className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 py-6 text-lg font-semibold"
                   >
                     {updating ? "Updating..." : `Update to ${selectedStatus}`}
                   </Button>
                   
                   {selectedStatus === "Shipped" && (!trackingNumber || !carrier) && (
-                    <p className="text-sm text-red-600">
+                    <p className="text-sm text-red-600 font-medium">
                       * Tracking number and carrier are required for shipped status
                     </p>
                   )}
@@ -318,31 +332,31 @@ export default function AdminOrderDetailPage() {
           {/* Order Summary Sidebar */}
           <div className="space-y-6">
             {/* Price Summary */}
-            <Card>
+            <Card className="border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up bg-white/80 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+                <CardTitle className="text-xl font-bold text-stone-900">Order Summary</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium">{formatPrice(order.subtotal)}</span>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-stone-600 font-medium">Subtotal</span>
+                    <span className="font-bold text-stone-900">{formatPrice(order.subtotal)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Shipping</span>
-                    <span className="font-medium">
+                  <div className="flex justify-between items-center">
+                    <span className="text-stone-600 font-medium">Shipping</span>
+                    <span className="font-bold text-stone-900">
                       {order.shipping === 0 ? "Free" : formatPrice(order.shipping)}
                     </span>
                   </div>
                   {order.tax > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Tax</span>
-                      <span className="font-medium">{formatPrice(order.tax)}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-stone-600 font-medium">Tax</span>
+                      <span className="font-bold text-stone-900">{formatPrice(order.tax)}</span>
                     </div>
                   )}
-                  <div className="border-t pt-3 flex justify-between">
-                    <span className="text-lg font-bold">Total</span>
-                    <span className="text-lg font-bold text-amber-600">
+                  <div className="border-t-2 border-stone-200 pt-4 flex justify-between items-center">
+                    <span className="text-xl font-bold text-stone-900">Total</span>
+                    <span className="text-2xl font-bold text-amber-700">
                       {formatPrice(order.total)}
                     </span>
                   </div>
@@ -351,21 +365,23 @@ export default function AdminOrderDetailPage() {
             </Card>
 
             {/* Payment Info */}
-            <Card>
+            <Card className="border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-in-right stagger-1 bg-white/80 backdrop-blur-sm">
               <CardHeader>
-                <div className="flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-amber-600" />
-                  <CardTitle>Payment Information</CardTitle>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg shadow-md">
+                    <CreditCard className="w-5 h-5 text-amber-700" />
+                  </div>
+                  <CardTitle className="text-xl font-bold text-stone-900">Payment Information</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Method</span>
-                    <span className="font-medium">{order.paymentMethod}</span>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-stone-600 font-medium">Method</span>
+                    <span className="font-bold text-stone-900">{order.paymentMethod}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Status</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-stone-600 font-medium">Status</span>
                     <Badge
                       variant={
                         order.paymentStatus === "paid"
@@ -374,6 +390,7 @@ export default function AdminOrderDetailPage() {
                           ? "secondary"
                           : "destructive"
                       }
+                      className="shadow-sm"
                     >
                       {order.paymentStatus}
                     </Badge>
@@ -384,22 +401,22 @@ export default function AdminOrderDetailPage() {
 
             {/* Tracking Info */}
             {order.tracking && (order.tracking.trackingNumber || order.tracking.carrier) && (
-              <Card>
+              <Card className="border-2 border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-scale-up stagger-2 bg-gradient-to-br from-blue-50/50 to-white backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>Tracking Information</CardTitle>
+                  <CardTitle className="text-xl font-bold text-stone-900">Tracking Information</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {order.tracking.carrier && (
                       <div>
-                        <span className="text-gray-600">Carrier: </span>
-                        <span className="font-medium">{order.tracking.carrier}</span>
+                        <span className="text-stone-600 font-medium">Carrier: </span>
+                        <span className="font-bold text-stone-900">{order.tracking.carrier}</span>
                       </div>
                     )}
                     {order.tracking.trackingNumber && (
                       <div>
-                        <span className="text-gray-600">Tracking #: </span>
-                        <span className="font-medium">{order.tracking.trackingNumber}</span>
+                        <span className="text-stone-600 font-medium">Tracking #: </span>
+                        <span className="font-bold text-stone-900">{order.tracking.trackingNumber}</span>
                       </div>
                     )}
                     {order.tracking.trackingUrl && (
@@ -407,9 +424,9 @@ export default function AdminOrderDetailPage() {
                         href={order.tracking.trackingUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-amber-600 hover:underline text-sm"
+                        className="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm"
                       >
-                        Track Package
+                        Track Package →
                       </a>
                     )}
                   </div>
@@ -419,30 +436,32 @@ export default function AdminOrderDetailPage() {
 
             {/* Order Timeline */}
             {order.statusHistory && order.statusHistory.length > 0 && (
-              <Card>
+              <Card className="border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-scale-up stagger-3 bg-white/80 backdrop-blur-sm">
                 <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <Package className="w-5 h-5 text-amber-600" />
-                    <CardTitle>Order Timeline</CardTitle>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg shadow-md">
+                      <Package className="w-5 h-5 text-amber-700" />
+                    </div>
+                    <CardTitle className="text-xl font-bold text-stone-900">Order Timeline</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {order.statusHistory.map((history, index) => (
-                      <div key={index} className="flex gap-3">
+                      <div key={index} className="flex gap-4">
                         <div className="flex flex-col items-center">
-                          <div className="w-3 h-3 rounded-full bg-amber-600"></div>
+                          <div className="w-4 h-4 rounded-full bg-gradient-to-br from-amber-600 to-amber-700 shadow-md"></div>
                           {index < order.statusHistory.length - 1 && (
-                            <div className="w-0.5 h-full bg-gray-300 mt-1"></div>
+                            <div className="w-0.5 h-full bg-stone-300 mt-2"></div>
                           )}
                         </div>
                         <div className="flex-1 pb-4">
-                          <p className="font-medium text-gray-900">{history.status}</p>
-                          <p className="text-sm text-gray-600">
+                          <p className="font-bold text-stone-900">{history.status}</p>
+                          <p className="text-sm text-stone-600 font-medium mt-1">
                             {shortDate(history.at)}
                           </p>
                           {history.note && (
-                            <p className="text-sm text-gray-500 mt-1">{history.note}</p>
+                            <p className="text-sm text-stone-500 mt-2 italic">{history.note}</p>
                           )}
                         </div>
                       </div>
@@ -453,6 +472,7 @@ export default function AdminOrderDetailPage() {
             )}
           </div>
         </div>
+      </div>
     </div>
   );
 }

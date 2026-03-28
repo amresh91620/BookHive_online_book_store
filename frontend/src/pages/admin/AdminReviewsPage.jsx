@@ -60,33 +60,37 @@ export default function AdminReviewsPage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Manage Reviews</h1>
-        <p className="text-gray-600 mt-1">Total: {Array.isArray(reviews) ? reviews.length : 0} reviews</p>
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+      {/* Header */}
+      <div className="mb-8 animate-fade-in-up">
+        <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent">
+          Manage Reviews
+        </h1>
+        <p className="text-stone-600 mt-2 font-semibold">Total: {Array.isArray(reviews) ? reviews.length : 0} reviews</p>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 mb-6 border-2 border-stone-200 animate-slide-in-right stagger-1">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5" />
             <Input
               type="text"
               placeholder="Search by user, book, or comment..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 border-2 border-stone-200 focus:border-amber-500 transition-colors"
             />
           </div>
 
           {/* Rating Filter */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button
               variant={ratingFilter === "" ? "default" : "outline"}
               size="sm"
               onClick={() => setRatingFilter("")}
+              className={ratingFilter === "" ? "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800" : "border-2 hover:border-amber-500"}
             >
               All Ratings
             </Button>
@@ -96,6 +100,7 @@ export default function AdminReviewsPage() {
                 variant={ratingFilter === rating.toString() ? "default" : "outline"}
                 size="sm"
                 onClick={() => setRatingFilter(rating.toString())}
+                className={ratingFilter === rating.toString() ? "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800" : "border-2 hover:border-amber-500"}
               >
                 {rating} ★
               </Button>
@@ -108,44 +113,48 @@ export default function AdminReviewsPage() {
       {isLoading ? (
         <LoadingSkeleton type="list" count={5} />
       ) : filteredReviews.length === 0 ? (
-        <Card className="p-12 text-center">
-          <p className="text-gray-500">No reviews found</p>
+        <Card className="p-12 text-center border-2 border-stone-200 bg-gradient-to-br from-stone-50 to-amber-50/30 animate-scale-up stagger-2">
+          <Star className="w-16 h-16 text-stone-300 mx-auto mb-4" />
+          <p className="text-stone-500 font-medium">No reviews found</p>
         </Card>
       ) : (
         <div className="space-y-4">
           {filteredReviews.map((review) => (
-            <Card key={review._id} className="p-6">
-              <div className="flex items-start justify-between mb-4">
+            <Card 
+              key={review._id} 
+              className="p-4 sm:p-6 border-2 border-stone-200 hover:border-amber-300 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm"
+            >
+              <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
                   {/* User Info */}
-                  <Avatar>
-                    <AvatarFallback className="bg-amber-100 text-amber-700">
+                  <Avatar className="shadow-md">
+                    <AvatarFallback className="bg-gradient-to-br from-amber-100 to-amber-200 text-amber-700 font-bold text-lg">
                       {review.user?.name?.charAt(0).toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
                   
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold text-gray-900">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                      <h3 className="font-bold text-stone-900">
                         {review.user?.name || "Anonymous"}
                       </h3>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-stone-500 truncate">
                         {review.user?.email}
                       </span>
                       {review.isEdited && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-xs w-fit shadow-sm">
                           Edited
                         </Badge>
                       )}
                     </div>
                     
                     {/* Book Info */}
-                    <div className="flex items-center gap-2 mb-3">
-                      <BookOpen className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
+                      <BookOpen className="w-4 h-4 text-stone-400 flex-shrink-0" />
+                      <span className="text-sm text-stone-600 font-medium">
                         {review.book?.title || "Book not found"}
                       </span>
-                      <span className="text-sm text-gray-400">
+                      <span className="text-sm text-stone-400">
                         by {review.book?.author || "Unknown"}
                       </span>
                     </div>
@@ -153,13 +162,13 @@ export default function AdminReviewsPage() {
                     {/* Rating */}
                     <div className="flex items-center gap-2 mb-3">
                       {renderStars(review.rating)}
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-stone-500">
                         {shortDate(review.createdAt)}
                       </span>
                     </div>
 
                     {/* Comment */}
-                    <p className="text-gray-700 leading-relaxed">
+                    <p className="text-stone-700 leading-relaxed">
                       {review.comment}
                     </p>
                   </div>
@@ -170,7 +179,7 @@ export default function AdminReviewsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setDeleteDialog({ open: true, reviewId: review._id })}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors flex-shrink-0"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -182,10 +191,10 @@ export default function AdminReviewsPage() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open, reviewId: null })}>
-        <DialogContent>
+        <DialogContent className="border-2 border-stone-200">
           <DialogHeader>
-            <DialogTitle>Delete Review</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-stone-900">Delete Review</DialogTitle>
+            <DialogDescription className="text-stone-600">
               Are you sure you want to delete this review? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -193,12 +202,14 @@ export default function AdminReviewsPage() {
             <Button
               variant="outline"
               onClick={() => setDeleteDialog({ open: false, reviewId: null })}
+              className="border-2 hover:border-stone-400"
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
+              className="hover:scale-105 transition-transform"
             >
               Delete Review
             </Button>

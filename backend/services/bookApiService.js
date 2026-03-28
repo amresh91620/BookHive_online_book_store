@@ -15,7 +15,7 @@ async function generateAboutBookWithAI(title, author, existingDescription) {
   }
   
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const prompt = `Write a compelling 200-word description about the book "${title}" by ${author}. Include the plot, main themes, and why it's significant. Make it engaging for readers.`;
     
     const result = await model.generateContent(prompt);
@@ -46,7 +46,7 @@ async function generateAboutAuthorWithAI(author) {
   }
   
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const prompt = `Write a concise 100-word biography about the author ${author}. Include their background, notable works, writing style, and significance in literature.`;
     
     const result = await model.generateContent(prompt);
@@ -73,58 +73,87 @@ async function generateAboutAuthorWithAI(author) {
  */
 async function fetchFromGoogleBooks(isbn) {
   try {
-    const response = await axios.get(
-      `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`
-    );
+    // Try with both ISBN formats (with and without hyphens)
+    const cleanISBN = isbn.replace(/[-\s]/g, '');
+    const queries = [
+      `isbn:${cleanISBN}`,
+      `isbn:${isbn}`,
+    ];
+    
+    for (const query of queries) {
+      try {
+        console.log(`🔍 Google Books: Trying query "${query}"`);
+        const response = await axios.get(
+          `https://www.googleapis.com/books/v1/volumes?q=${query}`,
+          { timeout: 5000 }
+        );
 
-    if (response.data.totalItems === 0) {
-      return null;
-    }
-
-    const bookData = response.data.items[0].volumeInfo;
-    
-    // Clean and format the description
-    let existingDescription = bookData.description || '';
-    existingDescription = existingDescription.replace(/<[^>]*>/g, '');
-    
-    const title = bookData.title || '';
-    const author = bookData.authors ? bookData.authors.join(', ') : '';
-    
-    // Generate with Gemini AI
-    const aboutBook = await generateAboutBookWithAI(title, author, existingDescription);
-    const aboutAuthor = await generateAboutAuthorWithAI(author);
-    
-    // Parse published date to YYYY-MM-DD format
-    let publishedDate = bookData.publishedDate || '';
-    if (publishedDate) {
-      // Handle different date formats: "1884", "1884-01", "1884-01-15"
-      const dateParts = publishedDate.split('-');
-      if (dateParts.length === 1) {
-        // Only year: "1884" -> "1884-01-01"
-        publishedDate = `${dateParts[0]}-01-01`;
-      } else if (dateParts.length === 2) {
-        // Year and month: "1884-01" -> "1884-01-01"
-        publishedDate = `${dateParts[0]}-${dateParts[1]}-01`;
+        if (response.data.totalItems > 0) {
+          const bookData = response.data.items[0].volumeInfo;
+          
+          // Verify ISBN matches (important to avoid wrong books)
+          const bookISBNs = bookData.industryIdentifiers || [];
+          const hasMatchingISBN = bookISBNs.some(id => 
+            id.identifier.replace(/[-\s]/g, '') === cleanISBN
+          );
+          
+          if (!hasMatchingISBN) {
+            console.log('⚠️ ISBN mismatch, skipping this result');
+            continue;
+          }
+          
+          // Clean and format the description
+          let existingDescription = bookData.description || '';
+          existingDescription = existingDescription.replace(/<[^>]*>/g, '');
+          
+          const title = bookData.title || '';
+          const author = bookData.authors ? bookData.authors.join(', ') : '';
+          
+          // Generate with Gemini AI
+          const aboutBook = await generateAboutBookWithAI(title, author, existingDescription);
+          const aboutAuthor = await generateAboutAuthorWithAI(author);
+          
+          // Parse published date to YYYY-MM-DD format
+          let publishedDate = bookData.publishedDate || '';
+          if (publishedDate) {
+            // Handle different date formats: "1884", "1884-01", "1884-01-15"
+            const dateParts = publishedDate.split('-');
+            if (dateParts.length === 1) {
+              // Only year: "1884" -> "1884-01-01"
+              publishedDate = `${dateParts[0]}-01-01`;
+            } else if (dateParts.length === 2) {
+              // Year and month: "1884-01" -> "1884-01-01"
+              publishedDate = `${dateParts[0]}-${dateParts[1]}-01`;
+            }
+            // else: already in YYYY-MM-DD format
+          }
+          
+          console.log(`✅ Found: ${title} by ${author}`);
+          
+          return {
+            title: title,
+            subtitle: bookData.subtitle || '',
+            author: author,
+            aboutBook: aboutBook,
+            aboutAuthor: aboutAuthor,
+            publisher: bookData.publisher || '',
+            publishedDate: publishedDate,
+            pages: bookData.pageCount || 0,
+            language: bookData.language === 'en' ? 'English' : bookData.language || 'English',
+            categories: bookData.categories ? bookData.categories[0] : '',
+            coverImage: bookData.imageLinks?.thumbnail?.replace('http:', 'https:') || 
+                        bookData.imageLinks?.smallThumbnail?.replace('http:', 'https:') || '',
+            isbn: cleanISBN,
+            source: 'Google Books + Gemini AI'
+          };
+        }
+      } catch (queryError) {
+        console.log(`⚠️ Query failed: ${queryError.message}`);
+        continue;
       }
-      // else: already in YYYY-MM-DD format
     }
     
-    return {
-      title: title,
-      subtitle: bookData.subtitle || '',
-      author: author,
-      aboutBook: aboutBook,
-      aboutAuthor: aboutAuthor,
-      publisher: bookData.publisher || '',
-      publishedDate: publishedDate,
-      pages: bookData.pageCount || 0,
-      language: bookData.language === 'en' ? 'English' : bookData.language || 'English',
-      categories: bookData.categories ? bookData.categories[0] : '',
-      coverImage: bookData.imageLinks?.thumbnail?.replace('http:', 'https:') || 
-                  bookData.imageLinks?.smallThumbnail?.replace('http:', 'https:') || '',
-      isbn: isbn,
-      source: 'Google Books + Gemini AI'
-    };
+    return null;
   } catch (error) {
     console.error('Google Books API Error:', error.message);
     return null;
@@ -270,125 +299,109 @@ async function fetchBookCoverImage(isbn) {
 }
 
 /**
- * Generate complete book data using Gemini AI when not found in any API
+ * Generate complete book data using Gemini AI
+ * 
+ * ⚠️ DISABLED: This function is disabled due to reliability issues
+ * 
+ * PROBLEM: ISBN databases on the web are inconsistent and conflicting
+ * - Same ISBN can appear for multiple different books
+ * - Regional editions, reprints, and eBooks cause confusion
+ * - No way to verify which source is correct
+ * - Gemini cannot reliably distinguish between conflicting data
+ * 
+ * EXAMPLE: ISBN 9789386235039 shows as:
+ * - "Wings of Fire" by Dr. A.P.J. Abdul Kalam (Digital Edition)
+ * - "The Art of Living" by Swami Mukundananda (Database error)
+ * - "Quantitative Aptitude" by R.S. Aggarwal (Wrong indexing)
+ * 
+ * SOLUTION: Use only verified APIs (Google Books, Open Library, ISBNdb)
+ * If book not found there, manual entry is the most reliable option.
  */
 async function generateBookDataWithAI(isbn) {
+  console.log('⚠️ Gemini ISBN lookup is disabled');
+  console.log('📚 Reason: ISBN databases have conflicting/unreliable data');
+  console.log('💡 Solution: Use manual entry for accurate book information');
+  return null;
+  
+  /* DISABLED CODE - DO NOT ENABLE WITHOUT FIXING RELIABILITY ISSUES
   if (!genAI) {
+    console.log('⚠️ Gemini AI not configured');
     return null;
   }
   
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+    console.log(\`🤖 Gemini: Searching web for ISBN \${isbn}...\`);
     
-    // Ask Gemini to provide book information based on ISBN including cover image URL
-    const prompt = `I have an ISBN: ${isbn}. Please provide the following information about this book in JSON format:
-{
-  "title": "Book title",
-  "author": "Author name",
-  "publisher": "Publisher name",
-  "publishedYear": "YYYY",
-  "pages": number,
-  "language": "Language",
-  "category": "Main category/genre",
-  "coverImageUrl": "Direct URL to book cover image (try Google Books, Open Library, or Amazon)",
-  "aboutBook": "200-word description about the book, plot, themes, and significance",
-  "aboutAuthor": "100-word biography about the author"
-}
-
-For coverImageUrl, try these formats:
-- Google Books: https://books.google.com/books/content?id=BOOK_ID&printsec=frontcover&img=1&zoom=1&isbn=ISBN
-- Open Library: https://covers.openlibrary.org/b/isbn/ISBN-L.jpg
-- If you know the book, provide the actual working cover image URL
-
-If you cannot find information about this ISBN, respond with: {"found": false}
-
-Important: Return ONLY valid JSON, no markdown formatting, no explanations.`;
+    // Use gemini-2.5-flash (stable model for v1beta API)
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-2.5-flash',
+      generationConfig: {
+        temperature: 0.1, // Very low temperature for factual accuracy
+        maxOutputTokens: 3000, // Increased for complete responses
+      }
+    });
     
-    const result = await model.generateContent(prompt);
-    let text = result.response.text();
-    
-    // Clean markdown code blocks if present
-    text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    
-    // Parse JSON response
-    const bookInfo = JSON.parse(text);
-    
-    if (bookInfo.found === false) {
-      return null;
-    }
-    
-    // Format the data
-    const publishedDate = bookInfo.publishedYear ? `${bookInfo.publishedYear}-01-01` : '';
-    
-    // Use Gemini-provided cover URL or fallback to our fetch function
-    let coverImage = bookInfo.coverImageUrl || '';
-    
-    // If Gemini didn't provide a valid URL, try our fallback sources
-    if (!coverImage || coverImage === '' || coverImage === 'N/A') {
-      coverImage = await fetchBookCoverImage(isbn);
-    }
-    
-    return {
-      title: bookInfo.title || '',
-      subtitle: '',
-      author: bookInfo.author || '',
-      aboutBook: bookInfo.aboutBook || '',
-      aboutAuthor: bookInfo.aboutAuthor || '',
-      publisher: bookInfo.publisher || '',
-      publishedDate: publishedDate,
-      pages: parseInt(bookInfo.pages) || 0,
-      language: bookInfo.language || 'English',
-      categories: bookInfo.category || '',
-      coverImage: coverImage,
-      isbn: isbn,
-      source: 'Gemini AI + Cover APIs'
-    };
+    // ... rest of the code ...
   } catch (error) {
-    // Check if it's a quota error
-    if (error.message && error.message.includes('quota')) {
-      console.error('Gemini AI Quota Exceeded - Please generate a new API key');
-    } else {
-      console.error('Gemini AI Error:', error.message);
-    }
+    console.error('❌ Gemini AI Error:', error.message);
     return null;
   }
+  */
 }
 
 /**
  * Fetch book data with sequential fallback system
- * Priority: Google Books → Open Library → ISBNdb → Gemini AI → Manual
+ * Priority: Google Books → Open Library → ISBNdb → Manual Entry
+ * 
+ * Note: Gemini AI ISBN lookup is permanently disabled due to:
+ * - Conflicting ISBN data across web sources
+ * - Same ISBN appearing for multiple different books
+ * - No reliable way to verify correct book
+ * 
+ * For best results:
+ * 1. Use Google Books API (most reliable)
+ * 2. Fallback to Open Library
+ * 3. If not found, manual entry ensures accuracy
  */
 async function fetchBookByISBN(isbn) {
   // Clean ISBN (remove hyphens and spaces)
   const cleanISBN = isbn.replace(/[-\s]/g, '');
 
-  // Step 1: Try Google Books first
+  console.log(`📚 Fetching book data for ISBN: ${cleanISBN}`);
+
+  // Step 1: Try Google Books first (most reliable)
+  console.log('🔍 Step 1: Trying Google Books API...');
   const googleData = await fetchFromGoogleBooks(cleanISBN);
   if (googleData) {
+    console.log('✅ Found in Google Books');
     return googleData;
   }
 
   // Step 2: Try Open Library
+  console.log('🔍 Step 2: Trying Open Library API...');
   const openLibData = await fetchFromOpenLibrary(cleanISBN);
   if (openLibData) {
+    console.log('✅ Found in Open Library');
     return openLibData;
   }
 
   // Step 3: Try ISBNdb (if API key configured)
   if (process.env.ISBNDB_API_KEY) {
+    console.log('🔍 Step 3: Trying ISBNdb API...');
     const isbndbData = await fetchFromISBNdb(cleanISBN);
     if (isbndbData) {
+      console.log('✅ Found in ISBNdb');
       return isbndbData;
     }
   }
 
-  // Step 4: Try Gemini AI as fallback (only if quota available)
-  const aiData = await generateBookDataWithAI(cleanISBN);
-  if (aiData) {
-    return aiData;
-  }
-
-  // Step 5: All sources failed
+  // Step 4: Gemini AI disabled - unreliable for ISBN lookup
+  // Reason: Web has conflicting ISBN data, same ISBN for multiple books
+  
+  // Step 5: All sources failed - manual entry is most reliable
+  console.log('❌ ISBN not found in verified sources');
+  console.log('💡 Please enter book details manually for accuracy');
+  console.log('📝 Manual entry ensures correct book information');
   return null;
 }
 

@@ -126,11 +126,17 @@ export default function EnhancedHero() {
                 <div className="relative">
                   <img 
                     src={featuredBooks[2]?.coverImage || placeholderCover} 
-                    loading="lazy"
+                    loading="eager"
+                    crossOrigin="anonymous"
+                    onError={(e) => {
+                      console.log('Back book image failed:', featuredBooks[2]?.coverImage);
+                      e.target.onerror = null;
+                      e.target.src = placeholderCover;
+                    }}
                     className="w-36 h-52 sm:w-44 sm:h-64 lg:w-48 lg:h-72 object-cover rounded-lg shadow-2xl border-4 border-white/20"
-                    alt="Back book"
+                    alt={featuredBooks[2]?.title || "Book cover"}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg pointer-events-none"></div>
                 </div>
               </div>
               
@@ -139,11 +145,17 @@ export default function EnhancedHero() {
                 <div className="relative">
                   <img 
                     src={featuredBooks[1]?.coverImage || placeholderCover} 
-                    loading="lazy"
+                    loading="eager"
+                    crossOrigin="anonymous"
+                    onError={(e) => {
+                      console.log('Middle book image failed:', featuredBooks[1]?.coverImage);
+                      e.target.onerror = null;
+                      e.target.src = placeholderCover;
+                    }}
                     className="w-40 h-56 sm:w-48 sm:h-68 lg:w-52 lg:h-76 object-cover rounded-lg shadow-2xl border-4 border-white/20"
-                    alt="Middle book"
+                    alt={featuredBooks[1]?.title || "Book cover"}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg pointer-events-none"></div>
                 </div>
               </div>
 
@@ -152,12 +164,18 @@ export default function EnhancedHero() {
                 <div className="relative overflow-hidden rounded-xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.8)] border-[6px] border-white">
                    <img 
                     src={featuredBooks[0]?.coverImage || placeholderCover} 
-                    loading="lazy"
+                    loading="eager"
+                    crossOrigin="anonymous"
+                    onError={(e) => {
+                      console.log('Featured book image failed:', featuredBooks[0]?.coverImage);
+                      e.target.onerror = null;
+                      e.target.src = placeholderCover;
+                    }}
                     className="w-52 h-76 sm:w-60 sm:h-[340px] lg:w-72 lg:h-[420px] object-cover"
-                    alt="Featured book"
+                    alt={featuredBooks[0]?.title || "Featured book"}
                   />
                   {/* Book Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none"></div>
                   
                   {/* Featured Badge */}
                   <div className="absolute top-4 left-4 bg-[#F59E0B] text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
@@ -165,7 +183,7 @@ export default function EnhancedHero() {
                   </div>
                   
                   {/* Bottom Info */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent pointer-events-none">
                      <p className="text-[#F59E0B] font-serif italic text-sm font-semibold mb-1">This Week's Pick</p>
                      <p className="text-white text-xs opacity-90">Trending Now</p>
                   </div>

@@ -176,45 +176,47 @@ export default function AdminBookFormPage() {
   };
 
   return (
-    <div className="p-6">
-      <Button
-        variant="ghost"
-        onClick={() => navigate(returnUrl)}
-        className="mb-6"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to Books
-      </Button>
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(returnUrl)}
+          className="mb-6 hover:bg-amber-100 transition-colors animate-fade-in-up"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Books
+        </Button>
 
       {!isEdit && (
-        <Tabs defaultValue="single" className="mb-6">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="single">Single Book</TabsTrigger>
-            <TabsTrigger value="bulk">Bulk Upload</TabsTrigger>
+        <Tabs defaultValue="single" className="mb-6 animate-scale-up">
+          <TabsList className="grid w-full grid-cols-2 max-w-md h-12 bg-white border-2 border-stone-200">
+            <TabsTrigger value="single" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600 data-[state=active]:to-amber-700 data-[state=active]:text-white font-semibold">Single Book</TabsTrigger>
+            <TabsTrigger value="bulk" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600 data-[state=active]:to-amber-700 data-[state=active]:text-white font-semibold">Bulk Upload</TabsTrigger>
           </TabsList>
           
           <TabsContent value="single">
             {/* ISBN Lookup Section */}
-            <div className="mb-6">
+            <div className="mb-6 animate-slide-in-right stagger-1">
               <ISBNLookup onDataFetched={handleISBNDataFetched} />
             </div>
 
             {isApiData && (
-              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded flex items-start gap-2">
-                <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
+              <div className="mb-6 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-xl flex items-start gap-3 shadow-md animate-slide-in-right stagger-2">
+                <AlertCircle className="w-6 h-6 text-yellow-600 mt-0.5 flex-shrink-0" />
                 <div className="text-sm">
-                  <p className="font-semibold text-yellow-800">Data loaded from external API</p>
-                  <p className="text-yellow-700">Please review all fields and add pricing, stock, and tags manually. You can edit any incorrect information.</p>
+                  <p className="font-bold text-yellow-800 text-base">Data loaded from external API</p>
+                  <p className="text-yellow-700 mt-1">Please review all fields and add pricing, stock, and tags manually. You can edit any incorrect information.</p>
                 </div>
               </div>
             )}
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Add New Book</CardTitle>
+            <Card className="border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-scale-up stagger-3 bg-white/80 backdrop-blur-sm">
+              <CardHeader className="border-b-2 border-stone-200 bg-gradient-to-r from-stone-50 to-amber-50/50">
+                <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent">Add New Book</CardTitle>
+                <p className="text-stone-600 mt-2">Fill in the details below to add a new book to your inventory</p>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">{renderForm()}</form>
+              <CardContent className="pt-6">
+                <form onSubmit={handleSubmit} className="space-y-8">{renderForm()}</form>
               </CardContent>
             </Card>
           </TabsContent>
@@ -226,15 +228,17 @@ export default function AdminBookFormPage() {
       )}
 
       {isEdit && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Edit Book</CardTitle>
+        <Card className="border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-scale-up bg-white/80 backdrop-blur-sm">
+          <CardHeader className="border-b-2 border-stone-200 bg-gradient-to-r from-stone-50 to-amber-50/50">
+            <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent">Edit Book</CardTitle>
+            <p className="text-stone-600 mt-2">Update the book information below</p>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">{renderForm()}</form>
+          <CardContent className="pt-6">
+            <form onSubmit={handleSubmit} className="space-y-8">{renderForm()}</form>
           </CardContent>
         </Card>
       )}
+      </div>
     </div>
   );
 
@@ -242,31 +246,36 @@ export default function AdminBookFormPage() {
     return (
       <>
         {/* Basic Information */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Basic Information</h3>
+        <div className="space-y-6 p-6 bg-gradient-to-br from-blue-50/50 to-white rounded-xl border-2 border-blue-200">
+          <h3 className="text-xl font-bold text-stone-900 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold">1</div>
+            Basic Information
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="title">Title *</Label>
+                    <Label htmlFor="title" className="text-stone-700 font-semibold">Title *</Label>
                     <Input
                       id="title"
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
                       required
+                      className="mt-2 border-2 border-stone-200 focus:border-blue-500 transition-colors"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="author">Author *</Label>
+                    <Label htmlFor="author" className="text-stone-700 font-semibold">Author *</Label>
                     <Input
                       id="author"
                       name="author"
                       value={formData.author}
                       onChange={handleChange}
                       required
+                      className="mt-2 border-2 border-stone-200 focus:border-blue-500 transition-colors"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <Label htmlFor="aboutBook">About Book *</Label>
+                    <Label htmlFor="aboutBook" className="text-stone-700 font-semibold">About Book *</Label>
                     <Textarea
                       id="aboutBook"
                       name="aboutBook"
@@ -275,10 +284,11 @@ export default function AdminBookFormPage() {
                       rows={4}
                       required
                       placeholder="Describe what the book is about..."
+                      className="mt-2 border-2 border-stone-200 focus:border-blue-500 transition-colors"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <Label htmlFor="aboutAuthor">About Author</Label>
+                    <Label htmlFor="aboutAuthor" className="text-stone-700 font-semibold">About Author</Label>
                     <Textarea
                       id="aboutAuthor"
                       name="aboutAuthor"
@@ -286,10 +296,11 @@ export default function AdminBookFormPage() {
                       onChange={handleChange}
                       rows={3}
                       placeholder="Information about the author (optional)..."
+                      className="mt-2 border-2 border-stone-200 focus:border-blue-500 transition-colors"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="categories">Category *</Label>
+                    <Label htmlFor="categories" className="text-stone-700 font-semibold">Category *</Label>
                     <Input
                       id="categories"
                       name="categories"
@@ -297,17 +308,21 @@ export default function AdminBookFormPage() {
                       onChange={handleChange}
                       placeholder="e.g., Fiction"
                       required
+                      className="mt-2 border-2 border-stone-200 focus:border-blue-500 transition-colors"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Pricing */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Pricing</h3>
+              <div className="space-y-6 p-6 bg-gradient-to-br from-green-50/50 to-white rounded-xl border-2 border-green-200">
+                <h3 className="text-xl font-bold text-stone-900 flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-bold">2</div>
+                  Pricing & Stock
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="price">Price *</Label>
+                    <Label htmlFor="price" className="text-stone-700 font-semibold">Price *</Label>
                     <Input
                       id="price"
                       name="price"
@@ -316,10 +331,11 @@ export default function AdminBookFormPage() {
                       value={formData.price}
                       onChange={handleChange}
                       required
+                      className="mt-2 border-2 border-stone-200 focus:border-green-500 transition-colors"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="originalPrice">Original Price</Label>
+                    <Label htmlFor="originalPrice" className="text-stone-700 font-semibold">Original Price</Label>
                     <Input
                       id="originalPrice"
                       name="originalPrice"
@@ -327,10 +343,11 @@ export default function AdminBookFormPage() {
                       step="0.01"
                       value={formData.originalPrice}
                       onChange={handleChange}
+                      className="mt-2 border-2 border-stone-200 focus:border-green-500 transition-colors"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="stock">Stock *</Label>
+                    <Label htmlFor="stock" className="text-stone-700 font-semibold">Stock *</Label>
                     <Input
                       id="stock"
                       name="stock"
@@ -338,25 +355,30 @@ export default function AdminBookFormPage() {
                       value={formData.stock}
                       onChange={handleChange}
                       required
+                      className="mt-2 border-2 border-stone-200 focus:border-green-500 transition-colors"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Book Details */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Book Details</h3>
+              <div className="space-y-6 p-6 bg-gradient-to-br from-purple-50/50 to-white rounded-xl border-2 border-purple-200">
+                <h3 className="text-xl font-bold text-stone-900 flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold">3</div>
+                  Book Details
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="isbn">ISBN (Optional - Must be unique)</Label>
+                    <Label htmlFor="isbn" className="text-stone-700 font-semibold">ISBN (Optional - Must be unique)</Label>
                     <Input
                       id="isbn"
                       name="isbn"
                       value={formData.isbn}
                       onChange={handleChange}
                       placeholder="e.g., 9780451524935"
+                      className="mt-2 border-2 border-stone-200 focus:border-purple-500 transition-colors"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Leave empty if not available. Each ISBN must be unique.</p>
+                    <p className="text-xs text-stone-500 mt-2">Leave empty if not available. Each ISBN must be unique.</p>
                   </div>
                   <div>
                     <Label htmlFor="publisher">Publisher</Label>
