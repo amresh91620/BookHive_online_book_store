@@ -3,8 +3,16 @@ import { ArrowRight, Award, BookOpen, Heart, Target, Users, Zap } from "lucide-r
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export default function AboutPage() {
+  const [heroRef, heroVisible] = useScrollAnimation();
+  const [missionRef, missionVisible] = useScrollAnimation();
+  const [statsRef, statsVisible] = useScrollAnimation();
+  const [featuresRef, featuresVisible] = useScrollAnimation();
+  const [teamRef, teamVisible] = useScrollAnimation();
+  const [ctaRef, ctaVisible] = useScrollAnimation();
+
   const features = [
     {
       icon: BookOpen,
@@ -86,7 +94,12 @@ export default function AboutPage() {
     <div className="min-h-screen">
       <section className="px-0 py-10 sm:py-10 lg:py-10">
         <div className="container-shell">
-          <div className="grid items-center gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12">
+          <div
+            ref={heroRef}
+            className={`grid items-center gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12 transition-all duration-700 ${
+              heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             <div>
               <Badge className="mb-5 border-0 bg-[#1f2937] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-100">
                 Our Story
@@ -168,7 +181,12 @@ export default function AboutPage() {
 
       <section className="relative z-10 py-14 sm:py-16">
         <div className="container-shell">
-          <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <div
+            ref={missionRef}
+            className={`grid gap-6 lg:grid-cols-[1.05fr_0.95fr] transition-all duration-700 ${
+              missionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             <Card className="rounded-[28px] border-amber-100 bg-white/85 shadow-sm">
               <CardContent className="p-6 sm:p-8">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">Our Mission</p>
@@ -201,7 +219,12 @@ export default function AboutPage() {
 
       <section className="relative z-10 py-14 sm:py-16">
         <div className="container-shell">
-          <div className="rounded-[32px] bg-[#1f2937] px-5 py-8 text-white shadow-[0_20px_50px_rgba(31,41,55,0.18)] sm:px-8 lg:px-10">
+          <div
+            ref={statsRef}
+            className={`rounded-[32px] bg-[#1f2937] px-5 py-8 text-white shadow-[0_20px_50px_rgba(31,41,55,0.18)] sm:px-8 lg:px-10 transition-all duration-700 ${
+              statsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
               {stats.map((stat) => (
                 <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-center backdrop-blur-sm">
@@ -218,7 +241,12 @@ export default function AboutPage() {
 
       <section className="relative z-10 py-14 sm:py-16">
         <div className="container-shell">
-          <div className="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+          <div
+            ref={featuresRef}
+            className={`mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end transition-all duration-700 ${
+              featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">Why Readers Choose Us</p>
               <h2 className="mt-3 font-serif text-3xl font-bold text-[#451a03] sm:text-4xl">A bookstore experience shaped for modern readers.</h2>
@@ -229,12 +257,15 @@ export default function AboutPage() {
           </div>
 
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {features.map((feature) => {
+            {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <Card
                   key={feature.title}
-                  className="group rounded-[26px] border-amber-100 bg-white/90 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                  className={`group rounded-[26px] border-amber-100 bg-white/90 transition-all duration-700 hover:-translate-y-1 hover:shadow-xl ${
+                    featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                  }`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
                 >
                   <CardContent className="p-6">
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fff3dd] text-[#b45309] shadow-sm transition-transform duration-300 group-hover:scale-105">
@@ -252,16 +283,24 @@ export default function AboutPage() {
 
       <section className="relative z-10 py-14 sm:py-16">
         <div className="container-shell">
-          <div className="mb-10 text-center">
+          <div
+            ref={teamRef}
+            className={`mb-10 text-center transition-all duration-700 ${
+              teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">Meet The Team</p>
             <h2 className="mt-3 font-serif text-3xl font-bold text-[#451a03] sm:text-4xl">The people behind the shelves.</h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            {team.map((member) => (
+            {team.map((member, index) => (
               <Card
                 key={`${member.name}-${member.role}`}
-                className="overflow-hidden rounded-[28px] border-amber-100 bg-white/90 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                className={`overflow-hidden rounded-[28px] border-amber-100 bg-white/90 shadow-sm transition-all duration-700 hover:-translate-y-1 hover:shadow-lg ${
+                  teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                }`}
+                style={{ transitionDelay: `${index * 150}ms` }}
               >
                 <CardContent className="p-6 sm:p-7">
                   <div className="flex items-center gap-4">
@@ -285,7 +324,12 @@ export default function AboutPage() {
 
       <section className="pb-16 pt-6 sm:pb-20">
         <div className="container-shell">
-          <div className="rounded-[32px] border border-amber-100 bg-[linear-gradient(135deg,#fff8e8_0%,#fff1d9_100%)] px-6 py-8 shadow-sm sm:px-10 sm:py-10">
+          <div
+            ref={ctaRef}
+            className={`rounded-[32px] border border-amber-100 bg-[linear-gradient(135deg,#fff8e8_0%,#fff1d9_100%)] px-6 py-8 shadow-sm sm:px-10 sm:py-10 transition-all duration-700 ${
+              ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-2xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">Ready To Browse</p>

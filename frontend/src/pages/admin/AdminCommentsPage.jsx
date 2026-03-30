@@ -99,30 +99,34 @@ export default function AdminCommentsPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-stone-100">
-                    {comments.map((comment) => (
-                      <tr key={comment._id} className="hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-stone-50 transition-all duration-200">
-                        <td className="px-6 py-4">
-                          <div>
-                            <p className="font-semibold text-sm text-stone-900">{comment.user.name}</p>
-                            <p className="text-xs text-stone-500 truncate max-w-[150px]">{comment.user.email}</p>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <p className="text-sm font-medium max-w-xs truncate text-stone-900">{comment.blog.title}</p>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="max-w-md">
-                            <p className="text-sm text-stone-700 line-clamp-2">{comment.content}</p>
-                            {comment.isEdited && <span className="text-xs text-stone-500 italic">(edited)</span>}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex gap-3 text-sm">
+                    {comments.map((comment) => {
+                      // Skip comments with deleted users
+                      if (!comment.user) return null;
+                      
+                      return (
+                        <tr key={comment._id} className="hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-stone-50 transition-all duration-200">
+                          <td className="px-6 py-4">
+                            <div>
+                              <p className="font-semibold text-sm text-stone-900">{comment.user.name || 'Unknown User'}</p>
+                              <p className="text-xs text-stone-500 truncate max-w-[150px]">{comment.user.email || 'N/A'}</p>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-sm font-medium max-w-xs truncate text-stone-900">{comment.blog?.title || 'Unknown Blog'}</p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="max-w-md">
+                              <p className="text-sm text-stone-700 line-clamp-2">{comment.content}</p>
+                              {comment.isEdited && <span className="text-xs text-stone-500 italic">(edited)</span>}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex gap-3 text-sm">
                             <span className="flex items-center gap-1 text-blue-600 font-semibold">
-                              <ThumbsUp className="w-3 h-3" />{comment.likes.length}
+                              <ThumbsUp className="w-3 h-3" />{comment.likes?.length || 0}
                             </span>
                             <span className="flex items-center gap-1 text-red-600 font-semibold">
-                              <ThumbsDown className="w-3 h-3" />{comment.dislikes.length}
+                              <ThumbsDown className="w-3 h-3" />{comment.dislikes?.length || 0}
                             </span>
                           </div>
                         </td>
@@ -135,40 +139,46 @@ export default function AdminCommentsPage() {
                           </Button>
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
 
               {/* Mobile Cards */}
               <div className="md:hidden space-y-4 animate-scale-up stagger-2">
-                {comments.map((comment) => (
-                  <Card key={comment._id} className="p-4 border-2 border-stone-200 shadow-lg bg-white">
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-stone-900">{comment.user.name}</h3>
-                        <p className="text-xs text-stone-500 truncate">{comment.user.email}</p>
+                {comments.map((comment) => {
+                  // Skip comments with deleted users
+                  if (!comment.user) return null;
+                  
+                  return (
+                    <Card key={comment._id} className="p-4 border-2 border-stone-200 shadow-lg bg-white">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-stone-900">{comment.user.name || 'Unknown User'}</h3>
+                          <p className="text-xs text-stone-500 truncate">{comment.user.email || 'N/A'}</p>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(comment._id)} className="text-red-600 hover:bg-red-50 flex-shrink-0">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(comment._id)} className="text-red-600 hover:bg-red-50 flex-shrink-0">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    <p className="text-sm font-medium text-stone-900 mb-2 line-clamp-1">{comment.blog.title}</p>
-                    <p className="text-sm text-stone-700 mb-3">{comment.content}</p>
-                    {comment.isEdited && <span className="text-xs text-stone-500 italic block mb-2">(edited)</span>}
-                    <div className="flex justify-between items-center text-sm">
-                      <div className="flex gap-3">
-                        <span className="flex items-center gap-1 text-blue-600 font-semibold">
-                          <ThumbsUp className="w-3 h-3" />{comment.likes.length}
-                        </span>
-                        <span className="flex items-center gap-1 text-red-600 font-semibold">
-                          <ThumbsDown className="w-3 h-3" />{comment.dislikes.length}
-                        </span>
+                      <p className="text-sm font-medium text-stone-900 mb-2 line-clamp-1">{comment.blog?.title || 'Unknown Blog'}</p>
+                      <p className="text-sm text-stone-700 mb-3">{comment.content}</p>
+                      {comment.isEdited && <span className="text-xs text-stone-500 italic block mb-2">(edited)</span>}
+                      <div className="flex justify-between items-center text-sm">
+                        <div className="flex gap-3">
+                          <span className="flex items-center gap-1 text-blue-600 font-semibold">
+                            <ThumbsUp className="w-3 h-3" />{comment.likes?.length || 0}
+                          </span>
+                          <span className="flex items-center gap-1 text-red-600 font-semibold">
+                            <ThumbsDown className="w-3 h-3" />{comment.dislikes?.length || 0}
+                          </span>
+                        </div>
+                        <span className="text-stone-600">{new Date(comment.createdAt).toLocaleDateString()}</span>
                       </div>
-                      <span className="text-stone-600">{new Date(comment.createdAt).toLocaleDateString()}</span>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  );
+                })}
               </div>
             </>
           )}

@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState(null);
+  const [headerRef, headerVisible] = useScrollAnimation();
+  const [ctaRef, ctaVisible] = useScrollAnimation();
 
   const faqs = [
     {
@@ -122,7 +125,12 @@ export default function FAQPage() {
     <div className="min-h-screen py-12">
       <div className="container-shell">
           {/* Header */}
-          <div className="text-center mb-12">
+          <div
+            ref={headerRef}
+            className={`text-center mb-12 transition-all duration-700 ${
+              headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             <h1 className="text-4xl font-bold font-serif text-[#451a03] mb-4">
               Frequently Asked Questions
             </h1>
@@ -172,7 +180,12 @@ export default function FAQPage() {
           </div>
 
           {/* Contact CTA */}
-          <Card className="mt-12 bg-[linear-gradient(180deg,#fff7e8_0%,#fffdf8_100%)] border-amber-100">
+          <Card
+            ref={ctaRef}
+            className={`mt-12 bg-[linear-gradient(180deg,#fff7e8_0%,#fffdf8_100%)] border-amber-100 transition-all duration-700 ${
+              ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             <CardContent className="p-8 text-center">
               <h3 className="text-2xl font-bold font-serif text-[#451a03] mb-2">
                 Still have questions?

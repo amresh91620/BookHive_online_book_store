@@ -8,11 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, ShoppingCart, Trash2 } from "lucide-react";
 import { formatPrice } from "@/utils/format";
 import toast from "react-hot-toast";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export default function WishlistPage() {
   const { data: items = [], isLoading } = useWishlist();
   const removeFromWishlist = useRemoveFromWishlist();
   const addToCart = useAddToCart();
+  
+  const [headerRef, headerVisible] = useScrollAnimation();
 
   const handleRemove = (bookId) => {
     removeFromWishlist.mutate(bookId, {
@@ -59,11 +62,26 @@ export default function WishlistPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container-shell">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Wishlist</h1>
+        <h1
+          ref={headerRef}
+          className={`text-3xl font-bold text-gray-900 mb-8 transition-all duration-700 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
+          My Wishlist
+        </h1>
 
         <div className="space-y-4">
-          {items.map((book) => (
-            <Card key={book._id} className="p-4 sm:p-6 hover:shadow-lg transition-shadow">
+          {items.map((book, index) => (
+            <Card
+              key={book._id}
+              className="p-4 sm:p-6 hover:shadow-lg transition-all duration-700"
+              style={{
+                opacity: headerVisible ? 1 : 0,
+                transform: headerVisible ? 'translateY(0)' : 'translateY(40px)',
+                transitionDelay: `${index * 100}ms`
+              }}
+            >
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                 {/* Book Image */}
                 <Link to={`/books/${book._id}`} className="flex-shrink-0">

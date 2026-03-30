@@ -2,17 +2,24 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useBlogCategories } from "@/hooks/api/useBlogs";
 import { useInfiniteBlogs } from "@/hooks/api/useInfiniteBlogs";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import BookSkeleton from "@/components/common/BookSkeleton";
+import BlogSkeleton from "@/components/common/BlogSkeleton";
 import { Search, Clock, Eye, Calendar, X, Loader2, ChevronRight } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 
 const ITEMS_PER_PAGE = 9;
 
-function BlogCard({ blog }) {
+function BlogCard({ blog, isVisible, delay }) {
   return (
-    <Link to={`/blog/${blog._id}`} className="group block h-full">
+    <Link 
+      to={`/blog/${blog._id}`} 
+      className={`group block h-full transition-all duration-700 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+      }`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
       <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 h-full flex flex-col">
         {/* Image Container */}
         <div className="relative overflow-hidden aspect-[4/3]">
@@ -78,6 +85,11 @@ export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const loadMoreRef = useRef(null);
+
+  // Scroll animation refs
+  const [headerRef, headerVisible] = useScrollAnimation();
+  const [filtersRef, filtersVisible] = useScrollAnimation();
+  const [blogsRef, blogsVisible] = useScrollAnimation();
 
   const debouncedSearch = useDebounce(searchQuery, 500);
 
@@ -150,7 +162,7 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen bg-[#FAFAFA] pb-20">
       {/* Premium Editorial Header */}
-      <div className="bg-white border-b border-gray-100 pt-8 pb-10">
+      <div ref={headerRef} className={`bg-white border-b border-gray-100 pt-8 pb-10 transition-all duration-700 ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
         <div className="container-shell">
           <div className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-gray-400 mb-6">
             <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
@@ -171,7 +183,7 @@ export default function BlogPage() {
 
       <div className="container-shell py-12">
         {/* Refined Filter Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+        <div ref={filtersRef} className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 transition-all duration-700 ${filtersVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           {/* Categories Pill Scroller */}
           <div className="flex-1 w-full overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
             <div className="flex gap-2 min-w-max">
@@ -229,7 +241,13 @@ export default function BlogPage() {
         {isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(6)].map((_, i) => (
-              <BookSkeleton key={i} />
+              <div 
+                key={i}
+                className="transition-all duration-700 opacity-100 translate-y-0"
+                style={{ transitionDelay: `${i * 100}ms` }}
+              >
+                <BlogSkeleton />
+              </div>
             ))}
           </div>
         )}
@@ -237,9 +255,14 @@ export default function BlogPage() {
         {/* Blogs Grid */}
         {!isLoading && blogs.length > 0 && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogs.map((blog) => (
-                <BlogCard key={blog._id} blog={blog} />
+            <div ref={blogsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {blogs.map((blog, index) => (
+                <BlogCard 
+                  key={blog._id} 
+                  blog={blog} 
+                  isVisible={blogsVisible}
+                  delay={(index % 9) * 100}
+                />
               ))}
             </div>
 

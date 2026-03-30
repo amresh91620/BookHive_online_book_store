@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useBookStats } from "@/hooks/api/useBooks";
 import { useBlogsList } from "@/hooks/api/useBlogs";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import BookCard from "@/components/common/BookCard";
 import BookSkeleton from "@/components/common/BookSkeleton";
 import HeroCarousel from "@/components/home/HeroCarousel";
@@ -19,6 +20,11 @@ export default function HomePage() {
   const newArrivals = useMemo(() => stats?.newArrivals ?? [], [stats]);
   const blogs = useMemo(() => blogsData?.blogs ?? [], [blogsData]);
 
+  // Scroll animation refs
+  const [featuredRef, featuredVisible] = useScrollAnimation();
+  const [blogsRef, blogsVisible] = useScrollAnimation();
+  const [arrivalsRef, arrivalsVisible] = useScrollAnimation();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-50 via-white to-stone-50">
       <HeroCarousel />
@@ -28,28 +34,30 @@ export default function HomePage() {
         <section className="py-16 sm:py-20 lg:py-24 bg-white relative overflow-hidden">
           <div className="absolute inset-0 bg-noise opacity-40"></div>
           <div className="container-shell relative">
-            <div className="flex items-center gap-3 mb-10">
-              <Sparkles className="w-6 h-6 text-stone-200 animate-pulse" />
-              <div className="h-10 w-56 bg-stone-100 rounded animate-pulse"></div>
+            <div className="flex items-center gap-3 mb-10 animate-fade-in-up">
+              <Sparkles className="w-6 h-6 text-amber-400 animate-pulse" />
+              <div className="h-10 w-56 bg-gradient-to-r from-stone-200 to-stone-100 rounded-lg animate-pulse"></div>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
               {[...Array(4)].map((_, i) => (
-                <BookSkeleton key={i} />
+                <div key={i} className="animate-fade-in-up" style={{ animationDelay: `${i * 0.1}s` }}>
+                  <BookSkeleton />
+                </div>
               ))}
             </div>
-            <p className="mt-12 text-center text-sm text-stone-400 italic font-light">
+            <p className="mt-12 text-center text-sm text-stone-400 italic font-light animate-pulse">
               Curating your perfect collection...
             </p>
           </div>
         </section>
       ) : featuredBooks.length > 0 && (
-        <section className="py-16 sm:py-20 lg:py-24 bg-white relative overflow-hidden">
+        <section ref={featuredRef} className="py-16 sm:py-20 lg:py-24 bg-white relative overflow-hidden">
           <div className="absolute inset-0 bg-noise opacity-40"></div>
           <div className="container-shell relative">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4">
+            <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4 transition-all duration-700 ${featuredVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <Sparkles className="w-6 h-6 text-amber-600" />
+                  <Sparkles className="w-6 h-6 text-amber-600 animate-float" />
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-stone-900 tracking-tight">
                     Featured Collection
                   </h2>
@@ -70,8 +78,14 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-              {featuredBooks.map((book) => (
-                <BookCard key={book._id} book={book} />
+              {featuredBooks.map((book, index) => (
+                <div 
+                  key={book._id} 
+                  className={`transition-all duration-700 ${featuredVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
+                >
+                  <BookCard book={book} />
+                </div>
               ))}
             </div>
           </div>
@@ -82,25 +96,44 @@ export default function HomePage() {
       {blogsLoading ? (
         <section className="py-16 sm:py-20 lg:py-24 bg-stone-50">
           <div className="container-shell">
-            <div className="flex flex-col items-center mb-14">
-              <div className="h-12 w-72 bg-stone-200 rounded animate-pulse mb-4"></div>
-              <div className="h-5 w-96 bg-stone-100 rounded animate-pulse"></div>
+            <div className="flex flex-col items-center mb-14 animate-fade-in-up">
+              <div className="h-12 w-72 bg-gradient-to-r from-stone-200 to-stone-100 rounded-lg animate-pulse mb-4"></div>
+              <div className="h-5 w-96 max-w-full bg-gradient-to-r from-stone-150 to-stone-100 rounded-lg animate-pulse"></div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-[420px] bg-white rounded-2xl shadow-soft animate-pulse"></div>
+                <div 
+                  key={i} 
+                  className="animate-fade-in-up" 
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                >
+                  <div className="h-[420px] bg-white rounded-2xl shadow-soft overflow-hidden">
+                    <div className="h-56 bg-gradient-to-br from-stone-200 via-stone-100 to-stone-200 animate-pulse relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer"></div>
+                    </div>
+                    <div className="p-6 space-y-4">
+                      <div className="h-6 bg-gradient-to-r from-stone-200 to-stone-100 rounded-md w-full"></div>
+                      <div className="h-6 bg-gradient-to-r from-stone-200 to-stone-100 rounded-md w-3/4"></div>
+                      <div className="space-y-2 pt-2">
+                        <div className="h-4 bg-gradient-to-r from-stone-150 to-stone-100 rounded w-full"></div>
+                        <div className="h-4 bg-gradient-to-r from-stone-150 to-stone-100 rounded w-5/6"></div>
+                        <div className="h-4 bg-gradient-to-r from-stone-150 to-stone-100 rounded w-4/6"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
         </section>
       ) : blogs.length > 0 && (
-        <section className="py-16 sm:py-20 lg:py-24 bg-stone-50 relative">
+        <section ref={blogsRef} className="py-16 sm:py-20 lg:py-24 bg-stone-50 relative">
           <div className="absolute inset-0 bg-texture opacity-30"></div>
           <div className="container-shell relative">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-14 gap-4">
+            <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between mb-14 gap-4 transition-all duration-700 ${blogsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               <div className="flex flex-col items-start max-w-2xl">
                 <div className="flex items-center gap-3 mb-3">
-                  <PenLine className="w-6 h-6 text-amber-700" />
+                  <PenLine className="w-6 h-6 text-amber-700 animate-float" />
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-stone-900 tracking-tight">
                     Literary Journal
                   </h2>
@@ -122,8 +155,13 @@ export default function HomePage() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {blogs.map((blog) => (
-                <Link key={blog._id} to={`/blog/${blog._id}`} className="group">
+              {blogs.map((blog, index) => (
+                <Link 
+                  key={blog._id} 
+                  to={`/blog/${blog._id}`} 
+                  className={`group transition-all duration-700 ${blogsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                  style={{ transitionDelay: `${index * 150}ms` }}
+                >
                   <Card className="h-full bg-white border border-stone-200 hover:border-amber-300 transition-smooth hover:shadow-medium hover:-translate-y-2 overflow-hidden">
                     {blog.coverImage && (
                       <div className="relative h-56 overflow-hidden bg-stone-100">
@@ -172,13 +210,13 @@ export default function HomePage() {
 
       {/* New Arrivals */}
       {!isLoading && newArrivals.length > 0 && (
-        <section className="py-16 sm:py-20 lg:py-24 bg-white relative overflow-hidden">
+        <section ref={arrivalsRef} className="py-16 sm:py-20 lg:py-24 bg-white relative overflow-hidden">
           <div className="absolute inset-0 bg-noise opacity-40"></div>
           <div className="container-shell relative">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4">
+            <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4 transition-all duration-700 ${arrivalsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <BookOpen className="w-6 h-6 text-amber-600" />
+                  <BookOpen className="w-6 h-6 text-amber-600 animate-float" />
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-stone-900 tracking-tight">
                     Fresh Arrivals
                   </h2>
@@ -199,8 +237,14 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-              {newArrivals.map((book) => (
-                <BookCard key={book._id} book={book} />
+              {newArrivals.map((book, index) => (
+                <div 
+                  key={book._id} 
+                  className={`transition-all duration-700 ${arrivalsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
+                >
+                  <BookCard book={book} />
+                </div>
               ))}
             </div>
           </div>

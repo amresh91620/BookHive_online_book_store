@@ -7,9 +7,7 @@ import { loginSchema } from "@/schemas/auth";
 import { loginUser } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Eye, EyeOff } from "lucide-react";
+import { BookOpen, Eye, EyeOff, Mail, Lock, Home } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function LoginPage() {
@@ -37,84 +35,182 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] relative flex justify-center px-4">
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2378350f' fill-opacity='1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E")`}}></div>
-      <div className="w-full max-w-md relative z-10">
-      <Card className="bg-white border-[#E5E5E5] shadow-lg mt-10">
-        <CardHeader className="text-center pt-5 border-b border-gray-100">
-          <div className="flex justify-center mb-3">
-            <div className="bg-[#FEF3C7] p-2 rounded-full border border-[#FDE68A]">
-              <BookOpen className="w-8 h-8 text-[#D97706]" />
+    <div className="min-h-screen flex relative overflow-hidden">
+      {/* Animated Background Blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-amber-400/20 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute top-1/2 -left-40 w-96 h-96 bg-orange-400/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute -bottom-40 right-1/4 w-80 h-80 bg-amber-300/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+      </div>
+
+      {/* Back to Home Button - Mobile Optimized */}
+      <Link 
+        to="/"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 z-50 inline-flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-white/95 hover:bg-white text-amber-700 rounded-full shadow-md hover:shadow-lg transition-all duration-300 backdrop-blur-sm border border-amber-200 hover:scale-105 text-sm sm:text-base"
+      >
+        <Home className="w-4 h-4 sm:w-4 sm:h-4" />
+        <span className="font-medium hidden xs:inline sm:inline">Back to Home</span>
+        <span className="font-medium xs:hidden sm:hidden">Home</span>
+      </Link>
+
+      {/* Left Side - Enhanced Gradient Background with Curved Right Edge */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-amber-600 via-amber-700 to-amber-900 relative rounded-r-[100px]">
+        {/* Animated decorative circles */}
+        <div className="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        
+        {/* Floating book icons */}
+        <div className="absolute top-1/4 left-1/4 opacity-10 animate-float">
+          <BookOpen className="w-32 h-32 text-white" />
+        </div>
+        <div className="absolute bottom-1/4 right-1/4 opacity-10 animate-float" style={{ animationDelay: '2s' }}>
+          <BookOpen className="w-24 h-24 text-white" />
+        </div>
+        
+        {/* Content */}
+        <div className="relative z-10 flex flex-col justify-center items-center w-full px-12 text-white">
+          <div className="mb-8 animate-scale-up">
+            <div className="relative">
+              <div className="absolute inset-0 bg-white/20 rounded-full blur-2xl"></div>
+              <BookOpen className="w-24 h-24 text-white drop-shadow-2xl relative z-10" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-serif text-[#451a03]">Welcome Back</CardTitle>
-          <CardDescription className="text-[#78350F] font-serif italic">Sign in to your BookHive account</CardDescription>
-        </CardHeader>
-        <CardContent className="pt-5">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-1">
-              <Label htmlFor="email" className="font-medium text-gray-700">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                {...register("email")}
-                className="focus-visible:ring-[#D97706]"
-              />
+          <h1 className="text-5xl font-bold mb-4 text-center animate-fade-in-up">Welcome Back</h1>
+          <p className="text-xl text-amber-100 text-center max-w-md italic animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            Sign in to continue your reading journey with BookHive
+          </p>
+          
+          {/* Enhanced decorative book stack */}
+          <div className="mt-16 flex gap-4 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+            <div className="w-16 h-20 bg-white/20 rounded backdrop-blur-sm transform hover:scale-110 transition-transform duration-300"></div>
+            <div className="w-16 h-20 bg-white/30 rounded backdrop-blur-sm translate-y-2 transform hover:scale-110 transition-transform duration-300"></div>
+            <div className="w-16 h-20 bg-white/20 rounded backdrop-blur-sm transform hover:scale-110 transition-transform duration-300"></div>
+          </div>
+
+          {/* Decorative dots pattern */}
+          <div className="absolute bottom-10 left-10 grid grid-cols-3 gap-2 opacity-30">
+            {[...Array(9)].map((_, i) => (
+              <div key={i} className="w-2 h-2 bg-white rounded-full"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-br from-stone-50 via-amber-50/30 to-stone-50 relative min-h-screen lg:min-h-0">
+        {/* Decorative elements - hidden on small mobile */}
+        <div className="hidden sm:block absolute top-10 right-10 w-20 h-20 border-2 border-amber-200 rounded-full opacity-50"></div>
+        <div className="hidden sm:block absolute bottom-10 left-10 w-16 h-16 border-2 border-amber-300 rounded-lg opacity-50 rotate-45"></div>
+
+        <div className="w-full max-w-md relative z-10 py-8 sm:py-0">
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex justify-center mb-8 animate-scale-up">
+            <div className="bg-gradient-to-br from-amber-100 to-amber-200 p-6 rounded-full shadow-xl relative">
+              <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-xl"></div>
+              <BookOpen className="w-12 h-12 text-amber-700 relative z-10" />
+            </div>
+          </div>
+
+          {/* Login Header */}
+          <div className="text-center mb-6 sm:mb-8 animate-fade-in-up">
+            <div className="inline-block mb-3 sm:mb-4">
+              <div className="h-1 w-16 sm:w-20 bg-gradient-to-r from-amber-600 to-amber-400 rounded-full mx-auto"></div>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 mb-2 bg-gradient-to-r from-amber-900 to-amber-700 bg-clip-text text-transparent">
+              LOGIN
+            </h2>
+            <p className="text-sm sm:text-base text-stone-600 italic">Sign in to your account</p>
+          </div>
+
+          {/* Login Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            {/* Email Field */}
+            <div className="space-y-2 group">
+              <div className="relative">
+                <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-stone-400 w-4 h-4 sm:w-5 sm:h-5 group-focus-within:text-amber-600 transition-colors" />
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  autoComplete="email"
+                  {...register("email")}
+                  className="pl-10 sm:pl-12 h-12 sm:h-14 bg-white border-2 border-stone-200 rounded-xl focus:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-200 text-base sm:text-lg transition-all duration-300 hover:border-amber-300"
+                />
+              </div>
               {errors.email && (
-                <p className="text-sm text-red-600">{errors.email.message}</p>
+                <p className="text-xs sm:text-sm text-red-600 ml-2 flex items-center gap-1">
+                  <span className="inline-block w-1 h-1 bg-red-600 rounded-full"></span>
+                  {errors.email.message}
+                </p>
               )}
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="font-medium text-gray-700">Password</Label>
-                <Link 
-                  to="/forgot-password" 
-                  className="text-xs text-[#D97706] hover:text-[#B45309] hover:underline transition-colors"
-                >
-                  Forgot password?
-                </Link>
-              </div>
+
+            {/* Password Field */}
+            <div className="space-y-2 group">
               <div className="relative">
+                <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-stone-400 w-4 h-4 sm:w-5 sm:h-5 group-focus-within:text-amber-600 transition-colors" />
                 <Input
-                  id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="Password"
+                  autoComplete="current-password"
                   {...register("password")}
-                  className="focus-visible:ring-[#D97706]"
+                  className="pl-10 sm:pl-12 pr-10 sm:pr-12 h-12 sm:h-14 bg-white border-2 border-stone-200 rounded-xl focus:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-200 text-base sm:text-lg transition-all duration-300 hover:border-amber-300"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-amber-600 transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                 </button>
               </div>
               {errors.password && (
-                <p className="text-sm text-red-600">{errors.password.message}</p>
+                <p className="text-xs sm:text-sm text-red-600 ml-2 flex items-center gap-1">
+                  <span className="inline-block w-1 h-1 bg-red-600 rounded-full"></span>
+                  {errors.password.message}
+                </p>
               )}
             </div>
+
+            {/* Forgot Password Link */}
+            <div className="text-right">
+              <Link 
+                to="/forgot-password" 
+                className="text-xs sm:text-sm text-amber-700 hover:text-amber-800 hover:underline font-medium"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+
+            {/* Login Button */}
             <Button
               type="submit"
-              className="w-full bg-[#78350F] hover:bg-[#92400E] text-[#FEF3C7] font-serif tracking-wide transition-colors"
+              className="w-full h-12 sm:h-14 bg-gradient-to-r from-amber-600 via-amber-700 to-amber-600 hover:from-amber-700 hover:via-amber-800 hover:to-amber-700 text-white text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] relative overflow-hidden group"
               disabled={status === "loading"}
             >
-              {status === "loading" ? "Signing in..." : "Sign In"}
+              <span className="relative z-10">{status === "loading" ? "Signing in..." : "LOGIN"}</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
             </Button>
           </form>
 
-          <div className="mt-5 text-center text-sm border-t border-gray-100 pt-4">
-            <p className="text-gray-600">
+          {/* Register Link */}
+          <div className="mt-6 sm:mt-8 text-center animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-stone-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs sm:text-sm">
+                <span className="px-4 bg-gradient-to-br from-stone-50 via-amber-50/30 to-stone-50 text-stone-500">or</span>
+              </div>
+            </div>
+            <p className="text-sm sm:text-base text-stone-600 mt-4">
               Don't have an account?{" "}
-              <Link to="/register" className="text-[#D97706] hover:text-[#B45309] hover:underline font-semibold transition-colors">
+              <Link to="/register" className="text-amber-700 hover:text-amber-800 font-semibold hover:underline transition-colors">
                 Sign up
               </Link>
             </p>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </div>
     </div>
   );
 }

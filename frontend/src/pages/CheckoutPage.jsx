@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, MapPin } from "lucide-react";
 import { formatPrice } from "@/utils/format";
 import toast from "react-hot-toast";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -30,6 +31,11 @@ export default function CheckoutPage() {
     state: "",
     pincode: "",
   });
+  
+  const [headerRef, headerVisible] = useScrollAnimation();
+  const [addressRef, addressVisible] = useScrollAnimation();
+  const [itemsRef, itemsVisible] = useScrollAnimation();
+  const [summaryRef, summaryVisible] = useScrollAnimation();
 
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddress) {
@@ -103,12 +109,24 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container-shell">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+        <h1
+          ref={headerRef}
+          className={`text-3xl font-bold text-gray-900 mb-8 transition-all duration-700 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
+          Checkout
+        </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Delivery Address */}
           <div className="lg:col-span-2 space-y-6">
-            <Card>
+            <Card
+              ref={addressRef}
+              className={`transition-all duration-700 ${
+                addressVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+            >
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Delivery Address</CardTitle>
@@ -237,7 +255,13 @@ export default function CheckoutPage() {
             </Card>
 
             {/* Order Items */}
-            <Card>
+            <Card
+              ref={itemsRef}
+              className={`transition-all duration-700 ${
+                itemsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+              style={{ transitionDelay: '150ms' }}
+            >
               <CardHeader>
                 <CardTitle>Order Items ({cartItems.length})</CardTitle>
               </CardHeader>
@@ -271,7 +295,13 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <div>
-            <Card className="sticky top-20">
+            <Card
+              ref={summaryRef}
+              className={`sticky top-20 transition-all duration-700 ${
+                summaryVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+              style={{ transitionDelay: '200ms' }}
+            >
               <CardHeader>
                 <CardTitle>Order Summary</CardTitle>
               </CardHeader>

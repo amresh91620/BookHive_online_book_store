@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Package, Eye, X } from "lucide-react";
 import { formatPrice, shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export default function OrdersPage() {
   const { user } = useSelector((state) => state.auth);
@@ -18,6 +19,8 @@ export default function OrdersPage() {
   const cancelOrder = useCancelOrder();
   const [cancelDialog, setCancelDialog] = useState({ open: false, orderId: null });
   const [cancelReason, setCancelReason] = useState("");
+  
+  const [headerRef, headerVisible] = useScrollAnimation();
 
   const handleCancelOrder = async () => {
     if (!cancelDialog.orderId) return;
@@ -107,11 +110,26 @@ export default function OrdersPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container-shell">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Orders</h1>
+        <h1
+          ref={headerRef}
+          className={`text-3xl font-bold text-gray-900 mb-8 transition-all duration-700 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
+          My Orders
+        </h1>
 
         <div className="space-y-4">
-          {orders.map((order) => (
-            <Card key={order._id} className="p-6">
+          {orders.map((order, index) => (
+            <Card
+              key={order._id}
+              className="p-6 transition-all duration-700"
+              style={{
+                opacity: headerVisible ? 1 : 0,
+                transform: headerVisible ? 'translateY(0)' : 'translateY(40px)',
+                transitionDelay: `${index * 100}ms`
+              }}
+            >
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
                 <div>
                   <div className="flex items-center gap-3 mb-2">

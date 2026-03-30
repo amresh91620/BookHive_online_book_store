@@ -35,10 +35,15 @@ app.use(
   cors({
     origin: (origin, callback) => {
       const normalizedOrigin = normalizeOrigin(origin);
+      
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin || origin === "null") {
+        return callback(null, true);
+      }
+      
+      // Check if origin is allowed
       if (
         allowAll ||
-        !origin ||
-        origin === "null" ||
         allowedOrigins.includes(normalizedOrigin) ||
         isVercelProjectOrigin(normalizedOrigin) ||
         isDevOrigin(normalizedOrigin) ||
@@ -46,9 +51,14 @@ app.use(
       ) {
         return callback(null, true);
       }
-      return callback(new Error("Not allowed by CORS"));
+      
+      // Log rejected origins for debugging
+      console.warn(`CORS blocked origin: ${origin}`);
+      return callback(new Error(`CORS policy: Origin ${origin} is not allowed`));
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 // Middleware

@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X, Tag, Loader2, ChevronRight, SlidersHorizontal } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import AnimatedBookRow from "@/components/common/AnimatedBookRow";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -18,6 +20,8 @@ export default function DealsPage() {
   const loadMoreRef = useRef(null);
 
   const debouncedSearch = useDebounce(searchQuery, 500);
+  const [headerRef, headerVisible] = useScrollAnimation();
+  const [filtersRef, filtersVisible] = useScrollAnimation();
 
   const params = {
     limit: ITEMS_PER_PAGE,
@@ -94,7 +98,12 @@ export default function DealsPage() {
     <div className="min-h-screen bg-[#FAFAFA] pb-20">
       {/* Premium Editorial Header */}
       <div className="bg-white border-b border-gray-100 pt-8 pb-10">
-        <div className="container-shell">
+        <div
+          ref={headerRef}
+          className={`container-shell transition-all duration-700 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
           <div className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-gray-400 mb-6">
             <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
             <ChevronRight className="w-3 h-3" />
@@ -122,7 +131,12 @@ export default function DealsPage() {
 
       <div className="container-shell py-10">
         {/* Refined Filter Section */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+        <div
+          ref={filtersRef}
+          className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12 transition-all duration-700 ${
+            filtersVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
           
           {/* Dropdown Filters */}
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
@@ -183,9 +197,17 @@ export default function DealsPage() {
         {!isLoading && books.length > 0 && (
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
-              {books.map((book) => (
-                <BookCard key={book._id} book={book} />
-              ))}
+              {/* Group books into rows of 4 */}
+              {Array.from({ length: Math.ceil(books.length / 4) }, (_, rowIndex) => {
+                const rowBooks = books.slice(rowIndex * 4, (rowIndex + 1) * 4);
+                return (
+                  <AnimatedBookRow 
+                    key={`row-${rowIndex}`} 
+                    books={rowBooks} 
+                    startIndex={rowIndex * 4}
+                  />
+                );
+              })}
             </div>
 
             {/* Load More Trigger */}

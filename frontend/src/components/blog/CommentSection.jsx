@@ -145,14 +145,20 @@ export default function CommentSection({ blogId }) {
       ) : (
         <div className="space-y-4">
           {comments.map((comment) => {
+            // Safety check: Skip if comment or user is null/undefined
+            if (!comment || !comment.user) {
+              // Silently skip comments with deleted users
+              return null;
+            }
+
             // Handle both cases: comment.user as object or string ID
             const commentUserId = typeof comment.user === 'object' ? comment.user._id : comment.user;
             // Check both _id and id fields for current user
             const currentUserId = user?._id || user?.id;
             const isOwner = currentUserId && commentUserId && (currentUserId === commentUserId || currentUserId.toString() === commentUserId.toString());
             
-            const userLiked = comment.likes.includes(currentUserId);
-            const userDisliked = comment.dislikes.includes(currentUserId);
+            const userLiked = comment.likes?.includes(currentUserId) || false;
+            const userDisliked = comment.dislikes?.includes(currentUserId) || false;
 
             return (
               <Card key={comment._id} className="border border-gray-200">
@@ -160,7 +166,7 @@ export default function CommentSection({ blogId }) {
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <p className="font-semibold text-gray-900">
-                        {comment.user.name || 'Unknown User'}
+                        {typeof comment.user === 'object' ? (comment.user.name || 'Unknown User') : 'Unknown User'}
                       </p>
                       <p className="text-xs text-gray-500">
                         {new Date(comment.createdAt).toLocaleDateString()}{" "}
@@ -197,7 +203,7 @@ export default function CommentSection({ blogId }) {
                             userLiked ? "fill-current" : ""
                           }`}
                         />
-                        <span>{comment.likes.length}</span>
+                        <span>{comment.likes?.length || 0}</span>
                       </Button>
                       <Button
                         variant="ghost"
@@ -212,14 +218,14 @@ export default function CommentSection({ blogId }) {
                             userDisliked ? "fill-current" : ""
                           }`}
                         />
-                        <span>{comment.dislikes.length}</span>
+                        <span>{comment.dislikes?.length || 0}</span>
                       </Button>
                     </div>
                   )}
                 </CardContent>
               </Card>
             );
-          })}
+          }).filter(Boolean)}
         </div>
       )}
     </div>

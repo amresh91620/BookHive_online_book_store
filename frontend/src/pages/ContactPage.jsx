@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import toast from "react-hot-toast";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const fieldClassName =
   "h-12 rounded-2xl border-amber-100 bg-white/90 text-[#451a03] placeholder:text-[#9b7b5f] focus-visible:ring-[#d97706]";
@@ -20,6 +21,10 @@ export default function ContactPage() {
     message: "",
   });
   const [loading, setLoading] = useState(false);
+
+  const [heroRef, heroVisible] = useScrollAnimation();
+  const [formRef, formVisible] = useScrollAnimation();
+  const [contactInfoRef, contactInfoVisible] = useScrollAnimation();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -102,7 +107,12 @@ export default function ContactPage() {
       <section className="border-b border-amber-100/80 py-10 sm:py-10 lg:py-10">
         <div className="container-shell">
           <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12">
-            <div>
+            <div
+              ref={heroRef}
+              className={`transition-all duration-700 ${
+                heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+            >
               <Badge className="mb-5 border-0 bg-[#1f2937] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-100">
                 Contact BookHive
               </Badge>
@@ -174,7 +184,12 @@ export default function ContactPage() {
       <section className="py-14 sm:py-16 lg:py-20">
         <div className="container-shell">
           <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-            <Card className="rounded-[30px] border-amber-100 bg-white/90 shadow-[0_14px_40px_rgba(120,53,15,0.08)]">
+            <Card
+              ref={formRef}
+              className={`rounded-[30px] border-amber-100 bg-white/90 shadow-[0_14px_40px_rgba(120,53,15,0.08)] transition-all duration-700 ${
+                formVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+            >
               <CardHeader className="border-b border-amber-100 bg-[linear-gradient(180deg,#fff7e8_0%,#fffdf8_100%)] pb-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b45309]">
                   Send a Message
@@ -267,7 +282,13 @@ export default function ContactPage() {
               </CardContent>
             </Card>
 
-            <div className="space-y-6">
+            <div
+              ref={contactInfoRef}
+              className={`space-y-6 transition-all duration-700 ${
+                contactInfoVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+              style={{ transitionDelay: '150ms' }}
+            >
               <Card className="rounded-[28px] border-amber-100 bg-white/90 shadow-sm">
                 <CardHeader className="border-b border-amber-100 pb-5">
                   <CardTitle className="font-serif text-2xl text-[#451a03]">

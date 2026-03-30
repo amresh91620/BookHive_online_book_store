@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import MainLayout from "@/layouts/MainLayout";
 import AdminLayout from "@/layouts/AdminLayout";
+import AuthLayout from "@/layouts/AuthLayout";
 import { lazy, Suspense, useEffect } from "react";
 const HomePage = lazy(() => import("@/pages/HomePage"));
 const BooksPage = lazy(() => import("@/pages/BooksPage"));
@@ -78,22 +79,8 @@ export default function AppRoutes() {
       </div>
     }>
     <Routes>
-      <Route element={<MainLayout />}>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/books" element={<BooksPage />} />
-        <Route path="/deals" element={<DealsPage />} />
-        <Route path="/books/:id" element={<BookDetailPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/blog/:id" element={<BlogDetailPage />} />
-        <Route path="/faq" element={<FAQPage />} />
-        <Route path="/privacy" element={<PrivacyPolicyPage />} />
-        <Route path="/terms" element={<TermsPage />} />
-        <Route path="/auth-test" element={<AuthTestPage />} />
-        
-        {/* Auth Routes */}
+      {/* Auth Routes - No Navbar/Footer */}
+      <Route element={<AuthLayout />}>
         <Route
           path="/login"
           element={
@@ -118,6 +105,23 @@ export default function AppRoutes() {
             </PublicRoute>
           }
         />
+      </Route>
+
+      {/* Main Routes - With Navbar/Footer */}
+      <Route element={<MainLayout />}>
+        {/* Public Routes */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/books" element={<BooksPage />} />
+        <Route path="/deals" element={<DealsPage />} />
+        <Route path="/books/:id" element={<BookDetailPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:id" element={<BlogDetailPage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/auth-test" element={<AuthTestPage />} />
 
         {/* Protected User Routes */}
         <Route

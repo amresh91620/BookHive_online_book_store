@@ -5,10 +5,17 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Clock, Eye, Calendar, Tag, User } from "lucide-react";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import CommentSection from "@/components/blog/CommentSection";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export default function BlogDetailPage() {
   const { id } = useParams();
   const { data: blog, isLoading, isError } = useBlogDetails(id);
+  
+  const [headerRef, headerVisible] = useScrollAnimation();
+  const [imageRef, imageVisible] = useScrollAnimation();
+  const [contentRef, contentVisible] = useScrollAnimation();
+  const [tagsRef, tagsVisible] = useScrollAnimation();
+  const [commentsRef, commentsVisible] = useScrollAnimation();
 
   if (isLoading)
     return (
@@ -52,7 +59,12 @@ export default function BlogDetailPage() {
         </div>
 
         {/* Header Section */}
-        <header className="mb-10">
+        <header
+          ref={headerRef}
+          className={`mb-10 transition-all duration-700 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
           <div className="flex flex-wrap gap-2 mb-4">
             <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-0 rounded-full px-3 py-1">
               {blog.category}
@@ -103,7 +115,12 @@ export default function BlogDetailPage() {
         </header>
 
         {/* Hero Cover */}
-        <div className="relative w-full overflow-hidden rounded-2xl shadow-sm border border-gray-100 mb-10">
+        <div
+          ref={imageRef}
+          className={`relative w-full overflow-hidden rounded-2xl shadow-sm border border-gray-100 mb-10 transition-all duration-700 ${
+            imageVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
           <img
             src={blog.coverImage}
             alt={blog.title}
@@ -114,13 +131,21 @@ export default function BlogDetailPage() {
         {/* Article Body Container - Constrained width for optimal reading */}
           {/* Content */}
           <div
-            className="prose prose-lg md:prose-xl prose-gray max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-amber-600 hover:prose-a:text-amber-700 prose-img:rounded-xl prose-img:shadow-md"
+            ref={contentRef}
+            className={`prose prose-lg md:prose-xl prose-gray max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-amber-600 hover:prose-a:text-amber-700 prose-img:rounded-xl prose-img:shadow-md transition-all duration-700 ${
+              contentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
             dangerouslySetInnerHTML={{ __html: blog.content }}
           />
 
           {/* Tags */}
           {blog.tags?.length > 0 && (
-            <div className="mt-12 pt-8 border-t border-gray-100 flex flex-wrap gap-2 items-center">
+            <div
+              ref={tagsRef}
+              className={`mt-12 pt-8 border-t border-gray-100 flex flex-wrap gap-2 items-center transition-all duration-700 ${
+                tagsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+            >
               <Tag className="w-4 h-4 text-gray-400 mr-2" />
               {blog.tags.map((tag) => (
                 <span
@@ -134,7 +159,12 @@ export default function BlogDetailPage() {
           )}
 
           {/* Comment Section */}
-          <div className="mt-16 bg-gray-50 rounded-2xl p-6 sm:p-8">
+          <div
+            ref={commentsRef}
+            className={`mt-16 bg-gray-50 rounded-2xl p-6 sm:p-8 transition-all duration-700 ${
+              commentsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             <h3 className="text-xl font-bold text-gray-900 mb-6">Discussion</h3>
             <CommentSection blogId={id} />
           </div>

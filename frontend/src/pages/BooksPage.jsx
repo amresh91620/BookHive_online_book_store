@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useBookCategories } from "@/hooks/api/useBooks";
 import { useInfiniteBooks } from "@/hooks/api/useInfiniteBooks";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import BookCard from "@/components/common/BookCard";
+import AnimatedBookRow from "@/components/common/AnimatedBookRow";
 import BookSkeleton from "@/components/common/BookSkeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,6 +19,10 @@ export default function BooksPage() {
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [statusFilter, setStatusFilter] = useState(searchParams.get("filter") || "");
   const loadMoreRef = useRef(null);
+
+  // Scroll animation refs for header and filters only
+  const [headerRef, headerVisible] = useScrollAnimation();
+  const [filtersRef, filtersVisible] = useScrollAnimation();
 
   const debouncedSearch = useDebounce(searchQuery, 500);
 
@@ -104,7 +110,7 @@ export default function BooksPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-50 via-white to-stone-50 pb-16">
       {/* Premium Editorial Header */}
-      <div className="bg-white/95 backdrop-blur-sm border-b border-stone-200 pt-10 pb-12 shadow-soft relative overflow-hidden">
+      <div ref={headerRef} className={`bg-white/95 backdrop-blur-sm border-b border-stone-200 pt-10 pb-12 shadow-soft relative overflow-hidden transition-all duration-700 ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
         <div className="absolute inset-0 bg-noise opacity-30"></div>
         <div className="container-shell relative">
           <div className="flex items-center gap-2.5 text-xs font-semibold tracking-[0.12em] uppercase text-amber-700 mb-8">
@@ -130,7 +136,7 @@ export default function BooksPage() {
 
       <div className="container-shell py-14">
         {/* Refined Filter Section */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+        <div ref={filtersRef} className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12 transition-all duration-700 ${filtersVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           
           {/* Dropdown Filters */}
           <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
@@ -192,9 +198,13 @@ export default function BooksPage() {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 animate-fade-in-up">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className={`stagger-${(i % 4) + 1}`}>
+              <div 
+                key={i} 
+                className="transition-all duration-700 opacity-100 translate-y-0"
+                style={{ transitionDelay: `${i * 100}ms` }}
+              >
                 <BookSkeleton />
               </div>
             ))}
@@ -204,12 +214,18 @@ export default function BooksPage() {
         {/* Books Grid */}
         {!isLoading && books.length > 0 && (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 animate-fade-in-up">
-              {books.map((book, index) => (
-                <div key={book._id} className={`stagger-${(index % 4) + 1}`}>
-                  <BookCard book={book} />
-                </div>
-              ))}
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
+              {/* Group books into rows of 4 */}
+              {Array.from({ length: Math.ceil(books.length / 4) }, (_, rowIndex) => {
+                const rowBooks = books.slice(rowIndex * 4, (rowIndex + 1) * 4);
+                return (
+                  <AnimatedBookRow 
+                    key={`row-${rowIndex}`} 
+                    books={rowBooks} 
+                    startIndex={rowIndex * 4}
+                  />
+                );
+              })}
             </div>
 
             {/* Load More Trigger */}

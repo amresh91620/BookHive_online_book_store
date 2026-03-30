@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { formatPrice } from "@/utils/format";
 import toast from "react-hot-toast";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -14,6 +15,9 @@ export default function CartPage() {
   const updateCartQuantity = useUpdateCartQuantity();
 
   const items = cartData?.items || [];
+  
+  const [headerRef, headerVisible] = useScrollAnimation();
+  const [summaryRef, summaryVisible] = useScrollAnimation();
 
   const handleRemove = (itemId) => {
     removeFromCart.mutate(itemId, {
@@ -79,7 +83,12 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-50 to-white py-12">
       <div className="container-shell">
-        <div className="mb-8">
+        <div
+          ref={headerRef}
+          className={`mb-8 transition-all duration-700 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
           <h1 className="text-4xl font-display font-bold text-stone-900 mb-2">Shopping Cart</h1>
           <p className="text-stone-600 font-light">{items.length} {items.length === 1 ? 'item' : 'items'} in your cart</p>
         </div>
@@ -87,8 +96,16 @@ export default function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {items.map((item) => (
-              <Card key={item._id} className="p-5 border-2 border-stone-200 hover:border-amber-300 transition-smooth shadow-soft hover:shadow-medium">
+            {items.map((item, index) => (
+              <Card
+                key={item._id}
+                className="p-5 border-2 border-stone-200 hover:border-amber-300 transition-all duration-700 shadow-soft hover:shadow-medium"
+                style={{
+                  opacity: headerVisible ? 1 : 0,
+                  transform: headerVisible ? 'translateY(0)' : 'translateY(40px)',
+                  transitionDelay: `${index * 100}ms`
+                }}
+              >
                 <div className="flex gap-5">
                   {/* Book Image */}
                   <Link to={`/books/${item.book?._id}`} className="shrink-0">
@@ -158,7 +175,13 @@ export default function CartPage() {
 
           {/* Order Summary */}
           <div>
-            <Card className="p-6 sticky top-24 border-2 border-stone-200 shadow-medium">
+            <Card
+              ref={summaryRef}
+              className={`p-6 sticky top-24 border-2 border-stone-200 shadow-medium transition-all duration-700 ${
+                summaryVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+              style={{ transitionDelay: '200ms' }}
+            >
               <h2 className="text-2xl font-display font-bold text-stone-900 mb-6">Order Summary</h2>
               
               <div className="space-y-4 mb-6">

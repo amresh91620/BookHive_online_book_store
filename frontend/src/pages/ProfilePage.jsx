@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatPrice, shortDate } from "@/utils/format";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export default function ProfilePage() {
   const { user } = useSelector((state) => state.auth);
@@ -69,6 +70,10 @@ export default function ProfilePage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [headerRef, headerVisible] = useScrollAnimation();
+  const [sidebarRef, sidebarVisible] = useScrollAnimation();
+  const [contentRef, contentVisible] = useScrollAnimation();
 
   useEffect(() => {
     if (user) {
@@ -196,7 +201,12 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container-shell">
         {/* Profile Header */}
-        <Card className="mb-8">
+        <Card
+          ref={headerRef}
+          className={`mb-8 transition-all duration-700 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
           <CardContent className="pt-6">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
               <Avatar className="w-24 h-24">
@@ -240,7 +250,13 @@ export default function ProfilePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar Navigation */}
-          <Card className="lg:col-span-1 h-fit">
+          <Card
+            ref={sidebarRef}
+            className={`lg:col-span-1 h-fit transition-all duration-700 ${
+              sidebarVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+            style={{ transitionDelay: '150ms' }}
+          >
             <CardHeader>
               <CardTitle className="text-lg">Account Settings</CardTitle>
             </CardHeader>
@@ -295,7 +311,13 @@ export default function ProfilePage() {
           </Card>
 
           {/* Main Content Area */}
-          <div className="lg:col-span-3">
+          <div
+            ref={contentRef}
+            className={`lg:col-span-3 transition-all duration-700 ${
+              contentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+            style={{ transitionDelay: '300ms' }}
+          >
             {activeTab === "profile" && (
                 <Card>
                   <CardHeader>

@@ -39,6 +39,7 @@ import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 // Helper: scroll to top
 const scrollToTop = () => {
@@ -54,6 +55,12 @@ export default function BookDetailPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const mainImageRef = useRef(null);
+  
+  const [imageRef, imageVisible] = useScrollAnimation();
+  const [detailsRef, detailsVisible] = useScrollAnimation();
+  const [infoRef, infoVisible] = useScrollAnimation();
+  const [reviewsRef, reviewsVisible] = useScrollAnimation();
+  const [relatedRef, relatedVisible] = useScrollAnimation();
 
   // Fetch book details
   const { data: book, isLoading, isError } = useBookDetails(id);
@@ -218,7 +225,12 @@ export default function BookDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-6">
           
           {/* Left Column - Images (2 columns) */}
-          <div className="lg:col-span-2 space-y-4 flex flex-col items-center lg:items-start">
+          <div
+            ref={imageRef}
+            className={`lg:col-span-2 space-y-4 flex flex-col items-center lg:items-start transition-all duration-700 ${
+              imageVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             {/* Main Image with 3D Effect */}
             <motion.div
               ref={mainImageRef}
@@ -328,7 +340,13 @@ export default function BookDetailPage() {
           </div>
 
           {/* Right Column - Details (3 columns) */}
-          <div className="lg:col-span-3 space-y-6">
+          <div
+            ref={detailsRef}
+            className={`lg:col-span-3 space-y-6 transition-all duration-700 ${
+              detailsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+            style={{ transitionDelay: '150ms' }}
+          >
             {/* Title & Author */}
             <div>
               {book.bestseller && (
@@ -487,7 +505,12 @@ export default function BookDetailPage() {
         </div>
 
         {/* Detailed Information Tabs */}
-        <div className="mt-12 sm:mt-16 border-t border-gray-200 pt-8 sm:pt-10">
+        <div
+          ref={infoRef}
+          className={`mt-12 sm:mt-16 border-t border-gray-200 pt-8 sm:pt-10 transition-all duration-700 ${
+            infoVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {/* About Book */}
             <div className="md:col-span-2">
@@ -539,13 +562,23 @@ export default function BookDetailPage() {
         </div>
 
         {/* Reviews Section */}
-        <div className="mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-gray-200">
+        <div
+          ref={reviewsRef}
+          className={`mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-gray-200 transition-all duration-700 ${
+            reviewsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
           <ReviewSection bookId={book._id} />
         </div>
 
         {/* Related Books */}
         {relatedBooks.length > 0 && (
-          <div className="mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-gray-200">
+          <div
+            ref={relatedRef}
+            className={`mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-gray-200 transition-all duration-700 ${
+              relatedVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
               <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" />
               You Might Also Like

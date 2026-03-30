@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Package, MapPin, CreditCard } from "lucide-react";
 import { formatPrice, shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export default function OrderDetailPage() {
   const { id } = useParams();
@@ -17,6 +18,11 @@ export default function OrderDetailPage() {
   const cancelOrder = useCancelOrder();
   const [showCancelForm, setShowCancelForm] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  
+  const [headerRef, headerVisible] = useScrollAnimation();
+  const [itemsRef, itemsVisible] = useScrollAnimation();
+  const [addressRef, addressVisible] = useScrollAnimation();
+  const [summaryRef, summaryVisible] = useScrollAnimation();
 
   const handleCancelOrder = async () => {
     if (!cancelReason.trim()) {
@@ -85,7 +91,12 @@ export default function OrderDetailPage() {
           {/* Order Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Order Header */}
-            <Card>
+            <Card
+              ref={headerRef}
+              className={`transition-all duration-700 ${
+                headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+            >
               <CardHeader>
                 <div className="flex flex-col md:flex-row md:items-center justify-between">
                   <div>
@@ -104,7 +115,13 @@ export default function OrderDetailPage() {
             </Card>
 
             {/* Order Items */}
-            <Card>
+            <Card
+              ref={itemsRef}
+              className={`transition-all duration-700 ${
+                itemsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+              style={{ transitionDelay: '100ms' }}
+            >
               <CardHeader>
                 <CardTitle>Order Items</CardTitle>
               </CardHeader>
@@ -136,7 +153,13 @@ export default function OrderDetailPage() {
             </Card>
 
             {/* Delivery Address */}
-            <Card>
+            <Card
+              ref={addressRef}
+              className={`transition-all duration-700 ${
+                addressVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+              style={{ transitionDelay: '200ms' }}
+            >
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-amber-600" />
@@ -203,7 +226,13 @@ export default function OrderDetailPage() {
           </div>
 
           {/* Order Summary Sidebar */}
-          <div className="space-y-6">
+          <div
+            ref={summaryRef}
+            className={`space-y-6 transition-all duration-700 ${
+              summaryVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+            style={{ transitionDelay: '150ms' }}
+          >
             {/* Price Summary */}
             <Card>
               <CardHeader>

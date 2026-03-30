@@ -1,17 +1,31 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export default function TermsPage() {
+  const [headerRef, headerVisible] = useScrollAnimation();
+  const [contentRef, contentVisible] = useScrollAnimation();
+  
   return (
     <div className="min-h-screen py-12">
       <div className="container-shell">
-          <h1 className="text-4xl font-bold font-serif text-[#451a03] mb-4">
+          <h1
+            ref={headerRef}
+            className={`text-4xl font-bold font-serif text-[#451a03] mb-4 transition-all duration-700 ${
+              headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             Terms of Service
           </h1>
           <p className="text-[#7c5b3d] mb-8">
             Last updated: {new Date().toLocaleDateString()}
           </p>
 
-          <Card className="mb-6 border-amber-100 bg-white/90 shadow-[0_14px_40px_rgba(120,53,15,0.08)] rounded-[30px]">
+          <Card
+            ref={contentRef}
+            className={`mb-6 border-amber-100 bg-white/90 shadow-[0_14px_40px_rgba(120,53,15,0.08)] rounded-[30px] transition-all duration-700 ${
+              contentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
             <CardContent className="p-8 space-y-6">
               <section>
                 <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
