@@ -36,7 +36,6 @@ const FAQPage = lazy(() => import("@/pages/FAQPage"));
 const PrivacyPolicyPage = lazy(() => import("@/pages/PrivacyPolicyPage"));
 const TermsPage = lazy(() => import("@/pages/TermsPage"));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
-const AuthTestPage = lazy(() => import("@/pages/AuthTestPage"));
 
 // Protected Route Component
 function ProtectedRoute({ children, adminOnly = false }) {
@@ -121,7 +120,6 @@ export default function AppRoutes() {
         <Route path="/faq" element={<FAQPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsPage />} />
-        <Route path="/auth-test" element={<AuthTestPage />} />
 
         {/* Protected User Routes */}
         <Route
