@@ -34,15 +34,17 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Consistent heading font across all pages */
-h1, h2, h3, h4, h5, h6 {
-  font-family: "Playfair Display", Georgia, serif;
+/* Consistent heading font across all pages - IMPORTANT */
+h1, h2, h3, h4, h5, h6,
+.font-serif {
+  font-family: "Playfair Display", Georgia, serif !important;
   font-weight: 700;
 }
 
-/* Body text should use Inter */
-p, span, div, a, button, input, textarea, select, label {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+/* Body text should use Inter - IMPORTANT */
+p, span, div, a, button, input, textarea, select, label,
+.font-sans {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 }
 
 #root {

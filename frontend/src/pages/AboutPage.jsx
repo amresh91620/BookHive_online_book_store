@@ -91,8 +91,14 @@ export default function AboutPage() {
   ];
 
   return (
-    <div className="min-h-screen">
-      <section className="px-0 py-10 sm:py-10 lg:py-10">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Subtle Floating Blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 -right-40 w-96 h-96 bg-orange-400/8 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-40 -left-40 w-80 h-80 bg-amber-400/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }}></div>
+      </div>
+
+      <section className="relative z-10 px-0 py-10 sm:py-10 lg:py-10">
         <div className="container-shell">
           <div
             ref={heroRef}
@@ -113,7 +119,7 @@ export default function AboutPage() {
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/books">
-                  <Button className="h-12 rounded-full bg-[#78350f] px-6 text-sm font-semibold text-white hover:bg-[#5f280a]">
+                  <Button className="h-12 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-6 text-sm font-semibold text-white hover:from-orange-600 hover:to-amber-600 shadow-md hover:shadow-lg transition-all duration-300">
                     Explore Books
                     <ArrowRight className="h-4 w-4" />
                   </Button>
@@ -121,7 +127,7 @@ export default function AboutPage() {
                 <Link to="/contact">
                   <Button
                     variant="outline"
-                    className="h-12 rounded-full border-[#d6b790] bg-white/70 px-6 text-sm font-semibold text-[#78350f] hover:bg-amber-50"
+                    className="h-12 rounded-full border-2 border-orange-500 bg-white/70 px-6 text-sm font-semibold text-orange-600 hover:bg-orange-50 transition-all duration-300"
                   >
                     Contact Us
                   </Button>
@@ -340,14 +346,14 @@ export default function AboutPage() {
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link to="/books">
-                  <Button className="h-12 rounded-full bg-[#78350f] px-6 text-white hover:bg-[#5f280a]">
+                  <Button className="h-12 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-6 text-white hover:from-orange-600 hover:to-amber-600 shadow-md hover:shadow-lg transition-all duration-300">
                     Browse Catalog
                   </Button>
                 </Link>
                 <Link to="/contact">
                   <Button
                     variant="outline"
-                    className="h-12 rounded-full border-[#d6b790] bg-white/80 px-6 text-[#78350f] hover:bg-white"
+                    className="h-12 rounded-full border-2 border-orange-500 bg-white/80 px-6 text-orange-600 hover:bg-orange-50 transition-all duration-300"
                   >
                     Talk to Us
                   </Button>

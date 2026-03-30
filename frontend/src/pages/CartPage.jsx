@@ -71,7 +71,7 @@ export default function CartPage() {
           <h2 className="text-3xl font-display font-bold text-stone-900 mb-3">Your cart is empty</h2>
           <p className="text-stone-600 mb-8 font-light">Discover amazing books and start your reading journey</p>
           <Link to="/books">
-            <Button className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-6 h-auto text-base font-semibold shadow-soft hover:shadow-medium transition-smooth">
+            <Button className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-8 py-6 h-auto text-base font-semibold shadow-md hover:shadow-lg transition-all duration-300">
               Browse Books
             </Button>
           </Link>
@@ -204,7 +204,7 @@ export default function CartPage() {
               </div>
 
               <Button
-                className="w-full bg-amber-600 hover:bg-amber-700 text-white h-12 text-base font-semibold shadow-soft hover:shadow-medium transition-smooth"
+                className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white h-12 text-base font-semibold shadow-md hover:shadow-lg transition-all duration-300"
                 onClick={() => navigate("/checkout")}
               >
                 Proceed to Checkout

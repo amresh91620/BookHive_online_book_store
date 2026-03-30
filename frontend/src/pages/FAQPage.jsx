@@ -195,7 +195,7 @@ export default function FAQPage() {
               </p>
               <a
                 href="/contact"
-                className="inline-block bg-[#78350f] text-white px-6 py-3 rounded-md font-medium hover:bg-[#5f280a] transition"
+                className="inline-block bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-3 rounded-md font-medium hover:from-orange-600 hover:to-amber-600 shadow-md hover:shadow-lg transition-all duration-300"
               >
                 Contact Support
               </a>

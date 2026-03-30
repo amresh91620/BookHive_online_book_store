@@ -273,7 +273,7 @@ export default function ContactPage() {
                     <Button
                       type="submit"
                       disabled={loading}
-                      className="h-12 rounded-full bg-[#78350f] px-7 text-sm font-semibold text-white hover:bg-[#5f280a]"
+                      className="h-12 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-7 text-sm font-semibold text-white hover:from-orange-600 hover:to-amber-600 shadow-md hover:shadow-lg transition-all duration-300"
                     >
                       {loading ? "Sending..." : "Send Message"}
                     </Button>

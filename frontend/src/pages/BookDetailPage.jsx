@@ -210,7 +210,7 @@ export default function BookDetailPage() {
           <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
             The book you're looking for doesn't exist or has been removed.
           </p>
-          <Button onClick={() => navigate("/books")} className="bg-yellow-500 hover:bg-yellow-600 text-sm sm:text-base">
+          <Button onClick={() => navigate("/books")} className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-md hover:shadow-lg transition-all duration-300 text-sm sm:text-base">
             Browse Books
           </Button>
         </div>
@@ -350,7 +350,7 @@ export default function BookDetailPage() {
             {/* Title & Author */}
             <div>
               {book.bestseller && (
-                <Badge className="mb-2 sm:mb-3 bg-yellow-500 text-white text-xs sm:text-sm font-semibold px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full">
+                <Badge className="mb-2 sm:mb-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs sm:text-sm font-semibold px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-md">
                   🏆 Bestseller
                 </Badge>
               )}
@@ -426,7 +426,7 @@ export default function BookDetailPage() {
               {book.stock > 0 && book.stock <= 10 && (
                 <div className="w-full bg-gray-200 rounded-full h-1.5">
                   <div
-                    className="bg-yellow-500 h-1.5 rounded-full"
+                    className="bg-gradient-to-r from-orange-500 to-amber-500 h-1.5 rounded-full"
                     style={{ width: `${(book.stock / 10) * 100}%` }}
                   ></div>
                 </div>
@@ -464,7 +464,7 @@ export default function BookDetailPage() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
               <Button
-                className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white text-sm sm:text-base font-bold py-4 sm:py-6 rounded-xl shadow-md hover:shadow-lg transition-all"
+                className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm sm:text-base font-bold py-4 sm:py-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
                 onClick={handleAddToCart}
                 disabled={book.stock === 0}
               >
@@ -633,7 +633,7 @@ export default function BookDetailPage() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 bg-yellow-500 text-white p-3 rounded-full shadow-lg hover:bg-yellow-600 transition-all z-40"
+            className="fixed bottom-6 right-6 bg-gradient-to-r from-orange-500 to-amber-500 text-white p-3 rounded-full shadow-lg hover:from-orange-600 hover:to-amber-600 transition-all duration-300 z-40"
           >
             <ArrowUp className="w-5 h-5" />
           </motion.button>
