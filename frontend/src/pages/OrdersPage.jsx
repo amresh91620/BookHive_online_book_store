@@ -134,7 +134,7 @@ export default function OrdersPage() {
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      Order #{order.orderNumber}
+                      Order <span className="font-sans">#{order.orderNumber}</span>
                     </h3>
                     <Badge variant={getStatusColor(order.status)}>{order.status}</Badge>
                   </div>
@@ -253,3 +253,4 @@ export default function OrdersPage() {
     </div>
   );
 }
+

@@ -172,7 +172,7 @@ export default function BlogPage() {
           
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight mb-6">
-              The BookHive <span className="text-amber-600 font-serif italic font-normal">Journal</span>
+              The BookHive <span className="text-amber-600 italic font-normal">Journal</span>
             </h1>
             <p className="text-lg md:text-xl text-gray-500 leading-relaxed">
               Explore our curated collection of {total > 0 ? total : 'insightful'} articles, literary analyses, and reading recommendations.

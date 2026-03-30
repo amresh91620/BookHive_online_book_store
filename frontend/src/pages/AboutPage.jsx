@@ -110,7 +110,7 @@ export default function AboutPage() {
               <Badge className="mb-5 border-0 bg-[#1f2937] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-100">
                 Our Story
               </Badge>
-              <h1 className="max-w-3xl font-serif text-4xl font-bold leading-tight text-[#451a03] sm:text-5xl lg:text-6xl">
+              <h1 className="max-w-3xl text-4xl font-bold leading-tight text-[#451a03] sm:text-5xl lg:text-6xl">
                 Building a warmer place for readers to discover their next favorite book.
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-8 text-[#6b4a2a] sm:text-lg">
@@ -156,7 +156,7 @@ export default function AboutPage() {
                 <CardContent className="p-0">
                   <div className="border-b border-amber-100 bg-[#1f2937] px-6 py-6 text-white sm:px-8">
                     <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">BookHive Journal</p>
-                    <h2 className="mt-3 font-serif text-2xl font-semibold leading-snug text-white sm:text-3xl">
+                    <h2 className="mt-3 text-2xl font-semibold leading-snug text-white sm:text-3xl">
                       More than a store. A curated reading destination.
                     </h2>
                   </div>
@@ -196,7 +196,7 @@ export default function AboutPage() {
             <Card className="rounded-[28px] border-amber-100 bg-white/85 shadow-sm">
               <CardContent className="p-6 sm:p-8">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">Our Mission</p>
-                <h2 className="mt-3 font-serif text-3xl font-bold text-[#451a03]">Reading should feel close, not complicated.</h2>
+                <h2 className="mt-3 text-3xl font-bold text-[#451a03]">Reading should feel close, not complicated.</h2>
                 <p className="mt-4 text-base leading-8 text-[#6b4a2a]">
                   We believe books can transform lives, spark imagination, and connect people across cultures and generations. That is why we focus on making discovery simple, pricing fair, and the overall experience genuinely enjoyable.
                 </p>
@@ -212,7 +212,7 @@ export default function AboutPage() {
                 <div className="mt-5 space-y-4">
                   {values.map((value) => (
                     <div key={value.title} className="rounded-2xl border border-amber-100 bg-white/80 p-4">
-                      <h3 className="font-serif text-xl font-semibold text-[#451a03]">{value.title}</h3>
+                      <h3 className=" text-xl font-semibold text-[#451a03]">{value.title}</h3>
                       <p className="mt-2 text-sm leading-7 text-[#6b4a2a]">{value.description}</p>
                     </div>
                   ))}
@@ -234,7 +234,7 @@ export default function AboutPage() {
             <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
               {stats.map((stat) => (
                 <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-center backdrop-blur-sm">
-                  <p className="font-serif text-3xl font-bold text-white sm:text-4xl">{stat.value}</p>
+                  <p className=" text-3xl font-bold text-white sm:text-4xl">{stat.value}</p>
                   <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200 sm:text-sm">
                     {stat.label}
                   </p>
@@ -255,7 +255,7 @@ export default function AboutPage() {
           >
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">Why Readers Choose Us</p>
-              <h2 className="mt-3 font-serif text-3xl font-bold text-[#451a03] sm:text-4xl">A bookstore experience shaped for modern readers.</h2>
+              <h2 className="mt-3 text-3xl font-bold text-[#451a03] sm:text-4xl">A bookstore experience shaped for modern readers.</h2>
             </div>
             <p className="max-w-xl text-sm leading-7 text-[#6b4a2a] sm:text-base">
               We combine a warm visual identity with a practical, dependable experience that makes browsing and buying books feel effortless.
@@ -277,7 +277,7 @@ export default function AboutPage() {
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fff3dd] text-[#b45309] shadow-sm transition-transform duration-300 group-hover:scale-105">
                       <Icon className="h-6 w-6" />
                     </div>
-                    <h3 className="mt-5 font-serif text-2xl font-semibold text-[#451a03]">{feature.title}</h3>
+                    <h3 className="mt-5 text-2xl font-semibold text-[#451a03]">{feature.title}</h3>
                     <p className="mt-3 text-sm leading-7 text-[#6b4a2a]">{feature.description}</p>
                   </CardContent>
                 </Card>
@@ -296,7 +296,7 @@ export default function AboutPage() {
             }`}
           >
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">Meet The Team</p>
-            <h2 className="mt-3 font-serif text-3xl font-bold text-[#451a03] sm:text-4xl">The people behind the shelves.</h2>
+            <h2 className="mt-3 text-3xl font-bold text-[#451a03] sm:text-4xl">The people behind the shelves.</h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
@@ -314,7 +314,7 @@ export default function AboutPage() {
                       {member.name.charAt(0)}
                     </div>
                     <div>
-                      <h3 className="font-serif text-2xl font-semibold text-[#451a03]">{member.name}</h3>
+                      <h3 className=" text-2xl font-semibold text-[#451a03]">{member.name}</h3>
                       <p className="mt-1 text-sm font-semibold uppercase tracking-[0.16em] text-[#b45309]">
                         {member.role}
                       </p>
@@ -339,7 +339,7 @@ export default function AboutPage() {
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-2xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">Ready To Browse</p>
-                <h2 className="mt-3 font-serif text-3xl font-bold text-[#451a03]">Find your next great read with BookHive.</h2>
+                <h2 className="mt-3 text-3xl font-bold text-[#451a03]">Find your next great read with BookHive.</h2>
                 <p className="mt-3 text-sm leading-7 text-[#6b4a2a] sm:text-base">
                   Explore curated titles, discover new favorites, and enjoy a bookstore experience built with readers in mind.
                 </p>
@@ -366,3 +366,4 @@ export default function AboutPage() {
     </div>
   );
 }
+

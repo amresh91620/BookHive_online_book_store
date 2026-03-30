@@ -58,7 +58,7 @@ export default function HomePage() {
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <Sparkles className="w-6 h-6 text-amber-600 animate-float" />
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-stone-900 tracking-tight">
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 tracking-tight">
                     Featured Collection
                   </h2>
                 </div>
@@ -134,7 +134,7 @@ export default function HomePage() {
               <div className="flex flex-col items-start max-w-2xl">
                 <div className="flex items-center gap-3 mb-3">
                   <PenLine className="w-6 h-6 text-amber-700 animate-float" />
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-stone-900 tracking-tight">
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 tracking-tight">
                     Literary Journal
                   </h2>
                 </div>
@@ -179,7 +179,7 @@ export default function HomePage() {
                       </div>
                     )}
                     <CardContent className="p-6">
-                      <h3 className="text-xl font-display font-bold text-stone-900 mb-3 line-clamp-2 group-hover:text-amber-700 transition-colors leading-tight">
+                      <h3 className="text-xl font-bold text-stone-900 mb-3 line-clamp-2 group-hover:text-amber-700 transition-colors leading-tight">
                         {blog.title}
                       </h3>
                       <p className="text-stone-600 text-sm leading-relaxed mb-5 line-clamp-3 font-light">
@@ -217,7 +217,7 @@ export default function HomePage() {
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <BookOpen className="w-6 h-6 text-amber-600 animate-float" />
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-stone-900 tracking-tight">
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 tracking-tight">
                     Fresh Arrivals
                   </h2>
                 </div>
@@ -254,3 +254,4 @@ export default function HomePage() {
     </div>
   );
 }
+

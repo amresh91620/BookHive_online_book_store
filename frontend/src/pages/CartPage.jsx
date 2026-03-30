@@ -68,7 +68,7 @@ export default function CartPage() {
           <div className="mb-6 inline-flex items-center justify-center w-24 h-24 rounded-full bg-stone-100">
             <ShoppingBag className="w-12 h-12 text-stone-400" />
           </div>
-          <h2 className="text-3xl font-display font-bold text-stone-900 mb-3">Your cart is empty</h2>
+          <h2 className="text-3xl font-bold text-stone-900 mb-3">Your cart is empty</h2>
           <p className="text-stone-600 mb-8 font-light">Discover amazing books and start your reading journey</p>
           <Link to="/books">
             <Button className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-8 py-6 h-auto text-base font-semibold shadow-md hover:shadow-lg transition-all duration-300">
@@ -89,7 +89,7 @@ export default function CartPage() {
             headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          <h1 className="text-4xl font-display font-bold text-stone-900 mb-2">Shopping Cart</h1>
+          <h1 className="text-4xl font-bold text-stone-900 mb-2">Shopping Cart</h1>
           <p className="text-stone-600 font-light">{items.length} {items.length === 1 ? 'item' : 'items'} in your cart</p>
         </div>
 
@@ -182,7 +182,7 @@ export default function CartPage() {
               }`}
               style={{ transitionDelay: '200ms' }}
             >
-              <h2 className="text-2xl font-display font-bold text-stone-900 mb-6">Order Summary</h2>
+              <h2 className="text-2xl font-bold text-stone-900 mb-6">Order Summary</h2>
               
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-stone-700">
@@ -196,8 +196,8 @@ export default function CartPage() {
                   </span>
                 </div>
                 <div className="border-t-2 border-stone-200 pt-4 flex justify-between items-center">
-                  <span className="text-xl font-display font-bold text-stone-900">Total</span>
-                  <span className="text-2xl font-display font-bold text-amber-700">
+                  <span className="text-xl font-bold text-stone-900">Total</span>
+                  <span className="text-2xl font-bold text-amber-700">
                     {formatPrice(total)}
                   </span>
                 </div>

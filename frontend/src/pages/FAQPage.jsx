@@ -131,7 +131,7 @@ export default function FAQPage() {
               headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
           >
-            <h1 className="text-4xl font-bold font-serif text-[#451a03] mb-4">
+            <h1 className="text-4xl font-bold text-[#451a03] mb-4">
               Frequently Asked Questions
             </h1>
             <p className="text-lg text-[#6b4a2a]">
@@ -143,7 +143,7 @@ export default function FAQPage() {
           <div className="space-y-8">
             {faqs.map((category, categoryIndex) => (
               <div key={categoryIndex}>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">{category.category}</h2>
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">{category.category}</h2>
                 <div className="space-y-3">
                   {category.questions.map((faq, questionIndex) => {
                     const index = `${categoryIndex}-${questionIndex}`;
@@ -187,7 +187,7 @@ export default function FAQPage() {
             }`}
           >
             <CardContent className="p-8 text-center">
-              <h3 className="text-2xl font-bold font-serif text-[#451a03] mb-2">
+              <h3 className="text-2xl font-bold text-[#451a03] mb-2">
                 Still have questions?
               </h3>
               <p className="text-[#6b4a2a] mb-6">
@@ -205,3 +205,4 @@ export default function FAQPage() {
     </div>
   );
 }
+

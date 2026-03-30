@@ -21,3 +21,4 @@ export default function AnimatedBookRow({ books, startIndex }) {
     </>
   );
 }
+

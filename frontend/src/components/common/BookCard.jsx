@@ -188,3 +188,4 @@ export default function BookCard({ book }) {
     </Link>
   );
 }
+

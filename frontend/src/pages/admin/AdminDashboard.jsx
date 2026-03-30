@@ -73,7 +73,7 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 animate-fade-in-up">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-stone-900 mb-2">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 mb-2">
             Dashboard
           </h1>
           <p className="text-stone-600 text-base sm:text-lg font-light">
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
                     </div>
                   </CardHeader>
                   <CardContent className="relative z-10">
-                    <div className="text-3xl font-display font-bold text-stone-900">{stat.value}</div>
+                    <div className="text-3xl font-bold text-stone-900">{stat.value}</div>
                   </CardContent>
                 </Card>
               </CardWrapper>
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
         {/* Quick Actions */}
         <Card className="mb-8 border-2 border-stone-200 shadow-soft hover:shadow-medium transition-all duration-300 animate-fade-in-up stagger-2">
           <CardHeader>
-            <CardTitle className="text-2xl font-display font-bold text-stone-900">Quick Actions</CardTitle>
+            <CardTitle className="text-2xl font-bold text-stone-900">Quick Actions</CardTitle>
             <p className="text-stone-600 text-sm font-light mt-1">Manage your store efficiently</p>
           </CardHeader>
           <CardContent>
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
           <CardHeader>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <CardTitle className="text-2xl font-display font-bold text-stone-900">New Orders</CardTitle>
+                <CardTitle className="text-2xl font-bold text-stone-900">New Orders</CardTitle>
                 <p className="text-sm text-stone-600 font-light mt-1">Recent pending orders</p>
               </div>
               <Link to="/admin/orders?status=Pending">
@@ -220,7 +220,7 @@ export default function AdminDashboard() {
           <CardHeader>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <CardTitle className="text-2xl font-display font-bold text-stone-900">Recent Orders</CardTitle>
+                <CardTitle className="text-2xl font-bold text-stone-900">Recent Orders</CardTitle>
                 <p className="text-sm text-stone-600 font-light mt-1">Latest orders by date</p>
               </div>
               <Link to="/admin/orders">
@@ -334,3 +334,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+

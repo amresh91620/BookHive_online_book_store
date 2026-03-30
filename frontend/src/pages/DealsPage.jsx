@@ -113,7 +113,7 @@ export default function DealsPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="max-w-3xl">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight mb-6 flex flex-wrap items-center gap-4">
-                Special <span className="text-amber-600 font-serif italic font-normal">Offers</span>
+                Special <span className="text-amber-600 italic font-normal">Offers</span>
                 {maxDiscount > 0 && (
                   <span className="inline-flex items-center justify-center bg-gray-900 text-amber-400 text-lg md:text-xl font-bold px-4 py-2 rounded-full shadow-md transform -rotate-2">
                     Up to {maxDiscount}% OFF

@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useOrderById, useCancelOrder } from "@/hooks/api/useOrders";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
@@ -101,7 +101,7 @@ export default function OrderDetailPage() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between">
                   <div>
                     <CardTitle className="text-2xl mb-2">
-                      Order #{order.orderNumber}
+                      Order <span className="font-sans">#{order.orderNumber}</span>
                     </CardTitle>
                     <p className="text-sm text-gray-600">
                       Placed on {shortDate(order.createdAt)}
@@ -338,3 +338,4 @@ export default function OrderDetailPage() {
     </div>
   );
 }
+

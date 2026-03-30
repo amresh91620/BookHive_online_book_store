@@ -603,7 +603,7 @@ export default function ProfilePage() {
                           <div>
                             <div className="flex items-center gap-3 mb-1">
                               <h3 className="font-semibold text-gray-900">
-                                Order #{order.orderNumber}
+                                Order <span className="font-sans">#{order.orderNumber}</span>
                               </h3>
                               <Badge 
                                 variant={
@@ -616,7 +616,7 @@ export default function ProfilePage() {
                               </Badge>
                             </div>
                             <p className="text-sm text-gray-600">
-                              {shortDate(order.createdAt)} Ã¢â‚¬Â¢ {order.items.length} items
+                              {shortDate(order.createdAt)} • {order.items.length} items
                             </p>
                           </div>
                           <div className="mt-3 md:mt-0 text-right">
@@ -836,3 +836,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+

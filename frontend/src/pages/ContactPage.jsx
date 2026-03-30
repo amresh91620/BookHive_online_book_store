@@ -116,7 +116,7 @@ export default function ContactPage() {
               <Badge className="mb-5 border-0 bg-[#1f2937] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-100">
                 Contact BookHive
               </Badge>
-              <h1 className="max-w-3xl font-serif text-4xl font-bold leading-tight text-[#451a03] sm:text-5xl lg:text-6xl">
+              <h1 className="max-w-3xl text-4xl font-bold leading-tight text-[#451a03] sm:text-5xl lg:text-6xl">
                 Questions, order help, or just want to say hello?
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-8 text-[#6b4a2a] sm:text-lg">
@@ -140,7 +140,7 @@ export default function ContactPage() {
               <CardContent className="p-0">
                 <div className="border-b border-amber-100 bg-[#1f2937] px-6 py-6 text-white sm:px-8">
                   <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">Support Promise</p>
-                  <h2 className="mt-3 font-serif text-2xl font-semibold leading-snug text-white sm:text-3xl">
+                  <h2 className="mt-3 text-2xl font-semibold leading-snug text-white sm:text-3xl">
                     Friendly support designed around real readers.
                   </h2>
                 </div>
@@ -151,7 +151,7 @@ export default function ContactPage() {
                         <Headphones className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="font-serif text-lg font-semibold text-[#451a03]">Personal Assistance</p>
+                        <p className=" text-lg font-semibold text-[#451a03]">Personal Assistance</p>
                         <p className="text-sm text-[#7c5b3d]">Order support, delivery questions, and product help.</p>
                       </div>
                     </div>
@@ -160,7 +160,7 @@ export default function ContactPage() {
                     <div className="flex items-start gap-3">
                       <MessageSquare className="mt-1 h-5 w-5 text-[#b45309]" />
                       <div>
-                        <p className="font-serif text-lg font-semibold text-[#451a03]">Fast Follow-up</p>
+                        <p className=" text-lg font-semibold text-[#451a03]">Fast Follow-up</p>
                         <p className="mt-1 text-sm leading-7 text-[#6b4a2a]">
                           We try to respond quickly so your next read is never held up by unanswered questions.
                         </p>
@@ -194,7 +194,7 @@ export default function ContactPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b45309]">
                   Send a Message
                 </p>
-                <CardTitle className="font-serif text-3xl text-[#451a03]">
+                <CardTitle className=" text-3xl text-[#451a03]">
                   We would love to hear from you.
                 </CardTitle>
                 <p className="text-sm leading-7 text-[#6b4a2a]">
@@ -291,7 +291,7 @@ export default function ContactPage() {
             >
               <Card className="rounded-[28px] border-amber-100 bg-white/90 shadow-sm">
                 <CardHeader className="border-b border-amber-100 pb-5">
-                  <CardTitle className="font-serif text-2xl text-[#451a03]">
+                  <CardTitle className=" text-2xl text-[#451a03]">
                     Contact Information
                   </CardTitle>
                 </CardHeader>
@@ -319,7 +319,7 @@ export default function ContactPage() {
                             <Icon className="h-5 w-5" />
                           </div>
                           <div className="min-w-0">
-                            <p className="font-serif text-lg font-semibold text-[#451a03]">
+                            <p className=" text-lg font-semibold text-[#451a03]">
                               {info.title}
                             </p>
                             <div className="mt-1 text-sm">{content}</div>
@@ -334,7 +334,7 @@ export default function ContactPage() {
 
               <Card className="rounded-[28px] border-amber-100 bg-[linear-gradient(180deg,#fff7e8_0%,#fffdf8_100%)] shadow-sm">
                 <CardHeader className="border-b border-amber-100 pb-5">
-                  <CardTitle className="font-serif text-2xl text-[#451a03]">
+                  <CardTitle className=" text-2xl text-[#451a03]">
                     Quick Answers
                   </CardTitle>
                 </CardHeader>
@@ -347,7 +347,7 @@ export default function ContactPage() {
                       <div className="flex items-start gap-3">
                         <HelpCircle className="mt-1 h-5 w-5 text-[#b45309]" />
                         <div>
-                          <p className="font-serif text-lg font-semibold text-[#451a03]">
+                          <p className=" text-lg font-semibold text-[#451a03]">
                             {item.question}
                           </p>
                           <p className="mt-1 text-sm leading-7 text-[#6b4a2a]">{item.answer}</p>
@@ -364,3 +364,4 @@ export default function ContactPage() {
     </div>
   );
 }
+

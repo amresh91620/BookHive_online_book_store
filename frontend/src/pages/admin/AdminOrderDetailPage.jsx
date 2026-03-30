@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import api from "@/services/api";
@@ -263,7 +263,7 @@ export default function AdminOrderDetailPage() {
                       ))}
                     </select>
                     <p className="text-xs text-stone-500 mt-2 font-medium">
-                      Current: {order.status} → Select next status
+                      Current: {order.status} ? Select next status
                     </p>
                   </div>
 
@@ -426,7 +426,7 @@ export default function AdminOrderDetailPage() {
                         rel="noopener noreferrer"
                         className="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm"
                       >
-                        Track Package →
+                        Track Package ?
                       </a>
                     )}
                   </div>
@@ -476,3 +476,4 @@ export default function AdminOrderDetailPage() {
     </div>
   );
 }
+

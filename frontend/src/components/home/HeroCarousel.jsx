@@ -148,7 +148,7 @@ export default function EnhancedHero() {
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.15] sm:leading-[1.1] tracking-tight animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
               Discover Your Next <br className="hidden sm:block" />
-              <span className="relative inline-block font-serif italic text-[#F59E0B] mt-1 sm:mt-2">
+              <span className="relative inline-block italic text-[#F59E0B] mt-1 sm:mt-2">
                 Great Read
                 <svg className="absolute -bottom-1 sm:-bottom-1.5 left-0 w-full" viewBox="0 0 300 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M5 15C50 5 150 5 295 15" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round"/>
@@ -256,7 +256,7 @@ export default function EnhancedHero() {
                   
                   {/* Bottom Info Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-5 bg-gradient-to-t from-black/95 via-black/70 to-transparent">
-                     <p className="text-[#F59E0B] font-serif italic text-sm lg:text-base font-semibold mb-1">This Week's Pick</p>
+                     <p className="text-[#F59E0B] italic text-sm lg:text-base font-semibold mb-1">This Week's Pick</p>
                      <p className="text-white text-xs lg:text-sm opacity-90">Trending Now</p>
                   </div>
                 </div>
@@ -302,3 +302,4 @@ export default function EnhancedHero() {
     </section>
   );
 }
+

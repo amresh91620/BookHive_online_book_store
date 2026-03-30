@@ -10,7 +10,7 @@ export default function TermsPage() {
       <div className="container-shell">
           <h1
             ref={headerRef}
-            className={`text-4xl font-bold font-serif text-[#451a03] mb-4 transition-all duration-700 ${
+            className={`text-4xl font-bold text-[#451a03] mb-4 transition-all duration-700 ${
               headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
           >
@@ -28,7 +28,7 @@ export default function TermsPage() {
           >
             <CardContent className="p-8 space-y-6">
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   1. Acceptance of Terms
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
@@ -39,7 +39,7 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   2. Use of Service
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed mb-3">
@@ -68,7 +68,7 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   3. Account Registration
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
@@ -82,7 +82,7 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   4. Orders and Payment
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed mb-3">
@@ -101,7 +101,7 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   5. Shipping and Delivery
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
@@ -113,7 +113,7 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   6. Returns and Refunds
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
@@ -125,7 +125,7 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   7. Intellectual Property
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
@@ -137,7 +137,7 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   8. Limitation of Liability
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
@@ -150,7 +150,7 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   9. Indemnification
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
@@ -161,7 +161,7 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   10. Termination
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
@@ -173,7 +173,7 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   11. Changes to Terms
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
@@ -186,7 +186,7 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   12. Governing Law
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
@@ -197,7 +197,7 @@ export default function TermsPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold font-serif text-[#451a03] mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   13. Contact Information
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
@@ -222,3 +222,4 @@ export default function TermsPage() {
     </div>
   );
 }
+

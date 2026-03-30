@@ -24,7 +24,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-display font-bold text-white mb-6 text-lg tracking-tight">Explore</h3>
+            <h3 className=" font-bold text-white mb-6 text-lg tracking-tight">Explore</h3>
             <ul className="space-y-3 text-sm">
               <li>
                 <Link to="/" className="text-stone-400 hover:text-amber-400 transition-smooth hover:translate-x-1 inline-block">Home</Link>
@@ -46,7 +46,7 @@ export default function Footer() {
 
           {/* Customer Service */}
           <div>
-            <h3 className="font-display font-bold text-white mb-6 text-lg tracking-tight">Account</h3>
+            <h3 className=" font-bold text-white mb-6 text-lg tracking-tight">Account</h3>
             <ul className="space-y-3 text-sm">
               <li>
                 <Link to="/orders" className="text-stone-400 hover:text-amber-400 transition-smooth hover:translate-x-1 inline-block">My Orders</Link>
@@ -65,7 +65,7 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h3 className="font-display font-bold text-white mb-6 text-lg tracking-tight">Get in Touch</h3>
+            <h3 className=" font-bold text-white mb-6 text-lg tracking-tight">Get in Touch</h3>
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3 group">
                 <Mail className="w-5 h-5 text-amber-500 mt-0.5 group-hover:scale-110 transition-smooth" />
@@ -95,3 +95,4 @@ export default function Footer() {
     </footer>
   );
 }
+

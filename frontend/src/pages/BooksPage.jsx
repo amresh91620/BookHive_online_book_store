@@ -120,9 +120,9 @@ export default function BooksPage() {
           </div>
           
           <div className="max-w-4xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold text-stone-900 tracking-tight leading-[1.1] mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-stone-900 tracking-tight leading-[1.1] mb-6">
               {getPageTitle() === 'The Library' ? (
-                <>The BookHive <span className="gradient-text font-serif italic">Library</span></>
+                <>The BookHive <span className="gradient-text italic">Library</span></>
               ) : (
                 getPageTitle()
               )}
@@ -261,7 +261,7 @@ export default function BooksPage() {
           <div className="text-center py-32 bg-white rounded-3xl border-2 border-stone-200 shadow-medium mt-12 relative overflow-hidden">
             <div className="absolute inset-0 bg-noise opacity-20"></div>
             <div className="relative">
-              <h3 className="text-3xl font-display font-bold text-stone-900 mb-4">No books found</h3>
+              <h3 className="text-3xl font-bold text-stone-900 mb-4">No books found</h3>
               <p className="text-stone-600 mb-10 max-w-md mx-auto font-light leading-relaxed">
                 We couldn't find any books matching your search criteria. Try adjusting your filters or exploring our full collection.
               </p>

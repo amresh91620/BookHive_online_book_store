@@ -30,3 +30,4 @@ export function SearchFilter({ placeholder = "Search...", onSearch, delay = 500 
     </div>
   );
 }
+

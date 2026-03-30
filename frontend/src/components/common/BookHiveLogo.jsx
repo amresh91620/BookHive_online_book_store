@@ -23,7 +23,7 @@ export default function BookHiveLogo({
       </span>
       <span
         className={cn(
-          "font-body text-[1.65rem] font-bold leading-none tracking-tight",
+          "text-[1.65rem] font-bold leading-none tracking-tight",
           textClassName
         )}
       >
@@ -33,3 +33,4 @@ export default function BookHiveLogo({
     </span>
   );
 }
+

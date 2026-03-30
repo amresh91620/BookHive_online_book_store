@@ -71,3 +71,4 @@ export const useAdminOrderNotifications = () => {
     pendingOrdersCount: data?.orders?.filter((o) => o.status === "Pending").length || 0,
   };
 };
+

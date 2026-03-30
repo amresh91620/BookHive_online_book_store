@@ -10,7 +10,7 @@ export default function PrivacyPolicyPage() {
       <div className="container-shell">
           <h1
             ref={headerRef}
-            className={`text-4xl font-bold text-[#451a03] font-serif mb-4 transition-all duration-700 ${
+            className={`text-4xl font-bold text-[#451a03] mb-4 transition-all duration-700 ${
               headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
           >
@@ -26,7 +26,7 @@ export default function PrivacyPolicyPage() {
           >
             <CardContent className="p-8 space-y-6">
               <section>
-                <h2 className="text-2xl font-bold text-[#451a03] font-serif mb-4">1. Introduction</h2>
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">1. Introduction</h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
                   Welcome to BookHive. We respect your privacy and are committed to protecting your
                   personal data. This privacy policy will inform you about how we look after your
@@ -35,7 +35,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-[#451a03] font-serif mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   2. Information We Collect
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed mb-3">
@@ -53,7 +53,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-[#451a03] font-serif mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   3. How We Use Your Information
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed mb-3">
@@ -70,7 +70,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-[#451a03] font-serif mb-4">4. Data Security</h2>
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">4. Data Security</h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
                   We have implemented appropriate security measures to prevent your personal data
                   from being accidentally lost, used, or accessed in an unauthorized way. We use
@@ -79,7 +79,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-[#451a03] font-serif mb-4">5. Data Retention</h2>
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">5. Data Retention</h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
                   We will only retain your personal data for as long as necessary to fulfill the
                   purposes we collected it for, including for legal, accounting, or reporting
@@ -88,7 +88,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-[#451a03] font-serif mb-4">6. Your Rights</h2>
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">6. Your Rights</h2>
                 <p className="text-[#6b4a2a] leading-relaxed mb-3">You have the right to:</p>
                 <ul className="list-disc list-inside space-y-2 text-[#6b4a2a] ml-4">
                   <li>Access your personal data</li>
@@ -102,7 +102,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-[#451a03] font-serif mb-4">7. Cookies</h2>
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">7. Cookies</h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
                   We use cookies and similar tracking technologies to track activity on our website
                   and store certain information. You can instruct your browser to refuse all
@@ -111,7 +111,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-[#451a03] font-serif mb-4">8. Third-Party Links</h2>
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">8. Third-Party Links</h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
                   Our website may include links to third-party websites. We have no control over
                   the content and practices of these sites and cannot accept responsibility for
@@ -120,7 +120,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-[#451a03] font-serif mb-4">
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">
                   9. Changes to This Policy
                 </h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
@@ -131,7 +131,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-[#451a03] font-serif mb-4">10. Contact Us</h2>
+                <h2 className="text-2xl font-bold text-[#451a03] mb-4">10. Contact Us</h2>
                 <p className="text-[#6b4a2a] leading-relaxed">
                   If you have any questions about this privacy policy or our privacy practices,
                   please contact us at:
@@ -154,3 +154,4 @@ export default function PrivacyPolicyPage() {
     </div>
   );
 }
+
