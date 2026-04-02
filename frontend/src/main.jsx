@@ -44,9 +44,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 duration: 3000,
                 limit: 3,
                 style: {
-                  background: "rgba(15, 23, 42, 0.95)",
-                  color: "#fff",
-                  borderRadius: "12px",
+                  background: "rgba(255, 255, 255, 0.92)",
+                  color: "#162033",
+                  borderRadius: "18px",
+                  border: "1px solid rgba(213, 227, 221, 0.92)",
+                  boxShadow: "0 18px 40px rgba(15, 23, 42, 0.1)",
                 },
               }}
             />

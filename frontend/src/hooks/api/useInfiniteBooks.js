@@ -15,6 +15,19 @@ export const useInfiniteBooks = (params = {}) => {
       if (pageParam) {
         queryParams.cursor = pageParam;
       }
+
+      // Add price range filters if provided
+      if (params.minPrice !== undefined) {
+        queryParams.minPrice = params.minPrice;
+      }
+      if (params.maxPrice !== undefined) {
+        queryParams.maxPrice = params.maxPrice;
+      }
+
+      // Add sort parameter if provided
+      if (params.sortBy) {
+        queryParams.sortBy = params.sortBy;
+      }
       
       const { data } = await api.get(endpoints.books.list, { params: queryParams });
       return data;

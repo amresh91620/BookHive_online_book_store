@@ -43,7 +43,7 @@ export default function BlogDetailPage() {
     );
 
   return (
-    <article className="  py-8 md:py-10 bg-white min-h-screen">
+    <article className="  py-8 md:py-10 min-h-screen">
       <div className=" container-shell">
         {/* Top Navigation */}
         <div className="mb-8">

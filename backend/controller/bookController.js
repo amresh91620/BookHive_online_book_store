@@ -34,6 +34,9 @@ exports.getAllBooks = async (req, res) => {
     const q = (req.query.q || "").trim();
     const category = (req.query.category || "").trim();
     const statusFilter = (req.query.status || "").trim();
+    const minPrice = parseFloat(req.query.minPrice) || 0;
+    const maxPrice = parseFloat(req.query.maxPrice) || Number.MAX_SAFE_INTEGER;
+    const sortBy = (req.query.sortBy || "").trim();
 
     const escapeRegex = (value) =>
       value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -59,6 +62,13 @@ exports.getAllBooks = async (req, res) => {
       if (statusFilter === 'newArrival') filters.push({ newArrival: true });
     }
 
+    // Price range filter
+    if (minPrice > 0 || maxPrice < Number.MAX_SAFE_INTEGER) {
+      filters.push({
+        price: { $gte: minPrice, $lte: maxPrice }
+      });
+    }
+
     const filter = filters.length > 0 ? { $and: filters } : {};
 
     const totalBooks = await Book.countDocuments(filter);
@@ -68,6 +78,33 @@ exports.getAllBooks = async (req, res) => {
     let nextCursor = null;
     let hasMore = false;
 
+    // Determine sort order based on sortBy parameter
+    let sortOrder = { _id: -1 }; // Default for cursor mode
+    if (!cursorMode) {
+      sortOrder = { createdAt: -1 }; // Default for offset mode
+    }
+
+    if (sortBy) {
+      switch (sortBy) {
+        case 'price-low':
+          sortOrder = { price: 1, _id: -1 };
+          break;
+        case 'price-high':
+          sortOrder = { price: -1, _id: -1 };
+          break;
+        case 'rating':
+          sortOrder = { averageRating: -1, _id: -1 };
+          break;
+        case 'newest':
+          sortOrder = { createdAt: -1, _id: -1 };
+          break;
+        case 'relevance':
+        default:
+          // Keep default sort
+          break;
+      }
+    }
+
     if (cursorMode) {
       let cursorFilter = filter;
       if (mongoose.Types.ObjectId.isValid(cursor)) {
@@ -75,13 +112,13 @@ exports.getAllBooks = async (req, res) => {
       }
       const page = await Book.find(cursorFilter)
         .select("-__v")
-        .sort({ _id: -1 })
+        .sort(sortOrder)
         .limit((limit || 10) + 1);
       hasMore = page.length > (limit || 10);
       books = hasMore ? page.slice(0, limit || 10) : page;
       nextCursor = books.length > 0 ? books[books.length - 1]._id : null;
     } else {
-      const query = Book.find(filter).select("-__v").sort({ createdAt: -1 });
+      const query = Book.find(filter).select("-__v").sort(sortOrder);
       if (offset) query.skip(offset);
       if (limit) query.limit(limit);
       books = await query;
@@ -281,15 +318,15 @@ exports.getStatsBooks = async (req, res) => {
   try {
     const featured = await Book.find({ featured: true })
       .sort({ createdAt: -1 })
-      .limit(4)
+      .limit(8)
       .select("-description -__v");
     const bestsellers = await Book.find({ bestseller: true })
       .sort({ createdAt: -1 })
-      .limit(4)
+      .limit(8)
       .select("-description -__v");
     const newArrivals = await Book.find({ newArrival: true })
       .sort({ createdAt: -1 })
-      .limit(4)
+      .limit(8)
       .select("-description -__v");
 
     res.status(200).json({

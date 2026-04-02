@@ -1,9 +1,17 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Award, BookOpen, Heart, Target, Users, Zap } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  ArrowRight,
+  Award,
+  BookOpen,
+  Heart,
+  Sparkles,
+  Target,
+  Users,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { cn } from "@/lib/utils";
 
 export default function AboutPage() {
   const [heroRef, heroVisible] = useScrollAnimation();
@@ -17,22 +25,26 @@ export default function AboutPage() {
     {
       icon: BookOpen,
       title: "Vast Collection",
-      description: "Access thousands of titles across fiction, non-fiction, academic, and children's categories.",
+      description:
+        "Access thousands of titles across fiction, non-fiction, academic, and children's categories.",
     },
     {
       icon: Users,
       title: "Community Driven",
-      description: "Built for readers who love discovering, sharing, and revisiting meaningful stories.",
+      description:
+        "Built for readers who love discovering, sharing, and revisiting meaningful stories.",
     },
     {
       icon: Award,
       title: "Quality Assured",
-      description: "We focus on trusted publishers, strong curation, and books worth recommending.",
+      description:
+        "We focus on trusted publishers, strong curation, and books worth recommending.",
     },
     {
       icon: Heart,
       title: "Customer First",
-      description: "A smooth experience, helpful support, and careful handling from shelf to doorstep.",
+      description:
+        "A smooth experience, helpful support, and careful handling from shelf to doorstep.",
     },
     {
       icon: Target,
@@ -42,26 +54,31 @@ export default function AboutPage() {
     {
       icon: Zap,
       title: "Easy Shopping",
-      description: "Simple browsing, quick checkout, and a storefront that stays easy to use.",
+      description:
+        "Simple browsing, quick checkout, and a storefront that stays easy to use.",
     },
   ];
 
   const values = [
     {
       title: "Quality",
-      description: "Every title we list should feel worth owning, gifting, or rereading.",
+      description:
+        "Every title we list should feel worth owning, gifting, or rereading.",
     },
     {
       title: "Accessibility",
-      description: "Great books should feel easy to find, easy to buy, and easy to enjoy.",
+      description:
+        "Great books should feel easy to find, easy to buy, and easy to enjoy.",
     },
     {
       title: "Community",
-      description: "Reading grows richer when readers can discover and share together.",
+      description:
+        "Reading grows richer when readers can discover and share together.",
     },
     {
       title: "Innovation",
-      description: "We keep improving the platform so the experience stays modern and friction-free.",
+      description:
+        "We keep improving the platform so the experience stays modern and friction-free.",
     },
   ];
 
@@ -81,45 +98,46 @@ export default function AboutPage() {
     {
       name: "Amresh Kumar",
       role: "Head of Operations",
-      description: "Keeps logistics, fulfillment, and daily operations running smoothly.",
+      description:
+        "Keeps logistics, fulfillment, and daily operations running smoothly.",
     },
     {
       name: "Amresh Kumar",
       role: "Customer Relations",
-      description: "Focused on making every reader interaction feel personal and helpful.",
+      description:
+        "Focused on making every reader interaction feel personal and helpful.",
     },
   ];
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Subtle Floating Blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 -right-40 w-96 h-96 bg-orange-400/8 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-40 -left-40 w-80 h-80 bg-amber-400/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }}></div>
-      </div>
+    <div className="min-h-screen bg-[#f7f5ef] pb-20">
+      <section className="page-wash relative overflow-hidden border-b border-[#d8e6e1]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(151,234,220,0.38),transparent_30%),radial-gradient(circle_at_85%_12%,rgba(241,208,136,0.24),transparent_24%)]" />
 
-      <section className="relative z-10 px-0 py-10 sm:py-10 lg:py-10">
-        <div className="container-shell">
-          <div
-            ref={heroRef}
-            className={`grid items-center gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12 transition-all duration-700 ${
-              heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
+        <div
+          ref={heroRef}
+          className={cn(
+            "container-shell relative py-12 sm:py-14 lg:py-16 transition-all duration-700",
+            heroVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          )}
+        >
+          <div className="grid gap-8 xl:grid-cols-[minmax(0,1.1fr)_380px] xl:items-end">
             <div>
-              <Badge className="mb-5 border-0 bg-[#1f2937] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-100">
-                Our Story
-              </Badge>
-              <h1 className="max-w-3xl text-4xl font-bold leading-tight text-[#451a03] sm:text-5xl lg:text-6xl">
-                Building a warmer place for readers to discover their next favorite book.
+              <span className="brand-chip">About BookHive</span>
+              <h1 className="mt-6 max-w-4xl text-[clamp(2.6rem,6vw,5.3rem)] font-semibold leading-[0.96] tracking-tight text-slate-900">
+                Building a warmer digital bookstore for{" "}
+                <span className="gradient-text">curious readers everywhere</span>
               </h1>
-              <p className="mt-5 max-w-2xl text-base leading-8 text-[#6b4a2a] sm:text-lg">
-                BookHive started with a simple idea: online book shopping should feel as inviting as walking into a well-loved bookstore. We bring together thoughtful curation, dependable service, and a reading-first experience designed for modern readers.
+              <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+                BookHive started with a simple idea: online book shopping should feel as
+                inviting as stepping into a thoughtful neighborhood bookstore. We combine
+                dependable service, careful curation, and modern browsing patterns without
+                losing the warmth readers expect.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/books">
-                  <Button className="h-12 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-6 text-sm font-semibold text-white hover:from-orange-600 hover:to-amber-600 shadow-md hover:shadow-lg transition-all duration-300">
+                  <Button className="h-12 rounded-full bg-[#0b7a71] px-6 text-white hover:bg-[#095f59]">
                     Explore Books
                     <ArrowRight className="h-4 w-4" />
                   </Button>
@@ -127,117 +145,113 @@ export default function AboutPage() {
                 <Link to="/contact">
                   <Button
                     variant="outline"
-                    className="h-12 rounded-full border-2 border-orange-500 bg-white/70 px-6 text-sm font-semibold text-orange-600 hover:bg-orange-50 transition-all duration-300"
+                    className="h-12 rounded-full border-[#0b7a71]/20 bg-white/80 px-6 text-[#0b7a71] hover:bg-[#edf7f4]"
                   >
                     Contact Us
                   </Button>
                 </Link>
               </div>
 
-              <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-amber-100 bg-white/80 px-4 py-4 shadow-sm">
-                  <p className="text-2xl font-bold text-[#451a03]">10k+</p>
-                  <p className="mt-1 text-sm text-[#7c5b3d]">Books across genres</p>
+              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                <div className="surface-card rounded-[24px] px-4 py-4">
+                  <p className="text-2xl font-semibold text-slate-900">10k+</p>
+                  <p className="mt-1 text-sm text-slate-500">Books across genres</p>
                 </div>
-                <div className="rounded-2xl border border-amber-100 bg-white/80 px-4 py-4 shadow-sm">
-                  <p className="text-2xl font-bold text-[#451a03]">50k+</p>
-                  <p className="mt-1 text-sm text-[#7c5b3d]">Readers served</p>
+                <div className="surface-card rounded-[24px] px-4 py-4">
+                  <p className="text-2xl font-semibold text-slate-900">50k+</p>
+                  <p className="mt-1 text-sm text-slate-500">Readers served</p>
                 </div>
-                <div className="rounded-2xl border border-amber-100 bg-white/80 px-4 py-4 shadow-sm col-span-2 sm:col-span-1">
-                  <p className="text-2xl font-bold text-[#451a03]">24/7</p>
-                  <p className="mt-1 text-sm text-[#7c5b3d]">Helpful support</p>
+                <div className="surface-card rounded-[24px] px-4 py-4">
+                  <p className="text-2xl font-semibold text-slate-900">24/7</p>
+                  <p className="mt-1 text-sm text-slate-500">Support coverage</p>
                 </div>
               </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute -left-6 top-10 hidden h-28 w-28 rounded-full bg-amber-200/40 blur-2xl lg:block" />
-              <Card className="overflow-hidden rounded-[32px] border-amber-100 bg-white/90 shadow-[0_20px_60px_rgba(120,53,15,0.12)] backdrop-blur">
-                <CardContent className="p-0">
-                  <div className="border-b border-amber-100 bg-[#1f2937] px-6 py-6 text-white sm:px-8">
-                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">BookHive Journal</p>
-                    <h2 className="mt-3 text-2xl font-semibold leading-snug text-white sm:text-3xl">
-                      More than a store. A curated reading destination.
-                    </h2>
+            <div className="surface-panel rounded-[34px] p-6 sm:p-7">
+              <div className="rounded-[28px] bg-[#102032] px-5 py-5 text-white shadow-[0_24px_50px_rgba(16,32,50,0.22)]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/65">
+                  Our Story
+                </p>
+                <h2 className="mt-3 text-3xl font-semibold leading-tight">
+                  More than a store. A curated reading destination.
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-white/84">
+                  We want discovery to feel guided, not overwhelming. From first browse to
+                  checkout to delivery, every layer of BookHive is built to feel helpful and calm.
+                </p>
+              </div>
+
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                <div className="surface-card rounded-[24px] px-5 py-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">
+                    Mission
+                  </p>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">
+                    Make reading accessible, affordable, and enjoyable with a catalog that feels both broad and thoughtfully chosen.
+                  </p>
+                </div>
+                <div className="surface-card rounded-[24px] px-5 py-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">
+                    Promise
+                  </p>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">
+                    Pair dependable service with a visual experience that feels inviting from the first click.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-5 rounded-[26px] bg-[#ecf8f5] px-5 py-5 text-[#0b6158]">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/80">
+                    <Sparkles className="h-5 w-5" />
                   </div>
-                  <div className="space-y-4 px-6 py-6 sm:px-8">
-                    <div className="rounded-2xl border border-amber-100 bg-[#fff8ef] p-5">
-                      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#b45309]">Mission</p>
-                      <p className="mt-2 text-sm leading-7 text-[#6b4a2a]">
-                        Make reading accessible, affordable, and enjoyable with a catalog that feels both broad and thoughtfully chosen.
-                      </p>
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="rounded-2xl border border-amber-100 bg-white p-5">
-                        <p className="text-3xl font-bold text-[#451a03]">100+</p>
-                        <p className="mt-1 text-sm text-[#7c5b3d]">Publishing partners</p>
-                      </div>
-                      <div className="rounded-2xl border border-amber-100 bg-white p-5">
-                        <p className="text-3xl font-bold text-[#451a03]">Fast</p>
-                        <p className="mt-1 text-sm text-[#7c5b3d]">Reliable doorstep delivery</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  <p className="text-sm leading-7">
+                    BookHive exists to make online book discovery feel more human, more curated,
+                    and much easier to enjoy.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="relative z-10 py-14 sm:py-16">
-        <div className="container-shell">
-          <div
-            ref={missionRef}
-            className={`grid gap-6 lg:grid-cols-[1.05fr_0.95fr] transition-all duration-700 ${
-              missionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
-            <Card className="rounded-[28px] border-amber-100 bg-white/85 shadow-sm">
-              <CardContent className="p-6 sm:p-8">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">Our Mission</p>
-                <h2 className="mt-3 text-3xl font-bold text-[#451a03]">Reading should feel close, not complicated.</h2>
-                <p className="mt-4 text-base leading-8 text-[#6b4a2a]">
-                  We believe books can transform lives, spark imagination, and connect people across cultures and generations. That is why we focus on making discovery simple, pricing fair, and the overall experience genuinely enjoyable.
-                </p>
-                <p className="mt-4 text-base leading-8 text-[#6b4a2a]">
-                  From bestsellers and classics to hidden gems and new releases, our goal is to help every kind of reader find something that feels exactly right.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-[28px] border-amber-100 bg-[linear-gradient(180deg,#fff7e7_0%,#fffdf8_100%)] shadow-sm">
-              <CardContent className="p-6 sm:p-8">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">What Guides Us</p>
-                <div className="mt-5 space-y-4">
-                  {values.map((value) => (
-                    <div key={value.title} className="rounded-2xl border border-amber-100 bg-white/80 p-4">
-                      <h3 className=" text-xl font-semibold text-[#451a03]">{value.title}</h3>
-                      <p className="mt-2 text-sm leading-7 text-[#6b4a2a]">{value.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+      <section className="container-shell py-12 sm:py-14">
+        <div
+          ref={missionRef}
+          className={cn(
+            "grid gap-6 lg:grid-cols-[1.05fr_0.95fr] transition-all duration-700",
+            missionVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          )}
+        >
+          <div className="surface-panel rounded-[32px] p-6 sm:p-8">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6f8883]">
+              Our Mission
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-slate-900">
+              Reading should feel close, not complicated.
+            </h2>
+            <p className="mt-4 text-base leading-8 text-slate-600">
+              We believe books can transform lives, spark imagination, and connect people
+              across cultures and generations. That is why we focus on making discovery simple,
+              pricing fair, and the overall experience genuinely enjoyable.
+            </p>
+            <p className="mt-4 text-base leading-8 text-slate-600">
+              From bestsellers and classics to hidden gems and new releases, our goal is to
+              help every kind of reader find something that feels exactly right.
+            </p>
           </div>
-        </div>
-      </section>
 
-      <section className="relative z-10 py-14 sm:py-16">
-        <div className="container-shell">
-          <div
-            ref={statsRef}
-            className={`rounded-[32px] bg-[#1f2937] px-5 py-8 text-white shadow-[0_20px_50px_rgba(31,41,55,0.18)] sm:px-8 lg:px-10 transition-all duration-700 ${
-              statsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
-            <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
-              {stats.map((stat) => (
-                <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-center backdrop-blur-sm">
-                  <p className=" text-3xl font-bold text-white sm:text-4xl">{stat.value}</p>
-                  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200 sm:text-sm">
-                    {stat.label}
-                  </p>
+          <div className="surface-panel rounded-[32px] p-6 sm:p-8">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6f8883]">
+              What Guides Us
+            </p>
+            <div className="mt-5 space-y-4">
+              {values.map((value) => (
+                <div key={value.title} className="surface-card rounded-[24px] px-5 py-5">
+                  <h3 className="text-xl font-semibold text-slate-900">{value.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-slate-600">{value.description}</p>
                 </div>
               ))}
             </div>
@@ -245,20 +259,49 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="relative z-10 py-14 sm:py-16">
-        <div className="container-shell">
-          <div
-            ref={featuresRef}
-            className={`mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end transition-all duration-700 ${
-              featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
+      <section className="container-shell py-4 sm:py-6">
+        <div
+          ref={statsRef}
+          className={cn(
+            "rounded-[34px] bg-[#102032] px-5 py-8 text-white shadow-[0_24px_55px_rgba(16,32,50,0.2)] sm:px-8 lg:px-10 transition-all duration-700",
+            statsVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          )}
+        >
+          <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-[24px] border border-white/10 bg-white/5 px-4 py-5 text-center backdrop-blur-sm"
+              >
+                <p className="text-3xl font-semibold text-white sm:text-4xl">{stat.value}</p>
+                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#cbe8e2] sm:text-sm">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="container-shell py-12 sm:py-14">
+        <div
+          ref={featuresRef}
+          className={cn(
+            "transition-all duration-700",
+            featuresVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          )}
+        >
+          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">Why Readers Choose Us</p>
-              <h2 className="mt-3 text-3xl font-bold text-[#451a03] sm:text-4xl">A bookstore experience shaped for modern readers.</h2>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6f8883]">
+                Why Readers Choose Us
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-4xl">
+                A bookstore experience shaped for modern readers.
+              </h2>
             </div>
-            <p className="max-w-xl text-sm leading-7 text-[#6b4a2a] sm:text-base">
-              We combine a warm visual identity with a practical, dependable experience that makes browsing and buying books feel effortless.
+            <p className="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
+              We combine a warm visual identity with a dependable user experience so browsing and buying books always feels easy to trust.
             </p>
           </div>
 
@@ -266,99 +309,106 @@ export default function AboutPage() {
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <Card
+                <div
                   key={feature.title}
-                  className={`group rounded-[26px] border-amber-100 bg-white/90 transition-all duration-700 hover:-translate-y-1 hover:shadow-xl ${
-                    featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                  }`}
-                  style={{ transitionDelay: `${index * 100}ms` }}
+                  className={cn(
+                    "surface-card group rounded-[28px] p-6 transition-all duration-700 hover:-translate-y-1 hover:border-[#9fcfc7] hover:shadow-[0_18px_45px_rgba(15,23,42,0.08)]",
+                    featuresVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+                  )}
+                  style={{ transitionDelay: `${index * 90}ms` }}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fff3dd] text-[#b45309] shadow-sm transition-transform duration-300 group-hover:scale-105">
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <h3 className="mt-5 text-2xl font-semibold text-[#451a03]">{feature.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-[#6b4a2a]">{feature.description}</p>
-                  </CardContent>
-                </Card>
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#ecf8f5] text-[#0b7a71] transition-transform duration-300 group-hover:scale-105">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="mt-5 text-2xl font-semibold text-slate-900">{feature.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">{feature.description}</p>
+                </div>
               );
             })}
           </div>
         </div>
       </section>
 
-      <section className="relative z-10 py-14 sm:py-16">
-        <div className="container-shell">
-          <div
-            ref={teamRef}
-            className={`mb-10 text-center transition-all duration-700 ${
-              teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">Meet The Team</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#451a03] sm:text-4xl">The people behind the shelves.</h2>
+      <section className="container-shell py-12 sm:py-14">
+        <div
+          ref={teamRef}
+          className={cn(
+            "transition-all duration-700",
+            teamVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          )}
+        >
+          <div className="mb-10 text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6f8883]">
+              Meet The Team
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-4xl">
+              The people behind the shelves.
+            </h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             {team.map((member, index) => (
-              <Card
+              <div
                 key={`${member.name}-${member.role}`}
-                className={`overflow-hidden rounded-[28px] border-amber-100 bg-white/90 shadow-sm transition-all duration-700 hover:-translate-y-1 hover:shadow-lg ${
-                  teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                }`}
-                style={{ transitionDelay: `${index * 150}ms` }}
+                className={cn(
+                  "surface-card rounded-[30px] p-6 transition-all duration-700 hover:-translate-y-1 hover:border-[#9fcfc7] hover:shadow-[0_18px_45px_rgba(15,23,42,0.08)]",
+                  teamVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+                )}
+                style={{ transitionDelay: `${index * 120}ms` }}
               >
-                <CardContent className="p-6 sm:p-7">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#1f2937] text-2xl font-bold text-amber-200">
-                      {member.name.charAt(0)}
-                    </div>
-                    <div>
-                      <h3 className=" text-2xl font-semibold text-[#451a03]">{member.name}</h3>
-                      <p className="mt-1 text-sm font-semibold uppercase tracking-[0.16em] text-[#b45309]">
-                        {member.role}
-                      </p>
-                    </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#102032] text-2xl font-semibold text-[#cbe8e2]">
+                    {member.name.charAt(0)}
                   </div>
-                  <p className="mt-5 text-sm leading-7 text-[#6b4a2a]">{member.description}</p>
-                </CardContent>
-              </Card>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-slate-900">{member.name}</h3>
+                    <p className="mt-1 text-sm font-semibold uppercase tracking-[0.16em] text-[#0b7a71]">
+                      {member.role}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-5 text-sm leading-7 text-slate-600">{member.description}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="pb-16 pt-6 sm:pb-20">
-        <div className="container-shell">
-          <div
-            ref={ctaRef}
-            className={`rounded-[32px] border border-amber-100 bg-[linear-gradient(135deg,#fff8e8_0%,#fff1d9_100%)] px-6 py-8 shadow-sm sm:px-10 sm:py-10 transition-all duration-700 ${
-              ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-              <div className="max-w-2xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b45309]">Ready To Browse</p>
-                <h2 className="mt-3 text-3xl font-bold text-[#451a03]">Find your next great read with BookHive.</h2>
-                <p className="mt-3 text-sm leading-7 text-[#6b4a2a] sm:text-base">
-                  Explore curated titles, discover new favorites, and enjoy a bookstore experience built with readers in mind.
-                </p>
-              </div>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Link to="/books">
-                  <Button className="h-12 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-6 text-white hover:from-orange-600 hover:to-amber-600 shadow-md hover:shadow-lg transition-all duration-300">
-                    Browse Catalog
-                  </Button>
-                </Link>
-                <Link to="/contact">
-                  <Button
-                    variant="outline"
-                    className="h-12 rounded-full border-2 border-orange-500 bg-white/80 px-6 text-orange-600 hover:bg-orange-50 transition-all duration-300"
-                  >
-                    Talk to Us
-                  </Button>
-                </Link>
-              </div>
+      <section className="container-shell pb-6 pt-4 sm:pb-10">
+        <div
+          ref={ctaRef}
+          className={cn(
+            "surface-panel rounded-[34px] px-6 py-8 sm:px-10 sm:py-10 transition-all duration-700",
+            ctaVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          )}
+        >
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6f8883]">
+                Ready To Browse
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold text-slate-900">
+                Find your next great read with BookHive.
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
+                Explore curated titles, discover new favorites, and enjoy a bookstore experience built with readers in mind.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link to="/books">
+                <Button className="h-12 rounded-full bg-[#0b7a71] px-6 text-white hover:bg-[#095f59]">
+                  Browse Catalog
+                </Button>
+              </Link>
+              <Link to="/contact">
+                <Button
+                  variant="outline"
+                  className="h-12 rounded-full border-[#0b7a71]/20 bg-white/85 px-6 text-[#0b7a71] hover:bg-[#edf7f4]"
+                >
+                  Talk to Us
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -366,4 +416,3 @@ export default function AboutPage() {
     </div>
   );
 }
-

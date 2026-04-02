@@ -1,15 +1,20 @@
-import { useState, useEffect, useRef } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useBookCategories } from "@/hooks/api/useBooks";
 import { useInfiniteBooks } from "@/hooks/api/useInfiniteBooks";
+import { useDebounce } from "@/hooks/useDebounce";
 import BookCard from "@/components/common/BookCard";
 import BookSkeleton from "@/components/common/BookSkeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Tag, Loader2, ChevronRight, SlidersHorizontal } from "lucide-react";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import AnimatedBookRow from "@/components/common/AnimatedBookRow";
+import {
+  Search,
+  Filter,
+  X,
+  Zap,
+  Grid3x3,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -17,17 +22,20 @@ export default function DealsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
+  const [discountRange, setDiscountRange] = useState([0, 100]);
+  const [sortBy, setSortBy] = useState("discount-high");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const loadMoreRef = useRef(null);
 
   const debouncedSearch = useDebounce(searchQuery, 500);
-  const [headerRef, headerVisible] = useScrollAnimation();
-  const [filtersRef, filtersVisible] = useScrollAnimation();
 
   const params = {
     limit: ITEMS_PER_PAGE,
   };
+
   if (debouncedSearch) params.q = debouncedSearch;
   if (category) params.category = category;
+  if (sortBy && sortBy !== 'relevance') params.sortBy = sortBy;
 
   const {
     data,
@@ -39,12 +47,28 @@ export default function DealsPage() {
 
   const { data: categories = [] } = useBookCategories();
 
-  // Flatten all pages and filter books with discounts
-  const allBooks = data?.pages.flatMap(page => page.books || []) || [];
-  const books = allBooks.filter(book => book.discount > 0);
-  const totalBooks = books.length;
+  const allBooks = data?.pages.flatMap((page) => page.books || []) || [];
+  
+  // Filter books with discount and apply discount range filter
+  const books = allBooks.filter((book) => {
+    const discount = Number(book.discount) || 0;
+    return discount > 0 && discount >= discountRange[0] && discount <= discountRange[1];
+  });
 
-  // Intersection Observer for infinite scroll
+  const totalDeals = books.length;
+  const maxDiscount = books.reduce(
+    (currentMax, book) => Math.max(currentMax, Number(book.discount) || 0),
+    0
+  );
+
+  const hasActiveFilters = Boolean(
+    searchQuery || 
+    category || 
+    discountRange[0] > 0 || 
+    discountRange[1] < 100 ||
+    (sortBy && sortBy !== 'discount-high')
+  );
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -67,196 +91,428 @@ export default function DealsPage() {
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    updateURL({ q: searchQuery, category });
+  const updateURL = ({ q, category: nextCategory }) => {
+    const nextParams = {};
+    if (q) nextParams.q = q;
+    if (nextCategory) nextParams.category = nextCategory;
+    setSearchParams(nextParams);
   };
 
-  const handleCategoryChange = (newCategory) => {
-    setCategory(newCategory);
-    updateURL({ q: searchQuery, category: newCategory });
+  const handleCategoryChange = (nextCategory) => {
+    setCategory(nextCategory);
+    updateURL({ q: searchQuery, category: nextCategory });
   };
 
   const handleClearFilters = () => {
     setSearchQuery("");
     setCategory("");
+    setDiscountRange([0, 100]);
+    setSortBy("discount-high");
     setSearchParams({});
   };
 
-  const updateURL = ({ q, category }) => {
-    const params = {};
-    if (q) params.q = q;
-    if (category) params.category = category;
-    setSearchParams(params);
-  };
-
-  const hasActiveFilters = searchQuery || category;
-
-  const maxDiscount = Math.max(...books.map(b => b.discount || 0), 0);
-
   return (
-    <div className="min-h-screen bg-[#FAFAFA] pb-20">
-      {/* Premium Editorial Header */}
-      <div className="bg-white border-b border-gray-100 pt-8 pb-10">
-        <div
-          ref={headerRef}
-          className={`container-shell transition-all duration-700 ${
-            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-        >
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-gray-400 mb-6">
-            <Link to="/" className="hover:text-gray-900 transition-colors">Home</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-gray-900">Deals & Offers</span>
-          </div>
-          
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight mb-6 flex flex-wrap items-center gap-4">
-                Special <span className="text-amber-600 italic font-normal">Offers</span>
-                {maxDiscount > 0 && (
-                  <span className="inline-flex items-center justify-center bg-gray-900 text-amber-400 text-lg md:text-xl font-bold px-4 py-2 rounded-full shadow-md transform -rotate-2">
-                    Up to {maxDiscount}% OFF
-                  </span>
-                )}
-              </h1>
-              <p className="text-lg md:text-xl text-gray-500 leading-relaxed flex items-center gap-3">
-                <Tag className="w-5 h-5 text-amber-500" />
-                Curated deals on <span className="font-semibold text-gray-900">{totalBooks}</span> beautifully crafted editions.
-              </p>
+    <div className="min-h-screen bg-[#f7f5ef]">
+      {/* Hero Banner */}
+      <div className="relative bg-gradient-to-r from-[#0b7a71] via-[#0d8a7f] to-[#0b7a71] overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#deb05a] rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        </div>
+
+        <div className="container-shell relative py-8 sm:py-12 lg:py-16">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-4 animate-fade-in">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#deb05a] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#deb05a]"></span>
+              </span>
+              <span className="text-sm font-bold text-white uppercase tracking-wider">
+                Limited Time Offer
+              </span>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-3 leading-tight animate-slide-up">
+              MASSIVE BOOK DEALS!
+            </h1>
+            <p className="text-base sm:text-lg text-white/95 mb-2 font-medium">
+              Up to <span className="text-[#deb05a] font-black text-xl sm:text-2xl">{maxDiscount}%</span> OFF + Free Shipping on orders above ₹499
+            </p>
+            <p className="text-sm text-white/80 mb-6">
+              🎉 Grab your favorite books at unbeatable prices • 📚 {totalDeals}+ deals available • ⚡ New deals added daily
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 sm:px-5 py-2.5 border border-white/20">
+                <div className="text-xs text-white/80 mb-0.5">⏰ Ends in</div>
+                <div className="text-lg sm:text-xl font-black text-white tabular-nums">12h 45m</div>
+              </div>
+              <div className="flex items-center gap-2 text-white/90 text-xs sm:text-sm">
+                <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">✓</div>
+                <span>Authentic Books</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/90 text-xs sm:text-sm">
+                <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">🚚</div>
+                <span>Fast Delivery</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container-shell py-10">
-        {/* Refined Filter Section */}
-        <div
-          ref={filtersRef}
-          className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12 transition-all duration-700 ${
-            filtersVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-        >
-          
-          {/* Dropdown Filters */}
-          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-            <div className="flex items-center gap-2 text-sm font-semibold tracking-widest uppercase text-gray-400 mr-2 hidden md:flex">
-              <SlidersHorizontal className="w-4 h-4" />
-              Filters
-            </div>
-
-            <select
-              value={category}
-              onChange={(e) => handleCategoryChange(e.target.value)}
-              className="h-12 px-6 rounded-full border border-gray-200 bg-white text-gray-700 text-sm font-medium focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all cursor-pointer hover:bg-gray-50 appearance-none pr-10 relative shadow-sm"
-              style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
-            >
-              <option value="">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-
-            {/* Clear Filters Button */}
-            {hasActiveFilters && (
-              <button
-                onClick={handleClearFilters}
-                className="h-12 px-6 rounded-full text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center gap-2"
-              >
-                <X className="w-4 h-4" />
-                Clear
-              </button>
-            )}
-          </div>
-
-          {/* Minimal Search Bar */}
-          <div className="w-full lg:w-auto">
-            <form onSubmit={handleSearch} className="relative w-full lg:w-80">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+      {/* Header with Search */}
+      <div className="bg-white border-b border-gray-200 sticky top-16 z-40">
+        <div className="container-shell py-3 sm:py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
               <Input
                 type="text"
                 placeholder="Search deals..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11 h-12 bg-white border border-gray-200 rounded-full focus:border-gray-900 focus:ring-1 focus:ring-gray-900 w-full shadow-sm"
+                className="h-11 sm:h-12 pl-10 sm:pl-12 pr-4 rounded-full border-gray-300 bg-gray-50 text-sm sm:text-base focus:bg-white focus:border-[#0b7a71] focus:ring-[#0b7a71]/20"
               />
-            </form>
-          </div>
-        </div>
-
-        {/* Loading State */}
-        {isLoading && (
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
-            {[...Array(8)].map((_, i) => (
-              <BookSkeleton key={i} />
-            ))}
-          </div>
-        )}
-
-        {/* Books Grid */}
-        {!isLoading && books.length > 0 && (
-          <>
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
-              {/* Group books into rows of 4 */}
-              {Array.from({ length: Math.ceil(books.length / 4) }, (_, rowIndex) => {
-                const rowBooks = books.slice(rowIndex * 4, (rowIndex + 1) * 4);
-                return (
-                  <AnimatedBookRow 
-                    key={`row-${rowIndex}`} 
-                    books={rowBooks} 
-                    startIndex={rowIndex * 4}
-                  />
-                );
-              })}
             </div>
 
-            {/* Load More Trigger */}
-            {hasNextPage && (
-              <div ref={loadMoreRef} className="flex justify-center mt-20">
-                {isFetchingNextPage ? (
-                  <div className="flex items-center gap-3 text-gray-500 bg-white px-6 py-3 rounded-full border border-gray-100 shadow-sm">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="text-sm font-medium uppercase tracking-wider">Loading deals</span>
+            <button
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className="flex items-center gap-2 px-4 sm:px-5 h-11 sm:h-12 rounded-full border border-gray-300 bg-white hover:bg-gray-50 transition-colors whitespace-nowrap"
+            >
+              <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-[#0b7a71]" />
+              <span className="text-sm sm:text-base font-medium">Filters</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Category Pills */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="container-shell py-3 sm:py-4">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <style>{`
+              .overflow-x-auto::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+            <button
+              onClick={() => handleCategoryChange("")}
+              className={cn(
+                "px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all",
+                category === ""
+                  ? "bg-[#0b7a71] text-white shadow-md"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              )}
+            >
+              All
+            </button>
+            {categories.slice(0, 10).map((cat) => (
+              <button
+                key={cat}
+                onClick={() => handleCategoryChange(cat)}
+                className={cn(
+                  "px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all",
+                  category === cat
+                    ? "bg-[#0b7a71] text-white shadow-md"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                )}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="container-shell py-4 sm:py-6 lg:py-8">
+        <div className="flex gap-4 sm:gap-6">
+          {/* Sidebar Filters - Desktop */}
+          <aside className="hidden lg:block w-64 flex-shrink-0">
+            <div className="sticky top-[180px] space-y-6">
+              <div className="bg-white rounded-2xl p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-gray-900">Filter Deals</h3>
+                  {hasActiveFilters && (
+                    <button
+                      onClick={handleClearFilters}
+                      className="text-xs text-red-600 hover:text-red-700 font-medium"
+                    >
+                      Clear All
+                    </button>
+                  )}
+                </div>
+
+                {/* Discount Range */}
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Discount Range
+                  </label>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-sm text-gray-600">{discountRange[0]}%</span>
+                    <span className="text-gray-400">-</span>
+                    <span className="text-sm text-gray-600">{discountRange[1]}%</span>
                   </div>
-                ) : (
-                  <div className="h-12" /> 
+                  <div className="space-y-2">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value={discountRange[0]}
+                      onChange={(e) => {
+                        const newMin = parseInt(e.target.value);
+                        if (newMin <= discountRange[1]) {
+                          setDiscountRange([newMin, discountRange[1]]);
+                        }
+                      }}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b7a71]"
+                    />
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value={discountRange[1]}
+                      onChange={(e) => {
+                        const newMax = parseInt(e.target.value);
+                        if (newMax >= discountRange[0]) {
+                          setDiscountRange([discountRange[0], newMax]);
+                        }
+                      }}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b7a71]"
+                    />
+                  </div>
+                </div>
+
+                {/* Sort Options */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Sort By
+                  </label>
+                  <div className="space-y-2">
+                    {[
+                      { value: "discount-high", label: "Highest Discount" },
+                      { value: "discount-low", label: "Lowest Discount" },
+                      { value: "price-low", label: "Price: Low to High" },
+                      { value: "price-high", label: "Price: High to Low" },
+                      { value: "newest", label: "Newest First" },
+                    ].map((option) => (
+                      <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="sort"
+                          value={option.value}
+                          checked={sortBy === option.value}
+                          onChange={(e) => setSortBy(e.target.value)}
+                          className="w-4 h-4 text-[#0b7a71] focus:ring-[#0b7a71]"
+                        />
+                        <span className="text-sm text-gray-700">{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Promo Card */}
+              <div className="bg-gradient-to-br from-[#deb05a] to-[#c89a4a] rounded-2xl p-5 text-white shadow-lg">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <Zap className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg mb-1">Flash Sale!</h3>
+                    <p className="text-sm text-white/90">
+                      Extra discounts on selected books. Limited time only!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* Mobile Filters Overlay */}
+          {showMobileFilters && (
+            <div className="lg:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setShowMobileFilters(false)}>
+              <div 
+                className="absolute right-0 top-0 bottom-0 w-80 bg-white p-6 overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-bold text-gray-900">Filters</h3>
+                  <button onClick={() => setShowMobileFilters(false)}>
+                    <X className="h-6 w-6 text-gray-600" />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Discount Range */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                      Discount Range
+                    </label>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-sm text-gray-600">{discountRange[0]}%</span>
+                      <span className="text-gray-400">-</span>
+                      <span className="text-sm text-gray-600">{discountRange[1]}%</span>
+                    </div>
+                    <div className="space-y-2">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="5"
+                        value={discountRange[0]}
+                        onChange={(e) => {
+                          const newMin = parseInt(e.target.value);
+                          if (newMin <= discountRange[1]) {
+                            setDiscountRange([newMin, discountRange[1]]);
+                          }
+                        }}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b7a71]"
+                      />
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="5"
+                        value={discountRange[1]}
+                        onChange={(e) => {
+                          const newMax = parseInt(e.target.value);
+                          if (newMax >= discountRange[0]) {
+                            setDiscountRange([discountRange[0], newMax]);
+                          }
+                        }}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b7a71]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Sort Options */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                      Sort By
+                    </label>
+                    <div className="space-y-2">
+                      {[
+                        { value: "discount-high", label: "Highest Discount" },
+                        { value: "discount-low", label: "Lowest Discount" },
+                        { value: "price-low", label: "Price: Low to High" },
+                        { value: "price-high", label: "Price: High to Low" },
+                        { value: "newest", label: "Newest First" },
+                      ].map((option) => (
+                        <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="sort-mobile"
+                            value={option.value}
+                            checked={sortBy === option.value}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="w-4 h-4 text-[#0b7a71] focus:ring-[#0b7a71]"
+                          />
+                          <span className="text-sm text-gray-700">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => setShowMobileFilters(false)}
+                    className="w-full h-12 rounded-full bg-[#0b7a71] text-white hover:bg-[#095f59]"
+                  >
+                    Apply Filters
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Main Content */}
+          <div className="flex-1 min-w-0">
+            {/* Results Header */}
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  Today's Flash Deals
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                  {totalDeals} amazing deals available
+                </p>
+              </div>
+              <div className="bg-gradient-to-br from-[#deb05a] to-[#c89a4a] rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-center text-white">
+                <div className="text-xl sm:text-2xl font-black">{maxDiscount}%</div>
+                <div className="text-xs font-medium opacity-90">Max Off</div>
+              </div>
+            </div>
+
+            {/* Books Grid */}
+            {isLoading ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="animate-fade-in-up" style={{ animationDelay: `${i * 50}ms` }}>
+                    <BookSkeleton />
+                  </div>
+                ))}
+              </div>
+            ) : books.length > 0 ? (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+                  {books.map((book, index) => (
+                    <div 
+                      key={book._id} 
+                      className="animate-fade-in-up"
+                      style={{ animationDelay: `${(index % 12) * 30}ms` }}
+                    >
+                      <BookCard book={book} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Load More */}
+                {hasNextPage && (
+                  <div ref={loadMoreRef} className="flex justify-center mt-8 mb-4">
+                    {isFetchingNextPage && (
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 w-full">
+                        {[...Array(4)].map((_, i) => (
+                          <div key={i} className="animate-fade-in-up" style={{ animationDelay: `${i * 50}ms` }}>
+                            <BookSkeleton />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {!hasNextPage && books.length > 0 && (
+                  <div className="mt-12 text-center">
+                    <p className="text-sm text-gray-500">
+                      You've reached the end of deals
+                    </p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-16">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                  <Grid3x3 className="h-8 w-8 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  No deals found
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Try adjusting your filters or search query
+                </p>
+                {hasActiveFilters && (
+                  <Button
+                    onClick={handleClearFilters}
+                    className="rounded-full bg-[#0b7a71] text-white hover:bg-[#095f59]"
+                  >
+                    Clear Filters
+                  </Button>
                 )}
               </div>
             )}
-
-            {/* End of Results */}
-            {!hasNextPage && books.length > 0 && (
-              <div className="text-center mt-20 pt-8 border-t border-gray-200">
-                <p className="text-gray-400 text-sm uppercase tracking-widest font-medium">
-                  End of Offers
-                </p>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* No Results */}
-        {!isLoading && books.length === 0 && (
-          <div className="text-center py-24 bg-white rounded-3xl border border-gray-100 shadow-sm mt-8">
-            <div className="mb-6 relative">
-              <div className="w-20 h-20 mx-auto bg-gray-50 rounded-full flex items-center justify-center border border-gray-100">
-                <Tag className="w-8 h-8 text-gray-400" />
-              </div>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">No deals found</h3>
-            <p className="text-gray-500 mb-8 max-w-md mx-auto">
-              We couldn't find any discounted books matching your criteria. Try adjusting your filters.
-            </p>
-            {hasActiveFilters && (
-              <Button 
-                onClick={handleClearFilters} 
-                className="bg-gray-900 hover:bg-gray-800 text-white rounded-full px-8 py-6 h-auto"
-              >
-                Clear All Filters
-              </Button>
-            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
