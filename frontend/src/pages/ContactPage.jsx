@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import {
   ArrowRight,
   Clock,
@@ -21,8 +20,8 @@ import { Textarea } from "@/components/ui/textarea";
 import toast from "react-hot-toast";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+import api from "@/services/api";
+import { endpoints } from "@/services/endpoints";
 
 const fieldClassName =
   "h-[52px] rounded-[20px] border-[#d8e6e1] bg-white/92 text-slate-800 placeholder:text-slate-400 shadow-none focus-visible:ring-[#d97642]/20 focus-visible:border-[#d97642]";
@@ -51,7 +50,7 @@ export default function ContactPage() {
     setLoading(true);
 
     try {
-      await axios.post(`${API_URL}/contact`, formData);
+      await api.post(endpoints.contact.send, formData);
       toast.success("Message sent successfully! We'll get back to you soon.");
       setFormData({
         name: "",
@@ -62,7 +61,7 @@ export default function ContactPage() {
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 5000);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to send message. Please try again.");
+      toast.error(error.response?.data?.msg || error.response?.data?.message || "Failed to send message. Please try again.");
     } finally {
       setLoading(false);
     }
