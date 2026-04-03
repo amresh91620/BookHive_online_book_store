@@ -61,12 +61,12 @@ export default function BookSkeleton() {
 
         {/* Price Section Skeleton */}
         <div className="flex items-baseline gap-2 mb-3">
-          <div className="h-6 md:h-7 w-20 bg-gradient-to-r from-[#0b7a71]/20 to-[#0b7a71]/10 rounded"></div>
+          <div className="h-6 md:h-7 w-20 bg-gradient-to-r from-[#d97642]/20 to-[#d97642]/10 rounded"></div>
           <div className="h-4 w-16 bg-gray-200 rounded"></div>
         </div>
 
         {/* Add to Cart Button Skeleton */}
-        <div className="w-full h-10 md:h-11 rounded-lg bg-gradient-to-r from-[#0b7a71]/30 to-[#0b7a71]/20"></div>
+        <div className="w-full h-10 md:h-11 rounded-lg bg-gradient-to-r from-[#d97642]/30 to-[#d97642]/20"></div>
       </div>
     </div>
   );

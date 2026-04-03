@@ -41,7 +41,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Illustration */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#0b7a71] via-[#0d8a7f] to-[#0b7a71] p-12 items-center justify-center relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#d97642] via-[#e08a4f] to-[#d97642] p-12 items-center justify-center relative overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-[#deb05a]/20 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
@@ -105,7 +105,7 @@ export default function LoginPage() {
 
           {/* Logo */}
           <Link to="/" className="inline-flex items-center gap-2 mb-6 sm:mb-8 animate-fade-in-up">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0b7a71] to-[#0d8a7f] flex items-center justify-center">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#d97642] to-[#e08a4f] flex items-center justify-center">
               <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <span className="text-xl sm:text-2xl font-bold text-gray-900">BookHive</span>
@@ -132,7 +132,7 @@ export default function LoginPage() {
                   placeholder="your@email.com"
                   autoComplete="email"
                   {...register("email")}
-                  className="h-11 sm:h-12 rounded-xl border-gray-200 bg-white pl-10 sm:pl-12 text-sm sm:text-base focus:border-[#0b7a71] focus:ring-[#0b7a71]/20"
+                  className="h-11 sm:h-12 rounded-xl border-gray-200 bg-white pl-10 sm:pl-12 text-sm sm:text-base focus:border-[#d97642] focus:ring-[#d97642]/20"
                 />
               </div>
               {errors.email && (
@@ -155,12 +155,12 @@ export default function LoginPage() {
                   placeholder="Enter your password"
                   autoComplete="current-password"
                   {...register("password")}
-                  className="h-11 sm:h-12 rounded-xl border-gray-200 bg-white pl-10 sm:pl-12 pr-10 sm:pr-12 text-sm sm:text-base focus:border-[#0b7a71] focus:ring-[#0b7a71]/20"
+                  className="h-11 sm:h-12 rounded-xl border-gray-200 bg-white pl-10 sm:pl-12 pr-10 sm:pr-12 text-sm sm:text-base focus:border-[#d97642] focus:ring-[#d97642]/20"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((value) => !value)}
-                  className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#0b7a71] transition-colors"
+                  className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#d97642] transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
                 </button>
@@ -176,7 +176,7 @@ export default function LoginPage() {
             <div className="flex justify-end">
               <Link
                 to="/forgot-password"
-                className="text-xs sm:text-sm font-medium text-[#0b7a71] hover:text-[#095f59] transition-colors"
+                className="text-xs sm:text-sm font-medium text-[#d97642] hover:text-[#c26535] transition-colors"
               >
                 Forgot Password?
               </Link>
@@ -186,7 +186,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={status === "loading"}
-              className="h-11 sm:h-12 w-full rounded-xl bg-gradient-to-r from-[#0b7a71] to-[#0d8a7f] hover:from-[#095f59] hover:to-[#0b7a71] text-white font-bold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+              className="h-11 sm:h-12 w-full rounded-xl bg-gradient-to-r from-[#d97642] to-[#e08a4f] hover:from-[#c26535] hover:to-[#d97642] text-white font-bold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
             >
               {status === "loading" ? (
                 <span className="flex items-center gap-2">
@@ -218,7 +218,7 @@ export default function LoginPage() {
           <div className="text-center animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
             <Link
               to="/register"
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#0b7a71] hover:text-[#095f59] transition-colors"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#d97642] hover:text-[#c26535] transition-colors"
             >
               Create an account
               <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />

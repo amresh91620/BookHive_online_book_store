@@ -76,51 +76,59 @@ export default function CommentSection({ blogId }) {
   const total = data?.total || 0;
 
   return (
-    <div className="mt-12 pt-8 border-t border-gray-200">
-      <div className="flex items-center gap-2 mb-6">
-        <MessageSquare className="w-5 h-5 text-gray-600" />
+    <div className="bg-white rounded-3xl border border-gray-200 shadow-lg p-6 sm:p-8">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 rounded-full bg-[#d97642] flex items-center justify-center">
+          <MessageSquare className="w-5 h-5 text-white" />
+        </div>
         <h2 className="text-2xl font-bold text-gray-900">
-          Comments ({total})
+          Discussion <span className="text-[#d97642]">({total})</span>
         </h2>
       </div>
 
       {/* Comment Form */}
       {user ? (
         <form onSubmit={handleSubmit} className="mb-8">
-          <Textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Share your thoughts..."
-            className="mb-3 min-h-[100px]"
-            maxLength={1000}
-          />
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-500">
-              {newComment.length}/1000
-            </span>
-            <Button
-              type="submit"
-              disabled={!newComment.trim() || createMutation.isPending}
-              className="bg-[#F59E0B] hover:bg-[#D97706]"
-            >
-              <Send className="w-4 h-4 mr-2" />
-              {createMutation.isPending ? "Posting..." : "Post Comment"}
-            </Button>
+          <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+            <Textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Share your thoughts on this article..."
+              className="mb-3 min-h-[120px] bg-white border-gray-200 focus:border-[#d97642] focus:ring-[#d97642]/20 rounded-xl resize-none"
+              maxLength={1000}
+            />
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-500 font-medium">
+                {newComment.length}/1000 characters
+              </span>
+              <Button
+                type="submit"
+                disabled={!newComment.trim() || createMutation.isPending}
+                className="bg-[#d97642] hover:bg-[#c26535] text-white rounded-full px-6 shadow-md"
+              >
+                <Send className="w-4 h-4 mr-2" />
+                {createMutation.isPending ? "Posting..." : "Post Comment"}
+              </Button>
+            </div>
           </div>
         </form>
       ) : (
-        <Card className="mb-8 bg-gray-50">
-          <CardContent className="p-6 text-center">
-            <p className="text-gray-600 mb-4">
-              Please login to leave a comment
-            </p>
-            <Link to="/login">
-              <Button className="bg-[#F59E0B] hover:bg-[#D97706]">
-                Login
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+        <div className="mb-8 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center mx-auto mb-4">
+            <MessageSquare className="w-8 h-8 text-gray-400" />
+          </div>
+          <p className="text-gray-700 font-medium mb-4">
+            Join the conversation
+          </p>
+          <p className="text-gray-500 text-sm mb-6">
+            Please login to share your thoughts and engage with other readers
+          </p>
+          <Link to="/login">
+            <Button className="bg-[#d97642] hover:bg-[#c26535] text-white rounded-full px-8 shadow-md">
+              Login to Comment
+            </Button>
+          </Link>
+        </div>
       )}
 
       {/* Comments List */}
@@ -129,31 +137,29 @@ export default function CommentSection({ blogId }) {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="h-32 bg-gray-100 rounded-lg animate-pulse"
+              className="h-32 bg-gray-100 rounded-2xl animate-pulse"
             ></div>
           ))}
         </div>
       ) : comments.length === 0 ? (
-        <Card className="bg-gray-50">
-          <CardContent className="p-8 text-center">
-            <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">
-              No comments yet. Be the first to comment!
-            </p>
-          </CardContent>
-        </Card>
+        <div className="bg-gray-50 rounded-2xl border border-gray-200 p-12 text-center">
+          <div className="w-20 h-20 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center mx-auto mb-4">
+            <MessageSquare className="w-10 h-10 text-gray-300" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">No comments yet</h3>
+          <p className="text-gray-500">
+            Be the first to share your thoughts on this article!
+          </p>
+        </div>
       ) : (
         <div className="space-y-4">
           {comments.map((comment) => {
             // Safety check: Skip if comment or user is null/undefined
             if (!comment || !comment.user) {
-              // Silently skip comments with deleted users
               return null;
             }
 
-            // Handle both cases: comment.user as object or string ID
             const commentUserId = typeof comment.user === 'object' ? comment.user._id : comment.user;
-            // Check both _id and id fields for current user
             const currentUserId = user?._id || user?.id;
             const isOwner = currentUserId && commentUserId && (currentUserId === commentUserId || currentUserId.toString() === commentUserId.toString());
             
@@ -161,69 +167,82 @@ export default function CommentSection({ blogId }) {
             const userDisliked = comment.dislikes?.includes(currentUserId) || false;
 
             return (
-              <Card key={comment._id} className="border border-gray-200">
-                <CardContent className="p-5">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900">
+              <div key={comment._id} className="bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#d97642] to-[#c26535] flex items-center justify-center shadow-md flex-shrink-0">
+                      <span className="text-white font-bold text-sm">
+                        {(typeof comment.user === 'object' ? (comment.user.name || 'U') : 'U').charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-gray-900 truncate">
                         {typeof comment.user === 'object' ? (comment.user.name || 'Unknown User') : 'Unknown User'}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {new Date(comment.createdAt).toLocaleDateString()}{" "}
-                        {comment.isEdited && "(edited)"}
+                        {new Date(comment.createdAt).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric"
+                        })}{" "}
+                        {comment.isEdited && <span className="text-gray-400">(edited)</span>}
                       </p>
                     </div>
-                    {isOwner && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(comment._id)}
-                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                        title="Delete comment"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    )}
                   </div>
-
-                  <p className="text-gray-700 mb-4">{comment.content}</p>
-
-                  {user && (
-                    <div className="flex gap-4">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleLike(comment._id)}
-                        className={`h-8 gap-1 ${
-                          userLiked ? "text-blue-600" : "text-gray-600"
-                        }`}
-                      >
-                        <ThumbsUp
-                          className={`w-4 h-4 ${
-                            userLiked ? "fill-current" : ""
-                          }`}
-                        />
-                        <span>{comment.likes?.length || 0}</span>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDislike(comment._id)}
-                        className={`h-8 gap-1 ${
-                          userDisliked ? "text-red-600" : "text-gray-600"
-                        }`}
-                      >
-                        <ThumbsDown
-                          className={`w-4 h-4 ${
-                            userDisliked ? "fill-current" : ""
-                          }`}
-                        />
-                        <span>{comment.dislikes?.length || 0}</span>
-                      </Button>
-                    </div>
+                  {isOwner && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(comment._id)}
+                      className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full flex-shrink-0"
+                      title="Delete comment"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+
+                <p className="text-gray-700 leading-relaxed mb-4 pl-13">{comment.content}</p>
+
+                {user && (
+                  <div className="flex gap-2 pl-13">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleLike(comment._id)}
+                      className={`h-9 gap-2 rounded-full px-4 ${
+                        userLiked 
+                          ? "bg-blue-50 text-blue-600 hover:bg-blue-100" 
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      <ThumbsUp
+                        className={`w-4 h-4 ${
+                          userLiked ? "fill-current" : ""
+                        }`}
+                      />
+                      <span className="font-semibold">{comment.likes?.length || 0}</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDislike(comment._id)}
+                      className={`h-9 gap-2 rounded-full px-4 ${
+                        userDisliked 
+                          ? "bg-red-50 text-red-600 hover:bg-red-100" 
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      <ThumbsDown
+                        className={`w-4 h-4 ${
+                          userDisliked ? "fill-current" : ""
+                        }`}
+                      />
+                      <span className="font-semibold">{comment.dislikes?.length || 0}</span>
+                    </Button>
+                  </div>
+                )}
+              </div>
             );
           }).filter(Boolean)}
         </div>

@@ -215,7 +215,7 @@ export default function BookDetailPage() {
           <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
             The book you're looking for doesn't exist or has been removed.
           </p>
-          <Button onClick={() => navigate("/books")} className="bg-gradient-to-r from-[#0b7a71] to-[#159887] hover:from-[#0f5f57] hover:to-[#0b7a71] text-white shadow-md hover:shadow-lg transition-all duration-300 text-sm sm:text-base">
+          <Button onClick={() => navigate("/books")} className="bg-gradient-to-r from-[#d97642] to-[#e89b5f] hover:from-[#c26535] hover:to-[#d97642] text-white shadow-md hover:shadow-lg transition-all duration-300 text-sm sm:text-base">
             Browse Books
           </Button>
         </div>
@@ -331,7 +331,7 @@ export default function BookDetailPage() {
                     key={idx}
                     className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
                       selectedImage === idx
-                        ? "border-[#0b7a71] shadow-md scale-105"
+                        ? "border-[#d97642] shadow-md scale-105"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                     onClick={() => setSelectedImage(idx)}
@@ -355,7 +355,7 @@ export default function BookDetailPage() {
             {/* Title & Author */}
             <div>
               {book.bestseller && (
-                <Badge className="mb-2 sm:mb-3 bg-gradient-to-r from-[#0b7a71] to-[#159887] text-white text-xs sm:text-sm font-semibold px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-md">
+                <Badge className="mb-2 sm:mb-3 bg-gradient-to-r from-[#d97642] to-[#e89b5f] text-white text-xs sm:text-sm font-semibold px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-md">
                   🏆 Bestseller
                 </Badge>
               )}
@@ -364,7 +364,7 @@ export default function BookDetailPage() {
               </h1>
               <Link
                 to={`/books?author=${encodeURIComponent(book.author)}`}
-                className="text-sm sm:text-base md:text-lg text-[#0b7a71] hover:text-[#159887] font-medium mt-2 inline-block"
+                className="text-sm sm:text-base md:text-lg text-[#d97642] hover:text-[#e89b5f] font-medium mt-2 inline-block"
               >
                 by {book.author}
               </Link>
@@ -431,7 +431,7 @@ export default function BookDetailPage() {
               {book.stock > 0 && book.stock <= 10 && (
                 <div className="w-full bg-gray-200 rounded-full h-1.5">
                   <div
-                    className="bg-gradient-to-r from-[#0b7a71] to-[#159887] h-1.5 rounded-full"
+                    className="bg-gradient-to-r from-[#d97642] to-[#e89b5f] h-1.5 rounded-full"
                     style={{ width: `${(book.stock / 10) * 100}%` }}
                   ></div>
                 </div>
@@ -469,7 +469,7 @@ export default function BookDetailPage() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
               <Button
-                className="flex-1 bg-gradient-to-r from-[#0b7a71] to-[#159887] hover:from-[#0f5f57] hover:to-[#0b7a71] text-white text-sm sm:text-base font-bold py-4 sm:py-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+                className="flex-1 bg-gradient-to-r from-[#d97642] to-[#e89b5f] hover:from-[#c26535] hover:to-[#d97642] text-white text-sm sm:text-base font-bold py-4 sm:py-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
                 onClick={handleAddToCart}
                 disabled={book.stock === 0}
               >
@@ -520,7 +520,7 @@ export default function BookDetailPage() {
             {/* About Book */}
             <div className="md:col-span-2">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-[#0b7a71]" />
+                <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-[#d97642]" />
                 About the Book
               </h2>
               <div className="prose max-w-none text-sm sm:text-base text-gray-700 leading-relaxed">
@@ -556,7 +556,7 @@ export default function BookDetailPage() {
           {book.aboutAuthor && (
             <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-200">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
-                <User className="w-5 h-5 sm:w-6 sm:h-6 text-[#0b7a71]" />
+                <User className="w-5 h-5 sm:w-6 sm:h-6 text-[#d97642]" />
                 About the Author
               </h2>
               <div className="bg-gray-50 rounded-2xl p-4 sm:p-6 text-sm sm:text-base text-gray-700 leading-relaxed">
@@ -586,12 +586,12 @@ export default function BookDetailPage() {
           >
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-[#0b7a71]" />
+                <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-[#d97642]" />
                 Explore More Books
               </h2>
               <Link
                 to="/books"
-                className="text-sm sm:text-base text-[#0b7a71] hover:text-[#159887] font-medium flex items-center gap-1"
+                className="text-sm sm:text-base text-[#d97642] hover:text-[#e89b5f] font-medium flex items-center gap-1"
               >
                 View All
                 <ChevronRight className="w-4 h-4" />
@@ -623,7 +623,7 @@ export default function BookDetailPage() {
                 </p>
               </div>
               <Button
-                className="flex-1 bg-[#0b7a71] hover:bg-[#159887] text-white text-xs sm:text-sm font-bold py-2.5 sm:py-3 rounded-xl"
+                className="flex-1 bg-[#d97642] hover:bg-[#e89b5f] text-white text-xs sm:text-sm font-bold py-2.5 sm:py-3 rounded-xl"
                 onClick={handleAddToCart}
               >
                 Add to Cart
@@ -647,7 +647,7 @@ export default function BookDetailPage() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 bg-gradient-to-r from-[#0b7a71] to-[#159887] text-white p-3 rounded-full shadow-lg hover:from-[#0f5f57] hover:to-[#0b7a71] transition-all duration-300 z-40"
+            className="fixed bottom-6 right-6 bg-gradient-to-r from-[#d97642] to-[#e89b5f] text-white p-3 rounded-full shadow-lg hover:from-[#c26535] hover:to-[#d97642] transition-all duration-300 z-40"
           >
             <ArrowUp className="w-5 h-5" />
           </motion.button>

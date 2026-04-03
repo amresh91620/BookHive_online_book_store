@@ -75,26 +75,26 @@ body.mobile-menu-open {
 :root {
   --ink: 22 32 51;
   --paper: 247 245 239;
-  --honey: 222 176 90;
+  --honey: 217 118 66; /* Changed to orange */
   --clay: 215 199 178;
-  --leaf: 11 122 113;
-  --sky: 221 244 239;
+  --leaf: 217 118 66; /* Changed to orange */
+  --sky: 254 243 237; /* Orange tint */
 
   --book-dark: 22 32 51;
-  --book-amber: 222 176 90;
+  --book-amber: 217 118 66; /* Changed to orange */
   --book-white: 255 255 255;
   --book-cream: 247 245 239;
   --book-text: 22 32 51;
-  --book-amber-light: 232 190 111;
-  --book-gold: 194 152 72;
+  --book-amber-light: 224 133 80; /* Orange light */
+  --book-gold: 194 101 53; /* Orange gold */
 
   --brand-ink: 22 32 51;
-  --brand-teal: 11 122 113;
-  --brand-teal-deep: 8 97 90;
-  --brand-teal-soft: 232 248 244;
+  --brand-teal: 217 118 66; /* Changed to orange */
+  --brand-teal-deep: 194 101 53; /* Orange deep */
+  --brand-teal-soft: 254 243 237; /* Orange soft */
   --brand-cream: 247 245 239;
-  --brand-gold: 222 176 90;
-  --brand-line: 213 227 221;
+  --brand-gold: 217 118 66; /* Orange */
+  --brand-line: 243 220 203; /* Orange line */
 
   --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.05), 0 2px 8px rgba(15, 23, 42, 0.04);
   --shadow-medium: 0 18px 48px rgba(15, 23, 42, 0.08), 0 6px 18px rgba(15, 23, 42, 0.06);
@@ -117,7 +117,7 @@ body.mobile-menu-open {
 }
 
 .bg-bookshelf {
-  background: linear-gradient(135deg, #16423c 0%, #0b7a71 100%);
+  background: linear-gradient(135deg, #c26535 0%, #d97642 100%);
 }
 
 .text-book-primary {
@@ -219,13 +219,13 @@ body.mobile-menu-open {
 
   .brand-chip {
     @apply inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-semibold tracking-[0.2em] uppercase;
-    background: rgba(235, 249, 245, 0.9);
-    color: rgb(var(--brand-teal-deep));
-    border: 1px solid rgba(11, 122, 113, 0.18);
+    background: rgba(254, 243, 237, 0.9);
+    color: rgb(194, 101, 53);
+    border: 1px solid rgba(217, 118, 66, 0.18);
   }
 
   .brand-shadow {
-    box-shadow: 0 20px 45px rgba(11, 122, 113, 0.16);
+    box-shadow: 0 20px 45px rgba(217, 118, 66, 0.16);
   }
 
 }
@@ -244,31 +244,31 @@ body.mobile-menu-open {
     --popover: 0 0% 100%;
     --popover-foreground: 220 39% 15%;
 
-    --primary: 176 83% 26%;
+    --primary: 25 85% 55%; /* Orange primary */
     --primary-foreground: 45 60% 98%;
 
-    --secondary: 165 39% 94%;
-    --secondary-foreground: 176 83% 26%;
+    --secondary: 25 100% 95%; /* Orange secondary */
+    --secondary-foreground: 25 85% 45%;
 
     --muted: 44 33% 95%;
     --muted-foreground: 216 20% 44%;
 
-    --accent: 164 34% 94%;
+    --accent: 25 100% 95%; /* Orange accent */
     --accent-foreground: 220 39% 15%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 164 24% 84%;
-    --input: 164 24% 84%;
-    --ring: 176 83% 26%;
+    --border: 25 40% 84%; /* Orange border */
+    --input: 25 40% 84%; /* Orange input */
+    --ring: 25 85% 55%; /* Orange ring */
 
     --radius: 0.5rem;
 
-    --chart-1: 176 83% 26%;
+    --chart-1: 25 85% 55%; /* Orange */
     --chart-2: 44 71% 61%;
     --chart-3: 214 35% 30%;
-    --chart-4: 164 39% 76%;
+    --chart-4: 25 70% 76%;
     --chart-5: 28 76% 63%;
   }
 
@@ -361,8 +361,47 @@ body.mobile-menu-open {
   }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 .animate-float {
   animation: float 20s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 
 .animate-fade-in-up {
@@ -407,31 +446,31 @@ body.mobile-menu-open {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #0b7a71 0%, #0f5f57 100%);
+  background: linear-gradient(180deg, #d97642 0%, #c26535 100%);
   border-radius: 6px;
   border: 2px solid #f7f5ef;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #119184 0%, #0b7a71 100%);
+  background: linear-gradient(180deg, #e08550 0%, #d97642 100%);
 }
 
 /* ----------- SELECTION STYLING ----------- */
 
 ::selection {
-  background-color: rgba(11, 122, 113, 0.18);
+  background-color: rgba(217, 118, 66, 0.18);
   color: #162033;
 }
 
 ::-moz-selection {
-  background-color: rgba(11, 122, 113, 0.18);
+  background-color: rgba(217, 118, 66, 0.18);
   color: #162033;
 }
 
 /* ----------- FOCUS STYLES ----------- */
 
 *:focus-visible {
-  outline: 2px solid #0b7a71;
+  outline: 2px solid #d97642;
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -439,7 +478,7 @@ body.mobile-menu-open {
 /* ----------- PREMIUM GRADIENT TEXT ----------- */
 
 .gradient-text {
-  background: linear-gradient(135deg, #0b7a71 0%, #159887 52%, #e1b45b 100%);
+  background: linear-gradient(135deg, #d97642 0%, #e08550 52%, #f0a76b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

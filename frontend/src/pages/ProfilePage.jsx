@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { useUpdateProfile, useChangePassword } from "@/hooks/api/useProfile";
 import { useAddresses, useAddAddress, useUpdateAddress, useDeleteAddress } from "@/hooks/api/useAddress";
 import { useOrders } from "@/hooks/api/useOrders";
+import { logout } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,13 +27,16 @@ import {
   Settings,
   CheckCircle2,
   Eye,
-  EyeOff
+  EyeOff,
+  LogOut
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatPrice, shortDate } from "@/utils/format";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export default function ProfilePage() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const { data: addresses = [] } = useAddresses();
   const { data: orders = [] } = useOrders();
@@ -74,6 +78,12 @@ export default function ProfilePage() {
   const [headerRef, headerVisible] = useScrollAnimation();
   const [sidebarRef, sidebarVisible] = useScrollAnimation();
   const [contentRef, contentVisible] = useScrollAnimation();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    toast.success("Logged out successfully");
+    navigate("/");
+  };
 
   useEffect(() => {
     if (user) {
@@ -305,6 +315,16 @@ export default function ProfilePage() {
                 >
                   <Settings className="w-4 h-4" />
                   Security
+                </button>
+                
+                <Separator className="my-2" />
+                
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-4 py-3 rounded-lg text-left transition-colors text-red-600 hover:bg-red-50 w-full"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
                 </button>
               </div>
             </CardContent>

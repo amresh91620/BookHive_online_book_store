@@ -69,10 +69,41 @@ export default function OrdersPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <div className="h-8 w-32 bg-gray-200 rounded mb-6 animate-pulse"></div>
+        <div className="container-shell">
+          {/* Header Skeleton */}
+          <div className="h-9 w-40 bg-gray-200 rounded-lg mb-8 animate-pulse"></div>
+          
+          {/* Orders List Skeleton */}
           <div className="space-y-4">
-            <LoadingSkeleton type="list" count={5} />
+            {[...Array(4)].map((_, i) => (
+              <div 
+                key={i} 
+                className="bg-white rounded-lg border border-gray-200 p-6 animate-fade-in-up"
+                style={{ animationDelay: `${i * 100}ms` }}
+              >
+                {/* Order Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-6 w-24 bg-gray-200 rounded-full animate-pulse"></div>
+                    </div>
+                    <div className="h-4 w-48 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                  <div className="h-8 w-28 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+                
+                {/* Order Items Preview */}
+                <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+                  {[...Array(4)].map((_, j) => (
+                    <div key={j} className="w-12 h-16 bg-gray-200 rounded animate-pulse flex-shrink-0"></div>
+                  ))}
+                </div>
+                
+                {/* Action Button */}
+                <div className="h-9 w-full bg-gray-200 rounded-lg animate-pulse"></div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

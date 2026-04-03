@@ -57,11 +57,80 @@ export default function OrderDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <div className="h-10 w-32 bg-gray-200 rounded mb-6 animate-pulse"></div>
-          <div className="space-y-6">
-            <LoadingSkeleton type="detail" count={1} />
-            <LoadingSkeleton type="list" count={3} />
+        <div className="container-shell">
+          {/* Back Button Skeleton */}
+          <div className="h-10 w-36 bg-gray-200 rounded-lg mb-6 animate-pulse"></div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Content Skeleton */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Order Header Card */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6 animate-fade-in-up">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="space-y-2">
+                    <div className="h-7 w-48 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-5 w-32 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                  <div className="h-7 w-28 bg-gray-200 rounded-full animate-pulse"></div>
+                </div>
+                <div className="h-4 w-40 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+              
+              {/* Order Items Card */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+                <div className="h-6 w-32 bg-gray-200 rounded mb-4 animate-pulse"></div>
+                <div className="space-y-4">
+                  {[...Array(2)].map((_, i) => (
+                    <div key={i} className="flex gap-4 pb-4 border-b border-gray-100 last:border-0">
+                      <div className="w-16 h-20 bg-gray-200 rounded animate-pulse flex-shrink-0"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-5 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-4 w-1/3 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-5 w-24 bg-gray-200 rounded animate-pulse"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Shipping Address Card */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+                <div className="h-6 w-40 bg-gray-200 rounded mb-4 animate-pulse"></div>
+                <div className="space-y-2">
+                  <div className="h-5 w-48 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Sidebar Skeleton */}
+            <div className="space-y-6">
+              {/* Order Summary Card */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+                <div className="h-6 w-36 bg-gray-200 rounded mb-4 animate-pulse"></div>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                  <div className="flex justify-between">
+                    <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                  <div className="flex justify-between pt-3 border-t">
+                    <div className="h-6 w-16 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Payment Method Card */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+                <div className="h-6 w-40 bg-gray-200 rounded mb-4 animate-pulse"></div>
+                <div className="h-5 w-32 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

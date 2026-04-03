@@ -26,19 +26,19 @@ export default function Footer() {
             <h3 className="mb-6 text-lg font-semibold tracking-tight text-slate-900">Explore</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link to="/" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#0b7a71]">Home</Link>
+                <Link to="/" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#d97642]">Home</Link>
               </li>
               <li>
-                <Link to="/books" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#0b7a71]">Books</Link>
+                <Link to="/books" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#d97642]">Books</Link>
               </li>
               <li>
-                <Link to="/about" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#0b7a71]">About Us</Link>
+                <Link to="/about" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#d97642]">About Us</Link>
               </li>
               <li>
-                <Link to="/contact" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#0b7a71]">Contact</Link>
+                <Link to="/contact" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#d97642]">Contact</Link>
               </li>
               <li>
-                <Link to="/blog" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#0b7a71]">Blog</Link>
+                <Link to="/blog" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#d97642]">Blog</Link>
               </li>
             </ul>
           </div>
@@ -48,16 +48,16 @@ export default function Footer() {
             <h3 className="mb-6 text-lg font-semibold tracking-tight text-slate-900">Account</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link to="/orders" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#0b7a71]">My Orders</Link>
+                <Link to="/orders" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#d97642]">My Orders</Link>
               </li>
               <li>
-                <Link to="/wishlist" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#0b7a71]">Wishlist</Link>
+                <Link to="/wishlist" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#d97642]">Wishlist</Link>
               </li>
               <li>
-                <Link to="/cart" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#0b7a71]">Shopping Cart</Link>
+                <Link to="/cart" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#d97642]">Shopping Cart</Link>
               </li>
               <li>
-                <Link to="/faq" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#0b7a71]">FAQ</Link>
+                <Link to="/faq" className="inline-block text-slate-500 transition-smooth hover:translate-x-1 hover:text-[#d97642]">FAQ</Link>
               </li>
             </ul>
           </div>
@@ -67,16 +67,16 @@ export default function Footer() {
             <h3 className="mb-6 text-lg font-semibold tracking-tight text-slate-900">Get in Touch</h3>
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3 group">
-                <Mail className="mt-0.5 h-5 w-5 text-[#0b7a71] transition-smooth group-hover:scale-110" />
-                <span className="text-slate-500 transition-smooth group-hover:text-[#0b7a71]">amresh91620@gmail.com</span>
+                <Mail className="mt-0.5 h-5 w-5 text-[#d97642] transition-smooth group-hover:scale-110" />
+                <span className="text-slate-500 transition-smooth group-hover:text-[#d97642]">amresh91620@gmail.com</span>
               </li>
               <li className="flex items-start gap-3 group">
-                <Phone className="mt-0.5 h-5 w-5 text-[#0b7a71] transition-smooth group-hover:scale-110" />
-                <span className="text-slate-500 transition-smooth group-hover:text-[#0b7a71]">+91 91232 33736</span>
+                <Phone className="mt-0.5 h-5 w-5 text-[#d97642] transition-smooth group-hover:scale-110" />
+                <span className="text-slate-500 transition-smooth group-hover:text-[#d97642]">+91 91232 33736</span>
               </li>
               <li className="flex items-start gap-3 group">
-                <MapPin className="mt-0.5 h-5 w-5 text-[#0b7a71] transition-smooth group-hover:scale-110" />
-                <span className="text-slate-500 transition-smooth group-hover:text-[#0b7a71]">Siwan, Bihar<br />Pin-841239</span>
+                <MapPin className="mt-0.5 h-5 w-5 text-[#d97642] transition-smooth group-hover:scale-110" />
+                <span className="text-slate-500 transition-smooth group-hover:text-[#d97642]">Siwan, Bihar<br />Pin-841239</span>
               </li>
             </ul>
           </div>
@@ -84,9 +84,9 @@ export default function Footer() {
 
         <div className="mt-12 border-t border-[#d8e6e1] pt-8 text-center text-sm text-slate-500">
           <div className="flex flex-wrap justify-center gap-6 mb-6">
-            <Link to="/privacy" className="font-medium transition-smooth hover:text-[#0b7a71]">Privacy Policy</Link>
-            <Link to="/terms" className="font-medium transition-smooth hover:text-[#0b7a71]">Terms of Service</Link>
-            <Link to="/faq" className="font-medium transition-smooth hover:text-[#0b7a71]">FAQ</Link>
+            <Link to="/privacy" className="font-medium transition-smooth hover:text-[#d97642]">Privacy Policy</Link>
+            <Link to="/terms" className="font-medium transition-smooth hover:text-[#d97642]">Terms of Service</Link>
+            <Link to="/faq" className="font-medium transition-smooth hover:text-[#d97642]">FAQ</Link>
           </div>
           <p className="font-light">&copy; {new Date().getFullYear()} BookHive. Crafted with passion for readers.</p>
         </div>

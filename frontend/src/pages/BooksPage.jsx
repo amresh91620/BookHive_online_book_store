@@ -132,7 +132,7 @@ export default function BooksPage() {
                 placeholder="Search books, authors, or genres..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-11 sm:h-12 pl-10 sm:pl-12 pr-4 rounded-full border-gray-300 bg-gray-50 text-sm sm:text-base focus:bg-white focus:border-[#0b7a71] focus:ring-[#0b7a71]/20"
+                className="h-11 sm:h-12 pl-10 sm:pl-12 pr-4 rounded-full border-gray-300 bg-gray-50 text-sm sm:text-base focus:bg-white focus:border-[#d97642] focus:ring-[#d97642]/20"
               />
             </div>
 
@@ -141,7 +141,7 @@ export default function BooksPage() {
               onClick={() => setShowMobileFilters(!showMobileFilters)}
               className="flex items-center gap-2 px-4 sm:px-5 h-11 sm:h-12 rounded-full border border-gray-300 bg-white hover:bg-gray-50 transition-colors whitespace-nowrap"
             >
-              <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-[#0b7a71]" />
+              <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-[#d97642]" />
               <span className="text-sm sm:text-base font-medium">Filters</span>
             </button>
           </div>
@@ -162,7 +162,7 @@ export default function BooksPage() {
               className={cn(
                 "px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all",
                 category === ""
-                  ? "bg-[#0b7a71] text-white shadow-md"
+                  ? "bg-[#d97642] text-white shadow-md"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               )}
             >
@@ -175,7 +175,7 @@ export default function BooksPage() {
                 className={cn(
                   "px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all",
                   category === cat
-                    ? "bg-[#0b7a71] text-white shadow-md"
+                    ? "bg-[#d97642] text-white shadow-md"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 )}
               >
@@ -228,7 +228,7 @@ export default function BooksPage() {
                           setPriceRange([newMin, priceRange[1]]);
                         }
                       }}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b7a71]"
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#d97642]"
                     />
                     <input
                       type="range"
@@ -242,7 +242,7 @@ export default function BooksPage() {
                           setPriceRange([priceRange[0], newMax]);
                         }
                       }}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b7a71]"
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#d97642]"
                     />
                   </div>
                 </div>
@@ -267,7 +267,7 @@ export default function BooksPage() {
                           value={option.value}
                           checked={sortBy === option.value}
                           onChange={(e) => setSortBy(e.target.value)}
-                          className="w-4 h-4 text-[#0b7a71] focus:ring-[#0b7a71]"
+                          className="w-4 h-4 text-[#d97642] focus:ring-[#d97642]"
                         />
                         <span className="text-sm text-gray-700">{option.label}</span>
                       </label>
@@ -292,7 +292,7 @@ export default function BooksPage() {
                           type="checkbox"
                           checked={statusFilter === option.value}
                           onChange={() => handleStatusFilterChange(option.value === statusFilter ? "" : option.value)}
-                          className="w-4 h-4 text-[#0b7a71] rounded focus:ring-[#0b7a71]"
+                          className="w-4 h-4 text-[#d97642] rounded focus:ring-[#d97642]"
                         />
                         <span className="text-sm text-gray-700">{option.label}</span>
                       </label>
@@ -342,7 +342,7 @@ export default function BooksPage() {
                             setPriceRange([newMin, priceRange[1]]);
                           }
                         }}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b7a71]"
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#d97642]"
                       />
                       <input
                         type="range"
@@ -356,7 +356,7 @@ export default function BooksPage() {
                             setPriceRange([priceRange[0], newMax]);
                           }
                         }}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b7a71]"
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#d97642]"
                       />
                     </div>
                   </div>
@@ -381,7 +381,7 @@ export default function BooksPage() {
                             value={option.value}
                             checked={sortBy === option.value}
                             onChange={(e) => setSortBy(e.target.value)}
-                            className="w-4 h-4 text-[#0b7a71] focus:ring-[#0b7a71]"
+                            className="w-4 h-4 text-[#d97642] focus:ring-[#d97642]"
                           />
                           <span className="text-sm text-gray-700">{option.label}</span>
                         </label>
@@ -406,7 +406,7 @@ export default function BooksPage() {
                             type="checkbox"
                             checked={statusFilter === option.value}
                             onChange={() => handleStatusFilterChange(option.value === statusFilter ? "" : option.value)}
-                            className="w-4 h-4 text-[#0b7a71] rounded focus:ring-[#0b7a71]"
+                            className="w-4 h-4 text-[#d97642] rounded focus:ring-[#d97642]"
                           />
                           <span className="text-sm text-gray-700">{option.label}</span>
                         </label>
@@ -416,7 +416,7 @@ export default function BooksPage() {
 
                   <Button
                     onClick={() => setShowMobileFilters(false)}
-                    className="w-full h-12 rounded-full bg-[#0b7a71] text-white hover:bg-[#095f59]"
+                    className="w-full h-12 rounded-full bg-[#d97642] text-white hover:bg-[#c26535]"
                   >
                     Apply Filters
                   </Button>
@@ -502,7 +502,7 @@ export default function BooksPage() {
                 {hasActiveFilters && (
                   <Button
                     onClick={handleClearFilters}
-                    className="rounded-full bg-[#0b7a71] text-white hover:bg-[#095f59]"
+                    className="rounded-full bg-[#d97642] text-white hover:bg-[#c26535]"
                   >
                     Clear Filters
                   </Button>

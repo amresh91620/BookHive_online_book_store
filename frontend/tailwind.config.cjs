@@ -170,6 +170,14 @@ module.exports = {
   					transform: 'scale(1)',
   					opacity: '1'
   				}
+  			},
+  			marquee: {
+  				'0%': {
+  					transform: 'translateX(0)'
+  				},
+  				'100%': {
+  					transform: 'translateX(-50%)'
+  				}
   			}
   		},
   		animation: {
@@ -177,7 +185,8 @@ module.exports = {
   			shimmer: 'shimmer 2.5s linear infinite',
   			fadeIn: 'fadeIn 0.5s ease-out',
   			slideIn: 'slideIn 0.4s ease-out',
-  			scaleIn: 'scaleIn 0.3s ease-out'
+  			scaleIn: 'scaleIn 0.3s ease-out',
+  			marquee: 'marquee 30s linear infinite'
   		}
   	}
   },

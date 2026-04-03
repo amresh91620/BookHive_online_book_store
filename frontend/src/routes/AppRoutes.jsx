@@ -28,6 +28,7 @@ const AdminMessagesPage = lazy(() => import("@/pages/admin/AdminMessagesPage"));
 const AdminBlogsPage = lazy(() => import("@/pages/admin/AdminBlogsPage"));
 const AdminBlogFormPage = lazy(() => import("@/pages/admin/AdminBlogFormPage"));
 const AdminCommentsPage = lazy(() => import("@/pages/admin/AdminCommentsPage"));
+const AdminSettingsPage = lazy(() => import("@/pages/admin/AdminSettingsPage"));
 const BlogPage = lazy(() => import("@/pages/BlogPage"));
 const BlogDetailPage = lazy(() => import("@/pages/BlogDetailPage"));
 const ContactPage = lazy(() => import("@/pages/ContactPage"));
@@ -278,6 +279,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute adminOnly>
               <AdminCommentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/settings"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminSettingsPage />
             </ProtectedRoute>
           }
         />

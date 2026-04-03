@@ -33,11 +33,43 @@ export default function WishlistPage() {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-50 py-8">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="h-8 w-32 bg-gray-200 rounded mb-6 animate-pulse"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <LoadingSkeleton type="card" count={6} />
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container-shell">
+          {/* Header Skeleton */}
+          <div className="h-9 w-48 bg-gray-200 rounded-lg mb-8 animate-pulse"></div>
+          
+          {/* Wishlist Items Skeleton */}
+          <div className="space-y-4">
+            {[...Array(4)].map((_, i) => (
+              <div 
+                key={i} 
+                className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 animate-fade-in-up"
+                style={{ animationDelay: `${i * 100}ms` }}
+              >
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                  {/* Image Skeleton */}
+                  <div className="w-full sm:w-32 h-48 sm:h-44 bg-gray-200 rounded-lg animate-pulse flex-shrink-0"></div>
+                  
+                  {/* Content Skeleton */}
+                  <div className="flex-1 space-y-3">
+                    <div className="h-7 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-5 w-1/3 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-5/6 bg-gray-200 rounded animate-pulse"></div>
+                    
+                    <div className="flex items-center gap-3 pt-2">
+                      <div className="h-8 w-28 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-6 w-20 bg-gray-200 rounded-full animate-pulse"></div>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-3 pt-2">
+                      <div className="h-10 w-32 bg-amber-200 rounded-lg animate-pulse"></div>
+                      <div className="h-10 w-28 bg-gray-200 rounded-lg animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

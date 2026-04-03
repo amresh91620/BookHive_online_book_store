@@ -6,6 +6,8 @@ const {
   getMyOrders,
   getOrderById,
   cancelOrder,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
 } = require("../controller/orderController");
 
 // All order routes require authentication
@@ -15,5 +17,9 @@ router.post("/", createOrder);
 router.get("/", getMyOrders);
 router.get("/:id", getOrderById);
 router.post("/:id/cancel", cancelOrder);
+
+// Razorpay routes
+router.post("/razorpay/create", createRazorpayOrder);
+router.post("/razorpay/verify", verifyRazorpayPayment);
 
 module.exports = router;

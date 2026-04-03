@@ -121,7 +121,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Illustration */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#0b7a71] via-[#0d8a7f] to-[#0b7a71] p-12 items-center justify-center relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#d97642] via-[#e08a4f] to-[#d97642] p-12 items-center justify-center relative overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-[#deb05a]/20 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
@@ -184,7 +184,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <Link to="/" className="inline-flex items-center gap-2 mb-6 sm:mb-8 animate-fade-in-up">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0b7a71] to-[#0d8a7f] flex items-center justify-center">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#d97642] to-[#e08a4f] flex items-center justify-center">
               <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <span className="text-xl sm:text-2xl font-bold text-gray-900">BookHive</span>
@@ -211,7 +211,7 @@ export default function RegisterPage() {
                   placeholder="Enter your name"
                   autoComplete="name"
                   {...register("name")}
-                  className="h-11 sm:h-12 rounded-xl border-gray-200 bg-white pl-10 sm:pl-12 text-sm sm:text-base focus:border-[#0b7a71] focus:ring-[#0b7a71]/20"
+                  className="h-11 sm:h-12 rounded-xl border-gray-200 bg-white pl-10 sm:pl-12 text-sm sm:text-base focus:border-[#d97642] focus:ring-[#d97642]/20"
                 />
               </div>
               {errors.name && (
@@ -234,7 +234,7 @@ export default function RegisterPage() {
                     autoComplete="email"
                     disabled={emailVerified}
                     {...register("email")}
-                    className={`h-11 sm:h-12 rounded-xl bg-white pl-10 sm:pl-12 text-sm sm:text-base focus:border-[#0b7a71] focus:ring-[#0b7a71]/20 ${
+                    className={`h-11 sm:h-12 rounded-xl bg-white pl-10 sm:pl-12 text-sm sm:text-base focus:border-[#d97642] focus:ring-[#d97642]/20 ${
                       emailVerified ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-gray-200"
                     }`}
                   />
@@ -249,7 +249,7 @@ export default function RegisterPage() {
                     type="button"
                     onClick={handleSendOtp}
                     disabled={otpStatus === "loading" || !emailValue || resendTimer > 0}
-                    className="h-11 sm:h-12 rounded-xl bg-[#0b7a71] px-4 sm:px-6 text-xs sm:text-sm font-semibold text-white hover:bg-[#095f59]"
+                    className="h-11 sm:h-12 rounded-xl bg-[#d97642] px-4 sm:px-6 text-xs sm:text-sm font-semibold text-white hover:bg-[#c26535]"
                   >
                     {resendTimer > 0 ? `${resendTimer}s` : otpSent ? "Resend" : "Send OTP"}
                   </Button>
@@ -276,14 +276,14 @@ export default function RegisterPage() {
                         placeholder="Enter 6-digit OTP"
                         maxLength={6}
                         {...register("otp")}
-                        className="h-11 sm:h-12 rounded-xl border-gray-200 bg-white pl-10 sm:pl-12 text-sm sm:text-base font-mono tracking-widest focus:border-[#0b7a71] focus:ring-[#0b7a71]/20"
+                        className="h-11 sm:h-12 rounded-xl border-gray-200 bg-white pl-10 sm:pl-12 text-sm sm:text-base font-mono tracking-widest focus:border-[#d97642] focus:ring-[#d97642]/20"
                       />
                     </div>
                     <Button
                       type="button"
                       onClick={handleVerifyOtp}
                       disabled={otpStatus === "loading" || !otpValue || otpValue.length !== 6}
-                      className="h-11 sm:h-12 rounded-xl bg-white px-4 sm:px-6 text-xs sm:text-sm font-semibold text-[#0b7a71] ring-1 ring-[#cfe5de] hover:bg-[#edf7f4]"
+                      className="h-11 sm:h-12 rounded-xl bg-white px-4 sm:px-6 text-xs sm:text-sm font-semibold text-[#d97642] ring-1 ring-[#f5d9c8] hover:bg-[#fef3ed]"
                     >
                       Verify
                     </Button>
@@ -311,12 +311,12 @@ export default function RegisterPage() {
                       placeholder="Create a password"
                       autoComplete="new-password"
                       {...register("password")}
-                      className="h-11 sm:h-12 rounded-xl border-gray-200 bg-white pl-10 sm:pl-12 pr-10 sm:pr-12 text-sm sm:text-base focus:border-[#0b7a71] focus:ring-[#0b7a71]/20"
+                      className="h-11 sm:h-12 rounded-xl border-gray-200 bg-white pl-10 sm:pl-12 pr-10 sm:pr-12 text-sm sm:text-base focus:border-[#d97642] focus:ring-[#d97642]/20"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((value) => !value)}
-                      className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#0b7a71] transition-colors"
+                      className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#d97642] transition-colors"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
                     </button>
@@ -339,12 +339,12 @@ export default function RegisterPage() {
                       placeholder="Re-enter your password"
                       autoComplete="new-password"
                       {...register("confirmPassword")}
-                      className="h-11 sm:h-12 rounded-xl border-gray-200 bg-white pl-10 sm:pl-12 pr-10 sm:pr-12 text-sm sm:text-base focus:border-[#0b7a71] focus:ring-[#0b7a71]/20"
+                      className="h-11 sm:h-12 rounded-xl border-gray-200 bg-white pl-10 sm:pl-12 pr-10 sm:pr-12 text-sm sm:text-base focus:border-[#d97642] focus:ring-[#d97642]/20"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword((value) => !value)}
-                      className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#0b7a71] transition-colors"
+                      className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#d97642] transition-colors"
                     >
                       {showConfirmPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
                     </button>
@@ -358,7 +358,7 @@ export default function RegisterPage() {
                 <Button
                   type="submit"
                   disabled={status === "loading"}
-                  className="h-11 sm:h-12 w-full rounded-xl bg-gradient-to-r from-[#0b7a71] to-[#0d8a7f] hover:from-[#095f59] hover:to-[#0b7a71] text-white font-bold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+                  className="h-11 sm:h-12 w-full rounded-xl bg-gradient-to-r from-[#d97642] to-[#e08a4f] hover:from-[#c26535] hover:to-[#d97642] text-white font-bold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
                 >
                   {status === "loading" ? (
                     <span className="flex items-center gap-2">
@@ -399,7 +399,7 @@ export default function RegisterPage() {
           <div className="text-center animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#0b7a71] hover:text-[#095f59] transition-colors"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#d97642] hover:text-[#c26535] transition-colors"
             >
               Sign in instead
               <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />

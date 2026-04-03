@@ -12,6 +12,7 @@ const addressRouter = require("./Routes/addressRoutes");
 const orderRouter = require("./Routes/orderRoutes");
 const blogRouter = require("./Routes/blogRoutes");
 const blogCommentRouter = require("./Routes/blogCommentRoutes");
+const settingsRouter = require("./Routes/settingsRoutes");
 
 const defaultOrigins = [
   "http://localhost:5173",
@@ -86,5 +87,6 @@ app.use("/api/address", addressRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/blogs", blogRouter);
 app.use("/api/blog-comments", blogCommentRouter);
+app.use("/api/settings", settingsRouter);
 
 module.exports = app;

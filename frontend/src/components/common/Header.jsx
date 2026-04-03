@@ -31,15 +31,15 @@ const getDesktopNavClass = (isActive) =>
     "group relative py-2 text-[15px] font-medium transition-colors duration-200",
     isActive
       ? "text-slate-900"
-      : "text-slate-600 hover:text-[#0b7a71]"
+      : "text-slate-600 hover:text-[#d97642]"
   );
 
 const getMobileNavClass = (isActive) =>
   cn(
     "group flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-[15px] font-medium transition-all duration-200",
     isActive
-      ? "bg-[#ecf8f5] text-[#0b6158]"
-      : "text-slate-700 hover:bg-[#f3f7f5] hover:text-[#0b7a71]"
+      ? "bg-[#fef3ed] text-[#c26535]"
+      : "text-slate-700 hover:bg-[#fef8f4] hover:text-[#d97642]"
   );
 
 export default function Header() {
@@ -99,7 +99,7 @@ export default function Header() {
                   <span className="relative">
                     Home
                     <span className={cn(
-                      "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#0b7a71] transition-transform duration-300",
+                      "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#d97642] transition-transform duration-300",
                       location.pathname === "/" ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                     )}></span>
                   </span>
@@ -108,7 +108,7 @@ export default function Header() {
                   <span className="relative">
                     Books
                     <span className={cn(
-                      "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#0b7a71] transition-transform duration-300",
+                      "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#d97642] transition-transform duration-300",
                       isBooksActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                     )}></span>
                   </span>
@@ -117,7 +117,7 @@ export default function Header() {
                   <span className="relative">
                     Deals
                     <span className={cn(
-                      "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#0b7a71] transition-transform duration-300",
+                      "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#d97642] transition-transform duration-300",
                       location.pathname === "/deals" ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                     )}></span>
                   </span>
@@ -126,7 +126,7 @@ export default function Header() {
                   <span className="relative">
                     Blog
                     <span className={cn(
-                      "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#0b7a71] transition-transform duration-300",
+                      "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#d97642] transition-transform duration-300",
                       location.pathname.startsWith("/blog") ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                     )}></span>
                   </span>
@@ -135,7 +135,7 @@ export default function Header() {
                   <span className="relative">
                     About
                     <span className={cn(
-                      "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#0b7a71] transition-transform duration-300",
+                      "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#d97642] transition-transform duration-300",
                       location.pathname === "/about" ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                     )}></span>
                   </span>
@@ -144,7 +144,7 @@ export default function Header() {
                   <span className="relative">
                     Contact
                     <span className={cn(
-                      "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#0b7a71] transition-transform duration-300",
+                      "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#d97642] transition-transform duration-300",
                       location.pathname === "/contact" ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                     )}></span>
                   </span>
@@ -158,7 +158,7 @@ export default function Header() {
                     <span className="relative">
                       Admin
                       <span className={cn(
-                        "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#0b7a71] transition-transform duration-300",
+                        "absolute -bottom-1.5 left-0 h-0.5 w-full origin-left rounded-full bg-[#d97642] transition-transform duration-300",
                         location.pathname.startsWith("/admin") ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                       )}></span>
                     </span>
@@ -182,17 +182,17 @@ export default function Header() {
                     </Link>
                     <Link to="/cart" className="relative group">
                       <div className="rounded-full p-2.5 transition-all duration-300 hover:bg-white/80">
-                        <ShoppingCart className="h-5 w-5 text-slate-700 transition-all duration-300 group-hover:scale-110 group-hover:text-[#0b7a71]" />
+                        <ShoppingCart className="h-5 w-5 text-slate-700 transition-all duration-300 group-hover:scale-110 group-hover:text-[#d97642]" />
                       </div>
                       {cartCount > 0 && (
-                        <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#0b7a71] text-[10px] font-bold text-white ring-2 ring-[#f7f5ef] shadow-sm">
+                        <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#d97642] text-[10px] font-bold text-white ring-2 ring-[#f7f5ef] shadow-sm">
                           {cartCount}
                         </span>
                       )}
                     </Link>
                     <Link to="/profile" className="hidden lg:block">
                       <div className="rounded-full p-2.5 transition-all duration-300 group hover:bg-white/80">
-                        <User className="h-5 w-5 text-slate-700 transition-all duration-300 group-hover:scale-110 group-hover:text-[#0b7a71]" />
+                        <User className="h-5 w-5 text-slate-700 transition-all duration-300 group-hover:scale-110 group-hover:text-[#d97642]" />
                       </div>
                     </Link>
                   </>
@@ -202,7 +202,7 @@ export default function Header() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-10 rounded-full px-5 text-slate-700 hover:bg-white/80 hover:text-[#0b7a71]"
+                        className="h-10 rounded-full px-5 text-slate-700 hover:bg-white/80 hover:text-[#d97642]"
                       >
                         Login
                       </Button>
@@ -210,7 +210,7 @@ export default function Header() {
                     <Link to="/register">
                       <Button
                         size="sm"
-                        className="h-10 rounded-full bg-[#0b7a71] px-6 text-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:bg-[#095f59]"
+                        className="h-10 rounded-full bg-[#d97642] px-6 text-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:bg-[#c26535]"
                       >
                         Register
                       </Button>
@@ -227,7 +227,7 @@ export default function Header() {
                       handleOpenMenu();
                     }
                   }}
-                  className="rounded-full p-2.5 transition-all duration-300 hover:bg-[#edf7f4] lg:hidden"
+                  className="rounded-full p-2.5 transition-all duration-300 hover:bg-[#fef3ed] lg:hidden"
                   aria-label="Toggle menu"
                 >
                   {mobileMenuOpen ? (
@@ -276,7 +276,7 @@ export default function Header() {
                 <button
                   type="button"
                   onClick={handleCloseMenu}
-                  className="mt-0.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[#cfe2dc] bg-white/90 text-slate-700 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all duration-200 hover:bg-[#edf7f4] hover:text-[#0b7a71]"
+                  className="mt-0.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[#cfe2dc] bg-white/90 text-slate-700 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all duration-200 hover:bg-[#fef3ed] hover:text-[#d97642]"
                   aria-label="Close menu"
                 >
                   <X className="h-5 w-5" />
@@ -356,6 +356,19 @@ export default function Header() {
                   <>
                     <div className="my-4 border-t border-[#d8e6e1] pt-4">
                       <Link
+                        to="/wishlist"
+                        className={getMobileNavClass(location.pathname === "/wishlist")}
+                        onClick={handleCloseMenu}
+                      >
+                        <Heart className="h-5 w-5" />
+                        Wishlist
+                        {wishlistCount > 0 && (
+                          <span className="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                            {wishlistCount}
+                          </span>
+                        )}
+                      </Link>
+                      <Link
                         to="/orders"
                         className={getMobileNavClass(location.pathname.startsWith("/orders"))}
                         onClick={handleCloseMenu}
@@ -389,14 +402,14 @@ export default function Header() {
                     <Link to="/login" onClick={handleCloseMenu}>
                       <Button
                         variant="outline"
-                        className="h-11 w-full justify-start gap-3 rounded-full border-[#0b7a71]/20 text-[#0b7a71] hover:bg-[#edf7f4]"
+                        className="h-11 w-full justify-start gap-3 rounded-full border-[#d97642]/20 text-[#d97642] hover:bg-[#fef3ed]"
                       >
                         <LogIn className="h-5 w-5" />
                         Login
                       </Button>
                     </Link>
                     <Link to="/register" onClick={handleCloseMenu}>
-                      <Button className="h-11 w-full justify-start gap-3 rounded-full bg-[#0b7a71] hover:bg-[#095f59]">
+                      <Button className="h-11 w-full justify-start gap-3 rounded-full bg-[#d97642] hover:bg-[#c26535]">
                         <UserPlus className="h-5 w-5" />
                         Register
                       </Button>

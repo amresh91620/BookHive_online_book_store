@@ -162,7 +162,7 @@ export default function BookCard({ book }) {
 
           {/* Price Section */}
           <div className="flex items-baseline gap-2 mb-3">
-            <span className="text-xl md:text-2xl font-bold text-[#0b7a71]">
+            <span className="text-xl md:text-2xl font-bold text-[#d97642]">
               {formatPrice(book.price)}
             </span>
             {hasDiscount && (
@@ -182,7 +182,7 @@ export default function BookCard({ book }) {
           {/* Add to Cart Button */}
           <Button
             onClick={handleAddToCart}
-            className="w-full h-10 md:h-11 rounded-lg bg-[#0b7a71] hover:bg-[#095f59] text-white font-semibold text-sm md:text-base shadow-sm transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full h-10 md:h-11 rounded-lg bg-[#d97642] hover:bg-[#c26535] text-white font-semibold text-sm md:text-base shadow-sm transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             disabled={isOutOfStock}
           >
             <ShoppingCart className="w-4 h-4" />

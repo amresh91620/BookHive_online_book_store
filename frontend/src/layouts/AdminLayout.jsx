@@ -13,7 +13,8 @@ import {
   Star,
   Mail,
   FileText,
-  MessageSquare
+  MessageSquare,
+  Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -48,6 +49,7 @@ export default function AdminLayout() {
     { path: "/admin/messages", icon: Mail, label: "Messages" },
     { path: "/admin/blogs", icon: FileText, label: "Blogs" },
     { path: "/admin/comments", icon: MessageSquare, label: "Comments" },
+    { path: "/admin/settings", icon: Settings, label: "Settings" },
   ];
 
   const isActive = (path) => {

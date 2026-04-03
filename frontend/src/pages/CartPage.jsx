@@ -45,15 +45,71 @@ export default function CartPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-stone-50 to-white py-12">
         <div className="container-shell">
-          <div className="h-10 w-48 bg-stone-200 rounded-lg mb-8 animate-pulse"></div>
+          {/* Header Skeleton */}
+          <div className="mb-8 animate-fade-in-up">
+            <div className="h-10 w-64 bg-stone-200 rounded-lg mb-2 animate-pulse"></div>
+            <div className="h-5 w-40 bg-stone-200 rounded animate-pulse"></div>
+          </div>
+          
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Cart Items Skeleton */}
             <div className="lg:col-span-2 space-y-4">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-40 bg-white rounded-2xl border-2 border-stone-200 animate-pulse"></div>
+                <div 
+                  key={i} 
+                  className="bg-white rounded-2xl border-2 border-stone-200 p-5 animate-fade-in-up"
+                  style={{ animationDelay: `${i * 100}ms` }}
+                >
+                  <div className="flex gap-5">
+                    {/* Image Skeleton */}
+                    <div className="w-24 h-32 bg-stone-200 rounded-lg animate-pulse shrink-0"></div>
+                    
+                    {/* Content Skeleton */}
+                    <div className="flex-1 space-y-3">
+                      <div className="h-6 w-3/4 bg-stone-200 rounded animate-pulse"></div>
+                      <div className="h-4 w-1/3 bg-stone-200 rounded animate-pulse"></div>
+                      <div className="h-7 w-24 bg-stone-200 rounded animate-pulse"></div>
+                      
+                      <div className="flex items-center gap-4 pt-2">
+                        <div className="h-10 w-32 bg-stone-200 rounded-lg animate-pulse"></div>
+                        <div className="h-5 w-32 bg-stone-200 rounded animate-pulse"></div>
+                        <div className="h-9 w-24 bg-stone-200 rounded-lg animate-pulse ml-auto"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
+            
+            {/* Order Summary Skeleton */}
             <div>
-              <div className="h-80 bg-white rounded-2xl border-2 border-stone-200 animate-pulse"></div>
+              <div 
+                className="bg-white rounded-2xl border-2 border-stone-200 p-6 sticky top-24 animate-fade-in-up"
+                style={{ animationDelay: '200ms' }}
+              >
+                <div className="h-8 w-48 bg-stone-200 rounded-lg mb-6 animate-pulse"></div>
+                
+                <div className="space-y-4 mb-6">
+                  <div className="flex justify-between">
+                    <div className="h-5 w-32 bg-stone-200 rounded animate-pulse"></div>
+                    <div className="h-5 w-20 bg-stone-200 rounded animate-pulse"></div>
+                  </div>
+                  <div className="flex justify-between">
+                    <div className="h-5 w-24 bg-stone-200 rounded animate-pulse"></div>
+                    <div className="h-5 w-16 bg-stone-200 rounded animate-pulse"></div>
+                  </div>
+                  <div className="border-t-2 border-stone-200 pt-4 flex justify-between">
+                    <div className="h-7 w-20 bg-stone-200 rounded animate-pulse"></div>
+                    <div className="h-8 w-28 bg-stone-200 rounded animate-pulse"></div>
+                  </div>
+                </div>
+                
+                <div className="h-12 w-full bg-gradient-to-r from-orange-200 to-amber-200 rounded-lg animate-pulse"></div>
+                
+                <div className="mt-4 text-center">
+                  <div className="h-4 w-40 bg-stone-200 rounded animate-pulse mx-auto"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

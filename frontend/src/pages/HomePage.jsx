@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useBookStats } from "@/hooks/api/useBooks";
+import { useBookStats, useBookCategories } from "@/hooks/api/useBooks";
 import { useBlogsList } from "@/hooks/api/useBlogs";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import BookCard from "@/components/common/BookCard";
@@ -14,6 +14,7 @@ import { ArrowRight, BookOpen, Sparkles, PenLine, Calendar, User, Shield, Truck,
 export default function HomePage() {
   const { user } = useSelector((state) => state.auth);
   const { data: stats, isLoading } = useBookStats();
+  const { data: categories = [], isLoading: categoriesLoading } = useBookCategories();
   const { data: blogsData, isLoading: blogsLoading } = useBlogsList({ limit: 3 });
 
   const featuredBooks = useMemo(() => stats?.featured ?? [], [stats]);
@@ -56,13 +57,49 @@ export default function HomePage() {
     <div className="min-h-screen bg-[linear-gradient(180deg,rgba(255,255,255,0.45),rgba(247,245,239,0.96))]">
       <HeroCarousel />
 
+      {/* Category Marquee */}
+      <div className="bg-white border-y border-gray-200 overflow-hidden shadow-sm">
+        <div className="py-3 whitespace-nowrap animate-marquee">
+          <span className="inline-flex items-center gap-6 font-semibold text-sm">
+            {categoriesLoading ? (
+              // Loading skeleton
+              <>
+                {[...Array(10)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-6">
+                    <div className="h-8 w-24 bg-gray-200 rounded-full animate-pulse" />
+                    <span className="text-gray-300">•</span>
+                  </div>
+                ))}
+              </>
+            ) : (
+              // Actual categories from database (duplicated for continuous scroll)
+              <>
+                {[...categories, ...categories].map((category, index) => (
+                  <div key={index} className="flex items-center gap-6">
+                    <Link 
+                      to={`/books?category=${encodeURIComponent(category)}`} 
+                      className="flex items-center gap-2 px-4 py-1.5 bg-gray-200 text-gray-900 rounded-full hover:bg-gray-300 transition-colors whitespace-nowrap"
+                    >
+                      {category}
+                    </Link>
+                    {index < (categories.length * 2 - 1) && (
+                      <span className="text-gray-300">•</span>
+                    )}
+                  </div>
+                ))}
+              </>
+            )}
+          </span>
+        </div>
+      </div>
+
       {/* Featured Books */}
       {isLoading ? (
-        <section className="relative overflow-hidden bg-white/70 py-16 sm:py-20 lg:py-24">
+        <section className="relative overflow-hidden bg-white/70 ">
           <div className="absolute inset-0 bg-noise opacity-40"></div>
           <div className="container-shell relative">
             <div className="flex items-center gap-3 mb-10 animate-fade-in-up">
-              <Sparkles className="h-6 w-6 animate-pulse text-[#0b7a71]" />
+              <Sparkles className="h-6 w-6 animate-pulse text-[#d97642]" />
               <div className="h-10 w-56 bg-gradient-to-r from-stone-200 to-stone-100 rounded-lg animate-pulse"></div>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
@@ -84,7 +121,7 @@ export default function HomePage() {
             <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4 transition-all duration-700 ${featuredVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <Sparkles className="h-6 w-6 animate-float text-[#0b7a71]" />
+                  <Sparkles className="h-6 w-6 animate-float text-[#d97642]" />
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 tracking-tight">
                     Featured Collection
                   </h2>
@@ -97,7 +134,7 @@ export default function HomePage() {
                 <Button 
                   variant="ghost" 
                   size="lg" 
-                  className="group font-medium text-[#0b7a71] transition-smooth hover:bg-[#edf7f4] hover:text-[#095f59]"
+                  className="group font-medium text-[#d97642] transition-smooth hover:bg-[#fef3ed] hover:text-[#c26535]"
                 >
                   View All
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -160,7 +197,7 @@ export default function HomePage() {
             <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between mb-14 gap-4 transition-all duration-700 ${blogsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               <div className="flex flex-col items-start max-w-2xl">
                 <div className="flex items-center gap-3 mb-3">
-                  <PenLine className="h-6 w-6 animate-float text-[#0b7a71]" />
+                  <PenLine className="h-6 w-6 animate-float text-[#d97642]" />
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 tracking-tight">
                     Literary Journal
                   </h2>
@@ -173,7 +210,7 @@ export default function HomePage() {
                 <Button 
                   variant="ghost" 
                   size="lg" 
-                  className="group font-medium text-[#0b7a71] transition-smooth hover:bg-[#edf7f4] hover:text-[#095f59]"
+                  className="group font-medium text-[#d97642] transition-smooth hover:bg-[#fef3ed] hover:text-[#c26535]"
                 >
                   All Articles
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -206,7 +243,7 @@ export default function HomePage() {
                       </div>
                     )}
                     <CardContent className="p-6">
-                      <h3 className="mb-3 line-clamp-2 text-xl font-bold leading-tight text-stone-900 transition-colors group-hover:text-[#0b7a71]">
+                      <h3 className="mb-3 line-clamp-2 text-xl font-bold leading-tight text-stone-900 transition-colors group-hover:text-[#d97642]">
                         {blog.title}
                       </h3>
                       <p className="text-stone-600 text-sm leading-relaxed mb-5 line-clamp-3 font-light">
@@ -222,7 +259,7 @@ export default function HomePage() {
                           <span>{new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                         </div>
                       </div>
-                      <div className="mt-5 flex items-center text-sm font-semibold text-[#0b7a71] group-hover:text-[#095f59]">
+                      <div className="mt-5 flex items-center text-sm font-semibold text-[#d97642] group-hover:text-[#c26535]">
                         <span>Continue Reading</span>
                         <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
                       </div>
@@ -243,7 +280,7 @@ export default function HomePage() {
             <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4 transition-all duration-700 ${arrivalsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <BookOpen className="h-6 w-6 animate-float text-[#0b7a71]" />
+                  <BookOpen className="h-6 w-6 animate-float text-[#d97642]" />
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-stone-900 tracking-tight">
                     Fresh Arrivals
                   </h2>
@@ -256,7 +293,7 @@ export default function HomePage() {
                 <Button 
                   variant="ghost" 
                   size="lg" 
-                  className="group font-medium text-[#0b7a71] transition-smooth hover:bg-[#edf7f4] hover:text-[#095f59]"
+                  className="group font-medium text-[#d97642] transition-smooth hover:bg-[#fef3ed] hover:text-[#c26535]"
                 >
                   Explore New
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -325,7 +362,7 @@ export default function HomePage() {
                 className={`group transition-all duration-700 ${whyUsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
-                <Card className="h-full border-2 border-gray-100 hover:border-[#0b7a71] transition-all hover:shadow-xl hover:-translate-y-2">
+                <Card className="h-full border-2 border-gray-100 hover:border-[#d97642] transition-all hover:shadow-xl hover:-translate-y-2">
                   <CardContent className="p-6 sm:p-8">
                     <div className={`w-14 h-14 rounded-xl ${feature.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                       <feature.icon className={`w-7 h-7 ${feature.color}`} />
@@ -365,9 +402,9 @@ export default function HomePage() {
                 className={`transition-all duration-700 ${testimonialsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 style={{ transitionDelay: `${index * 150}ms` }}
               >
-                <Card className="h-full border-2 border-gray-100 hover:border-[#0b7a71] transition-all hover:shadow-xl">
+                <Card className="h-full border-2 border-gray-100 hover:border-[#d97642] transition-all hover:shadow-xl hover:-translate-y-2">
                   <CardContent className="p-6 sm:p-8">
-                    <Quote className="w-10 h-10 text-[#0b7a71] opacity-20 mb-4" />
+                    <Quote className="w-10 h-10 text-[#d97642] opacity-20 mb-4" />
                     <div className="flex items-center gap-1 mb-4">
                       {[...Array(testimonial.rating)].map((_, i) => (
                         <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
@@ -377,7 +414,7 @@ export default function HomePage() {
                       "{testimonial.content}"
                     </p>
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0b7a71] to-[#0d8a7f] flex items-center justify-center text-white font-bold">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#d97642] to-[#e08550] flex items-center justify-center text-white font-bold">
                         {testimonial.avatar}
                       </div>
                       <div>

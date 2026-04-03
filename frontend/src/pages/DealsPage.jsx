@@ -114,7 +114,7 @@ export default function DealsPage() {
   return (
     <div className="min-h-screen bg-[#f7f5ef]">
       {/* Hero Banner */}
-      <div className="relative bg-gradient-to-r from-[#0b7a71] via-[#0d8a7f] to-[#0b7a71] overflow-hidden">
+      <div className="relative bg-gradient-to-r bg-[#1a2e44] overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-[#deb05a] rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
@@ -171,7 +171,7 @@ export default function DealsPage() {
                 placeholder="Search deals..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-11 sm:h-12 pl-10 sm:pl-12 pr-4 rounded-full border-gray-300 bg-gray-50 text-sm sm:text-base focus:bg-white focus:border-[#0b7a71] focus:ring-[#0b7a71]/20"
+                className="h-11 sm:h-12 pl-10 sm:pl-12 pr-4 rounded-full border-gray-300 bg-gray-50 text-sm sm:text-base focus:bg-white focus:border-[#d97642] focus:ring-[#d97642]/20"
               />
             </div>
 
@@ -179,7 +179,7 @@ export default function DealsPage() {
               onClick={() => setShowMobileFilters(!showMobileFilters)}
               className="flex items-center gap-2 px-4 sm:px-5 h-11 sm:h-12 rounded-full border border-gray-300 bg-white hover:bg-gray-50 transition-colors whitespace-nowrap"
             >
-              <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-[#0b7a71]" />
+              <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-[#d97642]" />
               <span className="text-sm sm:text-base font-medium">Filters</span>
             </button>
           </div>
@@ -200,7 +200,7 @@ export default function DealsPage() {
               className={cn(
                 "px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all",
                 category === ""
-                  ? "bg-[#0b7a71] text-white shadow-md"
+                  ? "bg-[#d97642] text-white shadow-md"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               )}
             >
@@ -213,7 +213,7 @@ export default function DealsPage() {
                 className={cn(
                   "px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all",
                   category === cat
-                    ? "bg-[#0b7a71] text-white shadow-md"
+                    ? "bg-[#d97642] text-white shadow-md"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 )}
               >
@@ -265,7 +265,7 @@ export default function DealsPage() {
                           setDiscountRange([newMin, discountRange[1]]);
                         }
                       }}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b7a71]"
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#d97642]"
                     />
                     <input
                       type="range"
@@ -279,7 +279,7 @@ export default function DealsPage() {
                           setDiscountRange([discountRange[0], newMax]);
                         }
                       }}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b7a71]"
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#d97642]"
                     />
                   </div>
                 </div>
@@ -304,7 +304,7 @@ export default function DealsPage() {
                           value={option.value}
                           checked={sortBy === option.value}
                           onChange={(e) => setSortBy(e.target.value)}
-                          className="w-4 h-4 text-[#0b7a71] focus:ring-[#0b7a71]"
+                          className="w-4 h-4 text-[#d97642] focus:ring-[#d97642]"
                         />
                         <span className="text-sm text-gray-700">{option.label}</span>
                       </label>
@@ -368,7 +368,7 @@ export default function DealsPage() {
                             setDiscountRange([newMin, discountRange[1]]);
                           }
                         }}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b7a71]"
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#d97642]"
                       />
                       <input
                         type="range"
@@ -382,7 +382,7 @@ export default function DealsPage() {
                             setDiscountRange([discountRange[0], newMax]);
                           }
                         }}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b7a71]"
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#d97642]"
                       />
                     </div>
                   </div>
@@ -407,7 +407,7 @@ export default function DealsPage() {
                             value={option.value}
                             checked={sortBy === option.value}
                             onChange={(e) => setSortBy(e.target.value)}
-                            className="w-4 h-4 text-[#0b7a71] focus:ring-[#0b7a71]"
+                            className="w-4 h-4 text-[#d97642] focus:ring-[#d97642]"
                           />
                           <span className="text-sm text-gray-700">{option.label}</span>
                         </label>
@@ -417,7 +417,7 @@ export default function DealsPage() {
 
                   <Button
                     onClick={() => setShowMobileFilters(false)}
-                    className="w-full h-12 rounded-full bg-[#0b7a71] text-white hover:bg-[#095f59]"
+                    className="w-full h-12 rounded-full bg-[#d97642] text-white hover:bg-[#c26535]"
                   >
                     Apply Filters
                   </Button>
@@ -504,7 +504,7 @@ export default function DealsPage() {
                 {hasActiveFilters && (
                   <Button
                     onClick={handleClearFilters}
-                    className="rounded-full bg-[#0b7a71] text-white hover:bg-[#095f59]"
+                    className="rounded-full bg-[#d97642] text-white hover:bg-[#c26535]"
                   >
                     Clear Filters
                   </Button>
