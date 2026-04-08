@@ -63,6 +63,13 @@ export default function CheckoutPage() {
     }
   }, [addresses, selectedAddress]);
 
+  // Auto-select ONLINE payment if COD is disabled
+  useEffect(() => {
+    if (settings && !settings.codEnabled && paymentMethod === "COD") {
+      setPaymentMethod("ONLINE");
+    }
+  }, [settings, paymentMethod]);
+
   // Load Razorpay script
   useEffect(() => {
     const script = document.createElement("script");
@@ -397,6 +404,7 @@ export default function CheckoutPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
+                  {/* Online Payment - Always Available */}
                   <div
                     className={`p-4 border-2 rounded-lg cursor-pointer transition ${
                       paymentMethod === "ONLINE"
@@ -414,22 +422,37 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  <div
-                    className={`p-4 border-2 rounded-lg cursor-pointer transition ${
-                      paymentMethod === "COD"
-                        ? "border-[#d97642] bg-orange-50"
-                        : "border-gray-200 hover:border-gray-400"
-                    }`}
-                    onClick={() => setPaymentMethod("COD")}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Wallet className="w-6 h-6 text-[#d97642]" />
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-900">Cash on Delivery</p>
-                        <p className="text-sm text-gray-600">Pay when you receive</p>
+                  {/* COD - Only if enabled in settings */}
+                  {settings?.codEnabled && (
+                    <div
+                      className={`p-4 border-2 rounded-lg cursor-pointer transition ${
+                        paymentMethod === "COD"
+                          ? "border-[#d97642] bg-orange-50"
+                          : "border-gray-200 hover:border-gray-400"
+                      }`}
+                      onClick={() => setPaymentMethod("COD")}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Wallet className="w-6 h-6 text-[#d97642]" />
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-900">Cash on Delivery</p>
+                          <p className="text-sm text-gray-600">Pay when you receive</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
+                  
+                  {!settings?.codEnabled && (
+                    <div className="p-4 border-2 border-gray-200 rounded-lg bg-gray-50 opacity-60">
+                      <div className="flex items-center gap-3">
+                        <Wallet className="w-6 h-6 text-gray-400" />
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-500">Cash on Delivery</p>
+                          <p className="text-sm text-gray-500">Currently unavailable</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -474,10 +497,10 @@ export default function CheckoutPage() {
           </div>
 
           {/* Order Summary */}
-          <div>
+          <div className="lg:sticky lg:top-20">
             <Card
               ref={summaryRef}
-              className={`sticky top-20 transition-all duration-700 ${
+              className={`transition-all duration-700 ${
                 summaryVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
               style={{ transitionDelay: '300ms' }}

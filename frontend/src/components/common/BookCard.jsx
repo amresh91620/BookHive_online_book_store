@@ -84,11 +84,13 @@ export default function BookCard({ book }) {
           <button
             type="button"
             onClick={handleWishlistToggle}
-            aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+            aria-label={isInWishlist ? `Remove ${book.title} from wishlist` : `Add ${book.title} to wishlist`}
+            aria-pressed={isInWishlist}
             className="absolute left-2 top-2 z-20 rounded-full bg-white/95 backdrop-blur-sm p-2 shadow-lg transition-all hover:scale-110 hover:bg-white"
           >
             <Heart
               className={`h-4 w-4 transition-all ${isInWishlist ? "fill-red-500 text-red-500" : "text-gray-600 hover:text-red-500"}`}
+              aria-hidden="true"
             />
           </button>
 
@@ -182,10 +184,11 @@ export default function BookCard({ book }) {
           {/* Add to Cart Button */}
           <Button
             onClick={handleAddToCart}
+            aria-label={isOutOfStock ? `${book.title} is out of stock` : `Add ${book.title} to cart`}
             className="w-full h-10 md:h-11 rounded-lg bg-[#d97642] hover:bg-[#c26535] text-white font-semibold text-sm md:text-base shadow-sm transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             disabled={isOutOfStock}
           >
-            <ShoppingCart className="w-4 h-4" />
+            <ShoppingCart className="w-4 h-4" aria-hidden="true" />
             {isOutOfStock ? "Out of Stock" : "Add to Cart"}
           </Button>
         </div>

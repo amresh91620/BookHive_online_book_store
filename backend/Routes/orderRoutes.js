@@ -6,6 +6,7 @@ const {
   getMyOrders,
   getOrderById,
   cancelOrder,
+  cancelOrderItem,
   createRazorpayOrder,
   verifyRazorpayPayment,
 } = require("../controller/orderController");
@@ -17,6 +18,7 @@ router.post("/", createOrder);
 router.get("/", getMyOrders);
 router.get("/:id", getOrderById);
 router.post("/:id/cancel", cancelOrder);
+router.post("/:id/items/:itemId/cancel", cancelOrderItem);
 
 // Razorpay routes
 router.post("/razorpay/create", createRazorpayOrder);

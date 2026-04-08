@@ -12,6 +12,7 @@ const {
   getOrderByIdAdmin,
   updateOrderStatus,
   updatePaymentStatus,
+  cancelOrderItemAdmin,
 } = require("../controller/adminController");
 const { getAllReviews, deleteUserReview } = require("../controller/reviewController");
 const { getAllMessages, deleteMessage } = require("../controller/contactController");
@@ -33,6 +34,7 @@ router.get("/orders", getAllOrders);
 router.get("/orders/:id", getOrderByIdAdmin);
 router.put("/orders/:id/status", updateOrderStatus);
 router.put("/orders/:id/payment", updatePaymentStatus);
+router.post("/orders/:id/items/:itemId/cancel", cancelOrderItemAdmin);
 
 // Review management
 router.get("/reviews", getAllReviews);

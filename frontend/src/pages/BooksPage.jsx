@@ -139,10 +139,15 @@ export default function BooksPage() {
             {/* Filters Button */}
             <button
               onClick={() => setShowMobileFilters(!showMobileFilters)}
+              aria-label="Toggle filters"
+              aria-expanded={showMobileFilters}
               className="flex items-center gap-2 px-4 sm:px-5 h-11 sm:h-12 rounded-full border border-gray-300 bg-white hover:bg-gray-50 transition-colors whitespace-nowrap"
             >
               <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-[#d97642]" />
               <span className="text-sm sm:text-base font-medium">Filters</span>
+              {hasActiveFilters && (
+                <span className="flex h-2 w-2 rounded-full bg-[#d97642]" aria-label={`${Object.keys(params).length} active filters`} />
+              )}
             </button>
           </div>
         </div>
@@ -159,6 +164,8 @@ export default function BooksPage() {
             `}</style>
             <button
               onClick={() => handleCategoryChange("")}
+              aria-label="Show all categories"
+              aria-pressed={category === ""}
               className={cn(
                 "px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all",
                 category === ""
@@ -172,6 +179,8 @@ export default function BooksPage() {
               <button
                 key={cat}
                 onClick={() => handleCategoryChange(cat)}
+                aria-label={`Filter by ${cat} category`}
+                aria-pressed={category === cat}
                 className={cn(
                   "px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all",
                   category === cat
@@ -312,7 +321,10 @@ export default function BooksPage() {
               >
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-bold text-gray-900">Filters</h3>
-                  <button onClick={() => setShowMobileFilters(false)}>
+                  <button 
+                    onClick={() => setShowMobileFilters(false)}
+                    aria-label="Close filters"
+                  >
                     <X className="h-6 w-6 text-gray-600" />
                   </button>
                 </div>

@@ -5,14 +5,20 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Eye } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
+import { Search, Eye, Download } from "lucide-react";
 import { formatPrice, shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
+const ITEMS_PER_PAGE = 20;
+
 export default function AdminOrdersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedOrders, setSelectedOrders] = useState([]);
+  
   const { data: ordersData, isLoading } = useAdminOrders();
   const updateOrderStatus = useUpdateAdminOrderStatus();
 
@@ -48,14 +54,157 @@ export default function AdminOrdersPage() {
     return matchesSearch && matchesStatus;
   });
 
+  // Pagination
+  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedOrders = filteredOrders.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Bulk actions
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedOrders(paginatedOrders.map(o => o._id));
+    } else {
+      setSelectedOrders([]);
+    }
+  };
+
+  const handleSelectOrder = (orderId) => {
+    setSelectedOrders(prev => 
+      prev.includes(orderId) 
+        ? prev.filter(id => id !== orderId)
+        : [...prev, orderId]
+    );
+  };
+
+  const handleBulkStatusUpdate = async (newStatus) => {
+    if (selectedOrders.length === 0) {
+      toast.error("Please select orders first");
+      return;
+    }
+    
+    if (!window.confirm(`Update ${selectedOrders.length} orders to ${newStatus}?`)) {
+      return;
+    }
+
+    try {
+      // Update orders one by one with proper error handling
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const orderId of selectedOrders) {
+        try {
+          await updateOrderStatus.mutateAsync({ orderId, status: newStatus });
+          successCount++;
+        } catch (error) {
+          failCount++;
+          console.error(`Failed to update order ${orderId}:`, error);
+        }
+      }
+
+      if (successCount > 0) {
+        toast.success(`${successCount} order(s) updated successfully`);
+      }
+      if (failCount > 0) {
+        toast.error(`${failCount} order(s) failed to update`);
+      }
+      
+      setSelectedOrders([]);
+    } catch (error) {
+      toast.error("Failed to update orders");
+    }
+  };
+
+  // Export to CSV
+  const handleExport = () => {
+    if (filteredOrders.length === 0) {
+      toast.error("No orders to export");
+      return;
+    }
+
+    try {
+      const csvData = filteredOrders.map(order => ({
+        OrderNumber: order.orderNumber || "",
+        Customer: order.user?.name || "Guest",
+        Email: order.user?.email || "",
+        Date: new Date(order.createdAt).toLocaleDateString(),
+        Status: order.status || "",
+        PaymentStatus: order.paymentStatus || "",
+        PaymentMethod: order.paymentMethod || "",
+        Total: order.total || 0,
+        Items: order.items?.length || 0
+      }));
+
+      const headers = Object.keys(csvData[0]).join(",");
+      const rows = csvData.map(row => Object.values(row).join(","));
+      const csv = [headers, ...rows].join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `orders-${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      toast.success(`${filteredOrders.length} orders exported successfully`);
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("Failed to export orders");
+    }
+  };
+
   const statuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent mb-8 animate-fade-in-up">
-        Manage Orders
-      </h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-fade-in-up">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent">
+            Manage Orders
+          </h1>
+          <p className="text-stone-600 mt-2">Total: {filteredOrders.length} orders</p>
+        </div>
+        <Button 
+          onClick={handleExport}
+          variant="outline"
+          className="border-2 border-green-600 text-green-700 hover:bg-green-50"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Export CSV
+        </Button>
+      </div>
+
+        {/* Bulk Actions */}
+        {selectedOrders.length > 0 && (
+          <Card className="mb-6 p-4 border-2 border-amber-300 bg-amber-50/50">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="font-semibold text-stone-900">
+                {selectedOrders.length} selected
+              </span>
+              <div className="flex gap-2 flex-wrap">
+                {statuses.map(status => (
+                  <Button
+                    key={status}
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleBulkStatusUpdate(status)}
+                    className="border-2"
+                  >
+                    Set {status}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Filters */}
         <div className="mb-6 flex flex-col md:flex-row gap-4 animate-slide-in-right stagger-1">
@@ -95,6 +244,18 @@ export default function AdminOrdersPage() {
         {/* Orders Table/Cards */}
         {isLoading ? (
           <LoadingSkeleton type="table" count={1} />
+        ) : filteredOrders.length === 0 ? (
+          <Card className="p-12 text-center border-2 border-stone-200 bg-gradient-to-br from-stone-50 to-amber-50/30">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-stone-100 mb-4">
+              <Search className="w-10 h-10 text-stone-400" />
+            </div>
+            <p className="text-stone-500 font-medium text-lg mb-2">No orders found</p>
+            <p className="text-stone-400 text-sm">
+              {searchQuery || filterStatus !== "all" 
+                ? "Try adjusting your search or filters" 
+                : "Orders will appear here once customers place them"}
+            </p>
+          </Card>
         ) : (
           <>
             {/* Desktop Table */}
@@ -103,6 +264,14 @@ export default function AdminOrdersPage() {
               <table className="w-full">
                 <thead className="bg-gradient-to-r from-stone-50 to-amber-50/50 border-b-2 border-stone-200">
                   <tr>
+                    <th className="px-4 py-4 text-left">
+                      <input
+                        type="checkbox"
+                        checked={selectedOrders.length === paginatedOrders.length && paginatedOrders.length > 0}
+                        onChange={handleSelectAll}
+                        className="w-4 h-4 rounded border-stone-300"
+                      />
+                    </th>
                     <th className="px-4 sm:px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">
                       Order
                     </th>
@@ -127,11 +296,19 @@ export default function AdminOrdersPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
-                  {filteredOrders.map((order) => (
+                  {paginatedOrders.map((order) => (
                     <tr 
                       key={order._id} 
                       className="hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-stone-50 transition-all duration-200"
                     >
+                      <td className="px-4 py-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedOrders.includes(order._id)}
+                          onChange={() => handleSelectOrder(order._id)}
+                          className="w-4 h-4 rounded border-stone-300"
+                        />
+                      </td>
                       <td className="px-4 sm:px-6 py-4">
                         <div className="font-semibold text-stone-900">#{order.orderNumber}</div>
                         <div className="text-sm text-stone-500">{order.items.length} items</div>
@@ -208,7 +385,7 @@ export default function AdminOrdersPage() {
 
           {/* Mobile Cards */}
           <div className="md:hidden space-y-4 animate-scale-up stagger-2">
-            {filteredOrders.map((order) => (
+            {paginatedOrders.map((order) => (
               <Card key={order._id} className="p-4 border-2 border-stone-200 shadow-lg bg-white/80 backdrop-blur-sm">
                 <div className="flex justify-between items-start mb-3">
                   <div>
@@ -258,6 +435,17 @@ export default function AdminOrdersPage() {
             ))}
           </div>
         </>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-6 animate-fade-in-up">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
         )}
     </div>
   );

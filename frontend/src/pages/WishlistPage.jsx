@@ -48,23 +48,25 @@ export default function WishlistPage() {
               >
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                   {/* Image Skeleton */}
-                  <div className="w-full sm:w-32 h-48 sm:h-44 bg-gray-200 rounded-lg animate-pulse flex-shrink-0"></div>
+                  <div className="w-40 h-56 sm:w-32 sm:h-44 bg-gray-200 rounded-lg animate-pulse flex-shrink-0 mx-auto sm:mx-0 shadow-md"></div>
                   
                   {/* Content Skeleton */}
                   <div className="flex-1 space-y-3">
                     <div className="h-7 w-3/4 bg-gray-200 rounded animate-pulse"></div>
                     <div className="h-5 w-1/3 bg-gray-200 rounded animate-pulse"></div>
-                    <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
-                    <div className="h-4 w-5/6 bg-gray-200 rounded animate-pulse"></div>
                     
-                    <div className="flex items-center gap-3 pt-2">
-                      <div className="h-8 w-28 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="flex flex-wrap gap-2 mb-4">
                       <div className="h-6 w-20 bg-gray-200 rounded-full animate-pulse"></div>
+                      <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
                     </div>
                     
-                    <div className="flex flex-wrap gap-3 pt-2">
-                      <div className="h-10 w-32 bg-amber-200 rounded-lg animate-pulse"></div>
-                      <div className="h-10 w-28 bg-gray-200 rounded-lg animate-pulse"></div>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+                      <div className="h-8 w-28 bg-gray-200 rounded animate-pulse"></div>
+                      
+                      <div className="flex gap-2">
+                        <div className="h-10 flex-1 sm:w-32 bg-amber-200 rounded-lg animate-pulse"></div>
+                        <div className="h-10 w-28 bg-gray-200 rounded-lg animate-pulse"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -116,12 +118,12 @@ export default function WishlistPage() {
             >
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                 {/* Book Image */}
-                <Link to={`/books/${book._id}`} className="flex-shrink-0">
+                <Link to={`/books/${book._id}`} className="flex-shrink-0 mx-auto sm:mx-0">
                   <img
                     src={book.coverImage}
                     alt={book.title}
                     loading="lazy"
-                    className="w-full sm:w-32 h-48 sm:h-44 object-cover rounded-lg"
+                    className="w-40 h-56 sm:w-32 sm:h-44 object-cover rounded-lg shadow-md"
                   />
                 </Link>
 
@@ -171,16 +173,18 @@ export default function WishlistPage() {
                         className="flex-1 sm:flex-none bg-[#F59E0B] hover:bg-[#D97706]"
                         onClick={() => handleAddToCart(book._id)}
                         disabled={book.stock === 0}
+                        aria-label={book.stock === 0 ? "Out of stock" : `Add ${book.title} to cart`}
                       >
-                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        <ShoppingCart className="w-4 h-4 mr-2" aria-hidden="true" />
                         {book.stock === 0 ? "Out of Stock" : "Add to Cart"}
                       </Button>
                       <Button
                         variant="outline"
                         className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
                         onClick={() => handleRemove(book._id)}
+                        aria-label={`Remove ${book.title} from wishlist`}
                       >
-                        <Trash2 className="w-4 h-4 mr-2" />
+                        <Trash2 className="w-4 h-4 mr-2" aria-hidden="true" />
                         Remove
                       </Button>
                     </div>

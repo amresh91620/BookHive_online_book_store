@@ -12,8 +12,15 @@ const orderItemSchema = new mongoose.Schema(
     coverImage: String,
     price: Number,
     quantity: Number,
+    status: {
+      type: String,
+      enum: ["active", "cancelled"],
+      default: "active",
+    },
+    cancelledAt: Date,
+    cancellationReason: String,
   },
-  { _id: false }
+  { _id: true }
 );
 
 const addressSchema = new mongoose.Schema(

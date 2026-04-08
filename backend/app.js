@@ -14,6 +14,7 @@ const blogRouter = require("./Routes/blogRoutes");
 const blogCommentRouter = require("./Routes/blogCommentRoutes");
 const settingsRouter = require("./Routes/settingsRoutes");
 const contactRouter = require("./Routes/contactRoutes");
+const activityLogRouter = require("./Routes/activityLogRoutes");
 
 const defaultOrigins = [
   "http://localhost:5173",
@@ -90,5 +91,6 @@ app.use("/api/blogs", blogRouter);
 app.use("/api/blog-comments", blogCommentRouter);
 app.use("/api/settings", settingsRouter);
 app.use("/api/contact", contactRouter);
+app.use("/api/activity-logs", activityLogRouter);
 
 module.exports = app;

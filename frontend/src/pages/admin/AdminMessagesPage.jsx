@@ -5,13 +5,18 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Pagination } from "@/components/ui/pagination";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { Search, Trash2, Mail, User, Phone } from "lucide-react";
+import { Search, Trash2, Mail, User, Phone, Download } from "lucide-react";
 import { shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
 
+const ITEMS_PER_PAGE = 20;
+
 export default function AdminMessagesPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedMessages, setSelectedMessages] = useState([]);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, messageId: null });
   const [viewDialog, setViewDialog] = useState({ open: false, message: null });
   
@@ -42,15 +47,116 @@ export default function AdminMessagesPage() {
     return matchesSearch;
   }) : [];
 
+  // Pagination
+  const totalPages = Math.ceil(filteredMessages.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedMessages = filteredMessages.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Bulk delete
+  const handleBulkDelete = async () => {
+    if (selectedMessages.length === 0) {
+      toast.error("Please select messages first");
+      return;
+    }
+    
+    if (!window.confirm(`Delete ${selectedMessages.length} messages?`)) {
+      return;
+    }
+
+    try {
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const messageId of selectedMessages) {
+        try {
+          await deleteMessage.mutateAsync(messageId);
+          successCount++;
+        } catch (error) {
+          failCount++;
+          console.error(`Failed to delete message ${messageId}:`, error);
+        }
+      }
+
+      if (successCount > 0) {
+        toast.success(`${successCount} message(s) deleted successfully`);
+      }
+      if (failCount > 0) {
+        toast.error(`${failCount} message(s) failed to delete`);
+      }
+      
+      setSelectedMessages([]);
+    } catch (error) {
+      toast.error("Failed to delete messages");
+    }
+  };
+
+  // Export to CSV
+  const handleExport = () => {
+    const csvData = filteredMessages.map(message => ({
+      Name: message.name,
+      Email: message.email,
+      Phone: message.phone || "",
+      Subject: message.subject,
+      Message: message.message?.replace(/,/g, ";") || "",
+      Date: new Date(message.createdAt).toLocaleDateString()
+    }));
+
+    const headers = Object.keys(csvData[0]).join(",");
+    const rows = csvData.map(row => Object.values(row).map(v => `"${v}"`).join(","));
+    const csv = [headers, ...rows].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `messages-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    toast.success("Messages exported successfully");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <div className="mb-8 animate-fade-in-up">
-        <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent">
-          Contact Messages
-        </h1>
-        <p className="text-stone-600 mt-2 font-semibold">Total: {Array.isArray(messages) ? messages.length : 0} messages</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-fade-in-up">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent">
+            Contact Messages
+          </h1>
+          <p className="text-stone-600 mt-2 font-semibold">Total: {filteredMessages.length} messages</p>
+        </div>
+        <Button 
+          onClick={handleExport}
+          variant="outline"
+          className="border-2 border-green-600 text-green-700 hover:bg-green-50"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Export CSV
+        </Button>
       </div>
+
+      {/* Bulk Actions */}
+      {selectedMessages.length > 0 && (
+        <Card className="mb-6 p-4 border-2 border-red-300 bg-red-50/50">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="font-semibold text-stone-900">
+              {selectedMessages.length} selected
+            </span>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={handleBulkDelete}
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              Delete All
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* Search */}
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 mb-6 border-2 border-stone-200 animate-slide-in-right stagger-1">
@@ -76,30 +182,45 @@ export default function AdminMessagesPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 gap-4">
-          {filteredMessages.map((message) => (
+          {paginatedMessages.map((message) => (
             <Card 
               key={message._id} 
               className="p-4 sm:p-6 hover:shadow-xl transition-all duration-300 border-2 border-stone-200 hover:border-amber-300 bg-white/80 backdrop-blur-sm"
             >
               <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  {/* Header */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg shadow-md">
-                      <Mail className="w-5 h-5 text-amber-700" />
+                <div className="flex items-start gap-3 flex-1">
+                  {/* Checkbox */}
+                  <input
+                    type="checkbox"
+                    checked={selectedMessages.includes(message._id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedMessages(prev => [...prev, message._id]);
+                      } else {
+                        setSelectedMessages(prev => prev.filter(id => id !== message._id));
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-stone-300 mt-1"
+                  />
+                  
+                  <div className="flex-1">
+                    {/* Header */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg shadow-md">
+                        <Mail className="w-5 h-5 text-amber-700" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-stone-900 truncate">
+                          {message.subject}
+                        </h3>
+                        <p className="text-sm text-stone-500">
+                          {shortDate(message.createdAt)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-stone-900 truncate">
-                        {message.subject}
-                      </h3>
-                      <p className="text-sm text-stone-500">
-                        {shortDate(message.createdAt)}
-                      </p>
-                    </div>
-                  </div>
 
-                  {/* Contact Info */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                    {/* Contact Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                     <div className="flex items-center gap-2">
                       <User className="w-4 h-4 text-stone-400 flex-shrink-0" />
                       <span className="text-sm text-stone-700 font-medium truncate">{message.name}</span>
@@ -141,10 +262,22 @@ export default function AdminMessagesPage() {
                       Delete
                     </Button>
                   </div>
+                  </div>
                 </div>
               </div>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 animate-fade-in-up">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       )}
 

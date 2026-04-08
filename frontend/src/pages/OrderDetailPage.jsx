@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useOrderById, useCancelOrder } from "@/hooks/api/useOrders";
+import { useOrderById, useCancelOrder, useCancelOrderItem } from "@/hooks/api/useOrders";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Package, MapPin, CreditCard } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { ArrowLeft, Package, MapPin, CreditCard, X } from "lucide-react";
 import { formatPrice, shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -16,8 +17,11 @@ export default function OrderDetailPage() {
   const navigate = useNavigate();
   const { data: order, isLoading } = useOrderById(id);
   const cancelOrder = useCancelOrder();
+  const cancelOrderItem = useCancelOrderItem();
   const [showCancelForm, setShowCancelForm] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  const [cancelItemDialog, setCancelItemDialog] = useState({ open: false, itemId: null, itemTitle: "" });
+  const [itemCancelReason, setItemCancelReason] = useState("");
   
   const [headerRef, headerVisible] = useScrollAnimation();
   const [itemsRef, itemsVisible] = useScrollAnimation();
@@ -39,6 +43,25 @@ export default function OrderDetailPage() {
           setCancelReason("");
         },
         onError: (error) => toast.error(error?.response?.data?.msg || "Failed to cancel order"),
+      }
+    );
+  };
+
+  const handleCancelItem = async () => {
+    if (!itemCancelReason.trim()) {
+      toast.error("Please provide a reason for cancellation");
+      return;
+    }
+
+    cancelOrderItem.mutate(
+      { orderId: id, itemId: cancelItemDialog.itemId, reason: itemCancelReason },
+      {
+        onSuccess: (data) => {
+          toast.success(data?.msg || "Item cancelled successfully");
+          setCancelItemDialog({ open: false, itemId: null, itemTitle: "" });
+          setItemCancelReason("");
+        },
+        onError: (error) => toast.error(error?.response?.data?.msg || "Failed to cancel item"),
       }
     );
   };
@@ -196,27 +219,55 @@ export default function OrderDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {order.items.map((item, index) => (
-                    <div key={index} className="flex gap-4 pb-4 border-b last:border-0">
-                      <img
-                        src={item.coverImage}
-                        alt={item.title}
-                        className="w-20 h-28 object-cover rounded"
-                      />
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900">{item.title}</h4>
-                        <p className="text-sm text-gray-600">{item.author}</p>
-                        <p className="text-sm text-gray-900 mt-2">
-                          Qty: {item.quantity} × {formatPrice(item.price)}
-                        </p>
+                  {order.items.map((item, index) => {
+                    const itemId = item._id || index;
+                    return (
+                      <div key={itemId} className="flex gap-4 pb-4 border-b last:border-0">
+                        <img
+                          src={item.coverImage}
+                          alt={item.title}
+                          className="w-20 h-28 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900">{item.title}</h4>
+                              <p className="text-sm text-gray-600">{item.author}</p>
+                              <p className="text-sm text-gray-900 mt-2">
+                                Qty: {item.quantity} × {formatPrice(item.price)}
+                              </p>
+                              {item.status === "cancelled" && (
+                                <Badge variant="destructive" className="mt-2">
+                                  Cancelled
+                                </Badge>
+                              )}
+                              {item.cancellationReason && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Reason: {item.cancellationReason}
+                                </p>
+                              )}
+                            </div>
+                            <div className="text-right">
+                              <p className={`font-semibold ${item.status === "cancelled" ? "text-gray-400 line-through" : "text-gray-900"}`}>
+                                {formatPrice(item.price * item.quantity)}
+                              </p>
+                              {item.status !== "cancelled" && (order.status === "Pending" || order.status === "Processing") && item._id && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="mt-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={() => setCancelItemDialog({ open: true, itemId: item._id, itemTitle: item.title })}
+                                >
+                                  <X className="w-4 h-4 mr-1" />
+                                  Cancel Item
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-900">
-                          {formatPrice(item.price * item.quantity)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -403,6 +454,53 @@ export default function OrderDetailPage() {
             )}
           </div>
         </div>
+
+        {/* Cancel Item Dialog */}
+        <Dialog open={cancelItemDialog.open} onOpenChange={(open) => !open && setCancelItemDialog({ open: false, itemId: null, itemTitle: "" })}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cancel Item</DialogTitle>
+              <p className="text-sm text-gray-600 mt-2">
+                Are you sure you want to cancel <span className="font-semibold">{cancelItemDialog.itemTitle}</span>? 
+                {order?.items?.filter(i => i.status !== "cancelled").length === 1 && (
+                  <span className="text-amber-600"> This is the last active item, cancelling it will cancel the entire order.</span>
+                )}
+              </p>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Reason for cancellation
+                </label>
+                <Textarea
+                  value={itemCancelReason}
+                  onChange={(e) => setItemCancelReason(e.target.value)}
+                  placeholder="Please tell us why you're cancelling this item..."
+                  rows={3}
+                  maxLength={200}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setCancelItemDialog({ open: false, itemId: null, itemTitle: "" });
+                  setItemCancelReason("");
+                }}
+              >
+                Keep Item
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleCancelItem}
+                disabled={cancelOrderItem.isLoading}
+              >
+                {cancelOrderItem.isLoading ? "Cancelling..." : "Cancel Item"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

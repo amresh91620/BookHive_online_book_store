@@ -5,6 +5,7 @@ const Order = require("../models/Order");
 const Contact = require("../models/Contact");
 const Razorpay = require("razorpay");
 const sendRefundEmail = require("../utils/sendRefundEmail");
+const { createLog } = require("./activityLogController");
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
@@ -159,6 +160,15 @@ exports.deleteUser = async (req, res) => {
 
         await User.findByIdAndDelete(userId);
 
+        // Log activity
+        await createLog(
+            req.user.id,
+            "user_deleted",
+            `User ${user.name} (${user.email}) was deleted`,
+            { deletedUserId: userId, deletedUserEmail: user.email },
+            req
+        );
+
         res.json({ msg: "User and all their reviews deleted successfully" });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -212,6 +222,15 @@ exports.toggleUserBlock = async (req, res) => {
         if (!user) {
             return res.status(404).json({ msg: "User not found" });
         }
+
+        // Log activity
+        await createLog(
+            req.user.id,
+            isBlocked ? "user_blocked" : "user_unblocked",
+            `User ${user.name} (${user.email}) was ${isBlocked ? "blocked" : "unblocked"}`,
+            { targetUserId: userId, targetUserEmail: user.email },
+            req
+        );
 
         res.json({ msg: "User status updated", user });
     } catch (error) {
@@ -495,6 +514,15 @@ exports.updateOrderStatus = async (req, res) => {
 
         await order.save();
 
+        // Log activity
+        await createLog(
+            req.user.id,
+            order.status === "Cancelled" ? "order_cancelled" : "order_updated",
+            `Order #${order.orderNumber} status changed from ${prevStatus} to ${order.status}`,
+            { orderId: order._id, orderNumber: order.orderNumber, oldStatus: prevStatus, newStatus: order.status },
+            req
+        );
+
         res.json({ msg: "Order updated", order });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -544,6 +572,217 @@ exports.updatePaymentStatus = async (req, res) => {
         res.json({ msg: "Payment status updated", order });
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+};
+
+// Cancel individual item in order (Admin)
+exports.cancelOrderItemAdmin = async (req, res) => {
+    try {
+        const { itemId } = req.params;
+        const { reason } = req.body || {};
+        
+        const order = await Order.findById(req.params.id);
+        
+        if (!order) {
+            return res.status(404).json({ msg: "Order not found" });
+        }
+
+        if (order.status === "Delivered") {
+            return res.status(400).json({ msg: "Cannot cancel items from delivered orders" });
+        }
+
+        if (order.status === "Cancelled") {
+            return res.status(400).json({ msg: "Order is already cancelled" });
+        }
+
+        const item = order.items.id(itemId);
+        if (!item) {
+            return res.status(404).json({ msg: "Item not found in order" });
+        }
+
+        if (item.status === "cancelled") {
+            return res.status(400).json({ msg: "Item already cancelled" });
+        }
+
+        // Mark item as cancelled
+        item.status = "cancelled";
+        item.cancelledAt = new Date();
+        item.cancellationReason = reason || "Cancelled by admin";
+
+        // Add to status history
+        order.statusHistory = [
+            ...(order.statusHistory || []),
+            {
+                status: "Item Cancelled",
+                at: new Date(),
+                by: "admin",
+                note: `Item "${item.title}" cancelled by admin. ${reason || ""}`,
+            },
+        ];
+
+        // Restore stock for cancelled item
+        await Book.findByIdAndUpdate(item.book, {
+            $inc: { stock: item.quantity, totalSales: -item.quantity },
+        });
+
+        // Calculate refund amount for this item
+        const itemRefundAmount = item.price * item.quantity;
+        
+        // Recalculate order totals
+        const activeItems = order.items.filter(i => i.status === "active");
+        
+        if (activeItems.length === 0) {
+            // All items cancelled, cancel entire order
+            order.status = "Cancelled";
+            order.cancelledAt = new Date();
+            order.cancellationReason = "All items cancelled by admin";
+            
+            // Process full refund
+            if (order.paymentStatus === "paid" && order.paymentMethod === "ONLINE") {
+                try {
+                    const paymentNote = order.paymentHistory?.find(h => h.note?.includes("Razorpay Payment ID:"));
+                    const paymentId = paymentNote?.note?.split("Razorpay Payment ID: ")[1]?.trim();
+                    
+                    if (paymentId) {
+                        const refund = await razorpay.payments.refund(paymentId, {
+                            amount: order.total * 100,
+                            speed: "normal",
+                            notes: {
+                                order_id: order.orderNumber,
+                                reason: "All items cancelled by admin",
+                            },
+                        });
+                        
+                        order.paymentStatus = "refunded";
+                        order.paymentHistory = [
+                            ...(order.paymentHistory || []),
+                            {
+                                status: "refunded",
+                                at: new Date(),
+                                by: "admin",
+                                note: `Full refund - Razorpay Refund ID: ${refund.id}`,
+                            },
+                        ];
+                    }
+                } catch (refundError) {
+                    console.error("Razorpay refund error:", refundError);
+                }
+            }
+        } else {
+            // Partial cancellation - process partial refund
+            const Settings = require("../models/Settings");
+            const settings = await Settings.getSettings();
+            
+            const newSubtotal = activeItems.reduce(
+                (sum, i) => sum + i.price * i.quantity,
+                0
+            );
+            
+            const newTax = settings.taxEnabled ? Math.ceil(newSubtotal * settings.taxRate) : 0;
+            const newShipping = settings.deliveryEnabled && newSubtotal < settings.freeDeliveryThreshold 
+                ? settings.deliveryCharge 
+                : 0;
+            const newTotal = newSubtotal + newShipping + newTax;
+            
+            const refundAmount = order.total - newTotal;
+            
+            // Update order totals
+            order.subtotal = newSubtotal;
+            order.tax = newTax;
+            order.shipping = newShipping;
+            order.total = newTotal;
+            
+            // Process partial refund for online payments
+            if (order.paymentStatus === "paid" && order.paymentMethod === "ONLINE" && refundAmount > 0) {
+                try {
+                    const paymentNote = order.paymentHistory?.find(h => h.note?.includes("Razorpay Payment ID:"));
+                    const paymentId = paymentNote?.note?.split("Razorpay Payment ID: ")[1]?.trim();
+                    
+                    if (paymentId) {
+                        const refund = await razorpay.payments.refund(paymentId, {
+                            amount: Math.round(refundAmount * 100),
+                            speed: "normal",
+                            notes: {
+                                order_id: order.orderNumber,
+                                item_title: item.title,
+                                reason: reason || "Item cancelled by admin",
+                            },
+                        });
+                        
+                        order.paymentHistory = [
+                            ...(order.paymentHistory || []),
+                            {
+                                status: "partial_refund",
+                                at: new Date(),
+                                by: "admin",
+                                note: `Partial refund ₹${refundAmount} for "${item.title}" - Razorpay Refund ID: ${refund.id}`,
+                            },
+                        ];
+                    }
+                } catch (refundError) {
+                    console.error("Razorpay partial refund error:", refundError);
+                    order.paymentHistory = [
+                        ...(order.paymentHistory || []),
+                        {
+                            status: "partial_refund",
+                            at: new Date(),
+                            by: "admin",
+                            note: `Partial refund ₹${refundAmount} pending - Manual processing required`,
+                        },
+                    ];
+                }
+            }
+        }
+
+        await order.save();
+
+        // Send email notification
+        try {
+            const user = await User.findById(order.user);
+            if (user && user.email) {
+                if (activeItems.length === 0) {
+                    // Full order cancelled - send full refund email
+                    const refundNote = order.paymentHistory?.find(h => h.note?.includes("Razorpay Refund ID:"));
+                    const refundId = refundNote?.note?.split("Razorpay Refund ID: ")[1]?.split(" - ")[0]?.trim();
+
+                    await sendRefundEmail({
+                        email: user.email,
+                        userName: user.name || "Customer",
+                        orderNumber: order.orderNumber,
+                        refundAmount: order.total,
+                        refundId: refundId || null,
+                        cancelledBy: "admin",
+                        cancellationReason: "All items cancelled by admin",
+                        paymentMethod: order.paymentMethod,
+                    });
+                } else if (refundAmount > 0) {
+                    // Partial refund - send notification about item cancellation
+                    const refundNote = order.paymentHistory?.find(h => h.note?.includes(`Partial refund ₹${refundAmount}`));
+                    const refundId = refundNote?.note?.split("Razorpay Refund ID: ")[1]?.trim();
+                    
+                    await sendRefundEmail({
+                        email: user.email,
+                        userName: user.name || "Customer",
+                        orderNumber: order.orderNumber,
+                        refundAmount: refundAmount,
+                        refundId: refundId || null,
+                        cancelledBy: "admin",
+                        cancellationReason: `Item "${item.title}" cancelled by admin. ${reason || ""}`,
+                        paymentMethod: order.paymentMethod,
+                    });
+                }
+            }
+        } catch (emailError) {
+            console.error("Failed to send email:", emailError);
+        }
+
+        res.json({ 
+            msg: activeItems.length === 0 ? "All items cancelled, order cancelled" : "Item cancelled successfully", 
+            order 
+        });
+    } catch (error) {
+        console.error("Cancel order item error:", error);
+        res.status(500).json({ msg: "Failed to cancel item" });
     }
 };
 

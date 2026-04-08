@@ -316,6 +316,12 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ msg: "Invalid payment method" });
     }
 
+    // Check if COD is enabled in settings
+    const settings = await Settings.getSettings();
+    if (normalizedMethod === "COD" && !settings.codEnabled) {
+      return res.status(400).json({ msg: "Cash on Delivery is currently not available. Please use online payment." });
+    }
+
     const cart = await Cart.findOne({ user: req.user.id }).populate(
       "items.book"
     );
@@ -358,10 +364,7 @@ exports.createOrder = async (req, res) => {
       0
     );
     
-    // Get settings for tax and delivery calculation
-    const settings = await Settings.getSettings();
-    
-    // Calculate tax
+    // Calculate tax (using settings already fetched above)
     const tax = settings.taxEnabled ? Math.round(subtotal * settings.taxRate) : 0;
     
     // Calculate delivery charge
@@ -506,6 +509,13 @@ exports.cancelOrder = async (req, res) => {
       },
     ];
     
+    // Mark all items as cancelled
+    order.items.forEach(item => {
+      item.status = "cancelled";
+      item.cancelledAt = new Date();
+      item.cancellationReason = reason || "Order cancelled";
+    });
+    
     // Process refund for online payments
     if (order.paymentStatus === "paid" && order.paymentMethod === "ONLINE") {
       try {
@@ -611,5 +621,216 @@ exports.cancelOrder = async (req, res) => {
   } catch (error) {
     console.error("Cancel order error:", error);
     res.status(500).json({ msg: "Failed to cancel order" });
+  }
+};
+
+// Cancel individual item in order
+exports.cancelOrderItem = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { reason } = req.body || {};
+    
+    const order = await Order.findOne({
+      _id: req.params.id,
+      user: req.user.id,
+    });
+    
+    if (!order) {
+      return res.status(404).json({ msg: "Order not found" });
+    }
+
+    if (!CANCEL_ALLOWED_STATUSES.includes(order.status)) {
+      return res
+        .status(400)
+        .json({ msg: "Order items cannot be cancelled at this stage" });
+    }
+
+    const item = order.items.id(itemId);
+    if (!item) {
+      return res.status(404).json({ msg: "Item not found in order" });
+    }
+
+    if (item.status === "cancelled") {
+      return res.status(400).json({ msg: "Item already cancelled" });
+    }
+
+    // Mark item as cancelled
+    item.status = "cancelled";
+    item.cancelledAt = new Date();
+    item.cancellationReason = reason || "Cancelled by user";
+
+    // Add to status history
+    order.statusHistory = [
+      ...(order.statusHistory || []),
+      {
+        status: "Item Cancelled",
+        at: new Date(),
+        by: "user",
+        note: `Item "${item.title}" cancelled. ${reason || ""}`,
+      },
+    ];
+
+    // Restore stock for cancelled item
+    await Book.findByIdAndUpdate(item.book, {
+      $inc: { stock: item.quantity, totalSales: -item.quantity },
+    });
+
+    // Calculate refund amount for this item
+    const itemRefundAmount = item.price * item.quantity;
+    
+    // Recalculate order totals
+    const activeItems = order.items.filter(i => i.status === "active");
+    
+    if (activeItems.length === 0) {
+      // All items cancelled, cancel entire order
+      order.status = "Cancelled";
+      order.cancelledAt = new Date();
+      order.cancellationReason = "All items cancelled";
+      
+      // Process full refund
+      if (order.paymentStatus === "paid" && order.paymentMethod === "ONLINE") {
+        try {
+          const paymentNote = order.paymentHistory?.find(h => h.note?.includes("Razorpay Payment ID:"));
+          const paymentId = paymentNote?.note?.split("Razorpay Payment ID: ")[1]?.trim();
+          
+          if (paymentId) {
+            const refund = await razorpay.payments.refund(paymentId, {
+              amount: order.total * 100,
+              speed: "normal",
+              notes: {
+                order_id: order.orderNumber,
+                reason: "All items cancelled",
+              },
+            });
+            
+            order.paymentStatus = "refunded";
+            order.paymentHistory = [
+              ...(order.paymentHistory || []),
+              {
+                status: "refunded",
+                at: new Date(),
+                by: "system",
+                note: `Full refund - Razorpay Refund ID: ${refund.id}`,
+              },
+            ];
+          }
+        } catch (refundError) {
+          console.error("Razorpay refund error:", refundError);
+        }
+      }
+    } else {
+      // Partial cancellation - process partial refund
+      const newSubtotal = activeItems.reduce(
+        (sum, i) => sum + i.price * i.quantity,
+        0
+      );
+      
+      // Get settings for recalculation
+      const settings = await Settings.getSettings();
+      const newTax = settings.taxEnabled ? Math.ceil(newSubtotal * settings.taxRate) : 0;
+      const newShipping = settings.deliveryEnabled && newSubtotal < settings.freeDeliveryThreshold 
+        ? settings.deliveryCharge 
+        : 0;
+      const newTotal = newSubtotal + newShipping + newTax;
+      
+      const refundAmount = order.total - newTotal;
+      
+      // Update order totals
+      order.subtotal = newSubtotal;
+      order.tax = newTax;
+      order.shipping = newShipping;
+      order.total = newTotal;
+      
+      // Process partial refund for online payments
+      if (order.paymentStatus === "paid" && order.paymentMethod === "ONLINE" && refundAmount > 0) {
+        try {
+          const paymentNote = order.paymentHistory?.find(h => h.note?.includes("Razorpay Payment ID:"));
+          const paymentId = paymentNote?.note?.split("Razorpay Payment ID: ")[1]?.trim();
+          
+          if (paymentId) {
+            const refund = await razorpay.payments.refund(paymentId, {
+              amount: Math.round(refundAmount * 100),
+              speed: "normal",
+              notes: {
+                order_id: order.orderNumber,
+                item_title: item.title,
+                reason: reason || "Item cancelled",
+              },
+            });
+            
+            order.paymentHistory = [
+              ...(order.paymentHistory || []),
+              {
+                status: "partial_refund",
+                at: new Date(),
+                by: "system",
+                note: `Partial refund ₹${refundAmount} for "${item.title}" - Razorpay Refund ID: ${refund.id}`,
+              },
+            ];
+          }
+        } catch (refundError) {
+          console.error("Razorpay partial refund error:", refundError);
+          order.paymentHistory = [
+            ...(order.paymentHistory || []),
+            {
+              status: "partial_refund",
+              at: new Date(),
+              by: "system",
+              note: `Partial refund ₹${refundAmount} pending - Manual processing required`,
+            },
+          ];
+        }
+      }
+    }
+
+    await order.save();
+
+    // Send email notification
+    try {
+      const user = await User.findById(req.user.id);
+      if (user && user.email) {
+        if (activeItems.length === 0) {
+          // Full order cancelled - send full refund email
+          const refundNote = order.paymentHistory?.find(h => h.note?.includes("Razorpay Refund ID:"));
+          const refundId = refundNote?.note?.split("Razorpay Refund ID: ")[1]?.split(" - ")[0]?.trim();
+
+          await sendRefundEmail({
+            email: user.email,
+            userName: user.name || "Customer",
+            orderNumber: order.orderNumber,
+            refundAmount: order.total,
+            refundId: refundId || null,
+            cancelledBy: "user",
+            cancellationReason: "All items cancelled",
+            paymentMethod: order.paymentMethod,
+          });
+        } else if (refundAmount > 0) {
+          // Partial refund - send notification about item cancellation
+          const refundNote = order.paymentHistory?.find(h => h.note?.includes(`Partial refund ₹${refundAmount}`));
+          const refundId = refundNote?.note?.split("Razorpay Refund ID: ")[1]?.trim();
+          
+          await sendRefundEmail({
+            email: user.email,
+            userName: user.name || "Customer",
+            orderNumber: order.orderNumber,
+            refundAmount: refundAmount,
+            refundId: refundId || null,
+            cancelledBy: "user",
+            cancellationReason: `Item "${item.title}" cancelled. ${reason || ""}`,
+            paymentMethod: order.paymentMethod,
+          });
+        }
+      }
+    } catch (emailError) {
+      console.error("Failed to send email:", emailError);
+    }
+
+    res.json({ 
+      msg: activeItems.length === 0 ? "All items cancelled, order cancelled" : "Item cancelled successfully", 
+      order 
+    });
+  } catch (error) {
+    console.error("Cancel order item error:", error);
+    res.status(500).json({ msg: "Failed to cancel item" });
   }
 };

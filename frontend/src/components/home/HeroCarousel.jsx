@@ -12,7 +12,7 @@ export default function HeroCarousel() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  const featuredBooks = stats?.featured?.slice(0, 2) || []; 
+  const featuredBooks = stats?.featured?.slice(0, 3) || []; 
   const trendingBooks = stats?.featured?.slice(0, 4) || []; // Showing 4 books at bottom
 
   const categories = ["New Arrival", "Best Trend", "Upcoming", "Top Rated"];
@@ -33,19 +33,19 @@ export default function HeroCarousel() {
             
             {/* Left - Book Stack Skeleton */}
             <div className="hidden lg:flex relative items-center justify-center h-full">
-              <div className="relative w-full max-w-[340px] h-[400px]">
-                {[0, 1].map((index) => (
+              <div className="relative w-full max-w-[400px] h-[400px]">
+                {[0, 1, 2].map((index) => (
                   <div
                     key={index}
                     className="absolute rounded-2xl overflow-hidden shadow-2xl animate-pulse"
                     style={{
                       width: "240px",
                       height: "320px",
-                      left: `${index * 50}px`,
+                      left: `${index * 40}px`,
                       top: "45%",
                       marginTop: "-160px",
-                      transform: `rotate(${index === 0 ? -7 : 5}deg)`,
-                      zIndex: 20 - index,
+                      transform: `rotate(${index === 0 ? -10 : index === 1 ? 0 : 8}deg)`,
+                      zIndex: 30 - index,
                       animationDelay: `${index * 200}ms`
                     }}
                   >
@@ -108,19 +108,19 @@ export default function HeroCarousel() {
           
           {/* Left - Hero Book Stack (Hidden on Mobile) */}
           <div className="hidden lg:flex relative items-center justify-center h-full">
-            <div className="relative w-full max-w-[340px] h-[400px]" style={{ perspective: "1500px" }}>
+            <div className="relative w-full max-w-[400px] h-[400px]" style={{ perspective: "1500px" }}>
               {featuredBooks.map((book, index) => (
                 <Link
                   key={index}
                   to={`/books/${book?._id}`}
                   className="absolute transition-all duration-500 hover:scale-105 hover:-translate-y-3 group"
                   style={{
-                    zIndex: 20 - index,
+                    zIndex: 30 - index,
                     width: "240px",
-                    left: `${index * 50}px`,
+                    left: `${index * 40}px`,
                     top: "45%",
                     marginTop: "-160px",
-                    transform: `rotate(${index === 0 ? -7 : 5}deg) rotateY(${index === 0 ? -15 : 15}deg)`,
+                    transform: `rotate(${index === 0 ? -10 : index === 1 ? 0 : 8}deg) rotateY(${index === 0 ? -15 : index === 1 ? 0 : 15}deg)`,
                     transformStyle: "preserve-3d",
                   }}
                 >

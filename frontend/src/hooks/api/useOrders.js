@@ -57,3 +57,17 @@ export const useCancelOrder = () => {
     },
   });
 };
+
+export const useCancelOrderItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ orderId, itemId, reason }) => {
+      const { data } = await api.post(`/api/orders/${orderId}/items/${itemId}/cancel`, { reason });
+      return data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders", variables.orderId] });
+    },
+  });
+};

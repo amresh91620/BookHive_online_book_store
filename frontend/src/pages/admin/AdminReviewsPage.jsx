@@ -6,14 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Pagination } from "@/components/ui/pagination";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { Search, Trash2, Star, BookOpen } from "lucide-react";
+import { Search, Trash2, Star, BookOpen, Download } from "lucide-react";
 import { shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
+
+const ITEMS_PER_PAGE = 20;
 
 export default function AdminReviewsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [ratingFilter, setRatingFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedReviews, setSelectedReviews] = useState([]);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, reviewId: null });
   
   const { data: reviewsData, isLoading } = useAdminReviews();
@@ -44,6 +49,78 @@ export default function AdminReviewsPage() {
     return matchesSearch && matchesRating;
   }) : [];
 
+  // Pagination
+  const totalPages = Math.ceil(filteredReviews.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedReviews = filteredReviews.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Bulk delete
+  const handleBulkDelete = async () => {
+    if (selectedReviews.length === 0) {
+      toast.error("Please select reviews first");
+      return;
+    }
+    
+    if (!window.confirm(`Delete ${selectedReviews.length} reviews?`)) {
+      return;
+    }
+
+    try {
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const reviewId of selectedReviews) {
+        try {
+          await deleteReview.mutateAsync(reviewId);
+          successCount++;
+        } catch (error) {
+          failCount++;
+          console.error(`Failed to delete review ${reviewId}:`, error);
+        }
+      }
+
+      if (successCount > 0) {
+        toast.success(`${successCount} review(s) deleted successfully`);
+      }
+      if (failCount > 0) {
+        toast.error(`${failCount} review(s) failed to delete`);
+      }
+      
+      setSelectedReviews([]);
+    } catch (error) {
+      toast.error("Failed to delete reviews");
+    }
+  };
+
+  // Export to CSV
+  const handleExport = () => {
+    const csvData = filteredReviews.map(review => ({
+      User: review.user?.name || "Anonymous",
+      Email: review.user?.email || "",
+      Book: review.book?.title || "",
+      Rating: review.rating,
+      Comment: review.comment?.replace(/,/g, ";") || "",
+      Date: new Date(review.createdAt).toLocaleDateString()
+    }));
+
+    const headers = Object.keys(csvData[0]).join(",");
+    const rows = csvData.map(row => Object.values(row).map(v => `"${v}"`).join(","));
+    const csv = [headers, ...rows].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `reviews-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    toast.success("Reviews exported successfully");
+  };
+
   const renderStars = (rating) => {
     return (
       <div className="flex gap-1">
@@ -62,12 +139,41 @@ export default function AdminReviewsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <div className="mb-8 animate-fade-in-up">
-        <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent">
-          Manage Reviews
-        </h1>
-        <p className="text-stone-600 mt-2 font-semibold">Total: {Array.isArray(reviews) ? reviews.length : 0} reviews</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-fade-in-up">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent">
+            Manage Reviews
+          </h1>
+          <p className="text-stone-600 mt-2 font-semibold">Total: {filteredReviews.length} reviews</p>
+        </div>
+        <Button 
+          onClick={handleExport}
+          variant="outline"
+          className="border-2 border-green-600 text-green-700 hover:bg-green-50"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Export CSV
+        </Button>
       </div>
+
+      {/* Bulk Actions */}
+      {selectedReviews.length > 0 && (
+        <Card className="mb-6 p-4 border-2 border-red-300 bg-red-50/50">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="font-semibold text-stone-900">
+              {selectedReviews.length} selected
+            </span>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={handleBulkDelete}
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              Delete All
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* Filters */}
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 mb-6 border-2 border-stone-200 animate-slide-in-right stagger-1">
@@ -119,13 +225,27 @@ export default function AdminReviewsPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {filteredReviews.map((review) => (
+          {paginatedReviews.map((review) => (
             <Card 
               key={review._id} 
               className="p-4 sm:p-6 border-2 border-stone-200 hover:border-amber-300 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
+                  {/* Checkbox */}
+                  <input
+                    type="checkbox"
+                    checked={selectedReviews.includes(review._id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedReviews(prev => [...prev, review._id]);
+                      } else {
+                        setSelectedReviews(prev => prev.filter(id => id !== review._id));
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-stone-300 mt-1"
+                  />
+                  
                   {/* User Info */}
                   <Avatar className="shadow-md">
                     <AvatarFallback className="bg-gradient-to-br from-amber-100 to-amber-200 text-amber-700 font-bold text-lg">
@@ -216,6 +336,17 @@ export default function AdminReviewsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 animate-fade-in-up">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

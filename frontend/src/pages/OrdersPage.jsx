@@ -243,11 +243,11 @@ export default function OrdersPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Cancel Order</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 mt-2">
                 Are you sure you want to cancel this order? This action cannot be undone.
               </p>
+            </DialogHeader>
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">
                   Reason for cancellation (optional)

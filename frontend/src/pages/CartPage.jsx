@@ -3,10 +3,12 @@ import { useCart, useRemoveFromCart, useUpdateCartQuantity } from "@/hooks/api/u
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, Info } from "lucide-react";
 import { formatPrice } from "@/utils/format";
 import toast from "react-hot-toast";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { useQuery } from "@tanstack/react-query";
+import api from "@/services/api";
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -18,6 +20,16 @@ export default function CartPage() {
   
   const [headerRef, headerVisible] = useScrollAnimation();
   const [summaryRef, summaryVisible] = useScrollAnimation();
+
+  // Fetch settings from API
+  const { data: settings, isLoading: settingsLoading } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data } = await api.get("/api/settings");
+      return data;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   const handleRemove = (itemId) => {
     removeFromCart.mutate(itemId, {
@@ -38,8 +50,15 @@ export default function CartPage() {
   };
 
   const subtotal = items.reduce((sum, item) => sum + (item.book?.price || 0) * item.quantity, 0);
-  const shipping = 0;
-  const total = subtotal + shipping;
+  
+  // Use settings from API with proper defaults
+  const taxRate = settings?.taxEnabled && settings?.taxRate ? settings.taxRate : 0;
+  const freeDeliveryThreshold = settings?.freeDeliveryThreshold || 500;
+  const deliveryCharge = settings?.deliveryEnabled && settings?.deliveryCharge ? settings.deliveryCharge : 0;
+  
+  const tax = settings?.taxEnabled ? Math.ceil(subtotal * taxRate) : 0;
+  const shipping = subtotal >= freeDeliveryThreshold ? 0 : deliveryCharge;
+  const total = subtotal + shipping + tax;
 
   if (isLoading) {
     return (
@@ -194,18 +213,20 @@ export default function CartPage() {
                         <button
                           onClick={() => handleUpdateQuantity(item._id, item.quantity, -1)}
                           disabled={item.quantity <= 1}
+                          aria-label={`Decrease quantity of ${item.book?.title}`}
                           className="p-2.5 hover:bg-stone-100 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <Minus className="w-4 h-4 text-stone-700" />
+                          <Minus className="w-4 h-4 text-stone-700" aria-hidden="true" />
                         </button>
-                        <span className="px-4 py-2 font-semibold text-stone-900 min-w-[3rem] text-center">
+                        <span className="px-4 py-2 font-semibold text-stone-900 min-w-[3rem] text-center" aria-label={`Quantity: ${item.quantity}`}>
                           {item.quantity}
                         </span>
                         <button
                           onClick={() => handleUpdateQuantity(item._id, item.quantity, 1)}
+                          aria-label={`Increase quantity of ${item.book?.title}`}
                           className="p-2.5 hover:bg-stone-100 transition-smooth"
                         >
-                          <Plus className="w-4 h-4 text-stone-700" />
+                          <Plus className="w-4 h-4 text-stone-700" aria-hidden="true" />
                         </button>
                       </div>
 
@@ -217,9 +238,10 @@ export default function CartPage() {
                       {/* Remove Button */}
                       <button
                         onClick={() => handleRemove(item._id)}
+                        aria-label={`Remove ${item.book?.title} from cart`}
                         className="ml-auto text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-2 rounded-lg flex items-center gap-2 transition-smooth font-medium"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" aria-hidden="true" />
                         <span className="hidden sm:inline">Remove</span>
                       </button>
                     </div>
@@ -245,12 +267,32 @@ export default function CartPage() {
                   <span className="font-light">Subtotal ({items.length} {items.length === 1 ? 'item' : 'items'})</span>
                   <span className="font-semibold">{formatPrice(subtotal)}</span>
                 </div>
+                
+                {settings?.taxEnabled && (
+                  <div className="flex justify-between text-stone-700">
+                    <span className="font-light">
+                      {settings?.taxName || 'Tax'} ({(taxRate * 100).toFixed(2)}%)
+                    </span>
+                    <span className="font-semibold">{formatPrice(tax)}</span>
+                  </div>
+                )}
+                
                 <div className="flex justify-between text-stone-700">
                   <span className="font-light">Shipping</span>
                   <span className="font-semibold text-green-600">
                     {shipping === 0 ? "Free" : formatPrice(shipping)}
                   </span>
                 </div>
+                
+                {subtotal > 0 && subtotal < freeDeliveryThreshold && settings?.deliveryEnabled && (
+                  <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-blue-700">
+                      Add {formatPrice(freeDeliveryThreshold - subtotal)} more to get free delivery!
+                    </p>
+                  </div>
+                )}
+                
                 <div className="border-t-2 border-stone-200 pt-4 flex justify-between items-center">
                   <span className="text-xl font-bold text-stone-900">Total</span>
                   <span className="text-2xl font-bold text-amber-700">
