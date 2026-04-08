@@ -176,7 +176,7 @@ export default function AdminBookFormPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
         <Button
           variant="ghost"

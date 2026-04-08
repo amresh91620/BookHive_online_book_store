@@ -36,7 +36,6 @@ import {
 } from "lucide-react";
 import { formatPrice, shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -699,34 +698,169 @@ export default function BookDetailPage() {
   );
 }
 
-// Skeleton Loader Component
+// ─── Skeleton Loader — mirrors the real page layout px-for-px ───────────────
 function BookDetailSkeleton() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Image Skeleton */}
-          <div className="space-y-4">
-            <Skeleton className="aspect-[3/4] rounded-2xl" />
-            <div className="flex gap-3">
+    <div className="min-h-screen bg-[linear-gradient(180deg,rgba(255,255,255,0.45),rgba(247,245,239,0.96))]">
+      <div className="container-shell py-8 sm:py-12">
+
+        {/* ── 5-col main grid ─────────────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-6">
+
+          {/* Left – image column (2 cols) */}
+          <div className="lg:col-span-2 flex flex-col items-center lg:items-start gap-4">
+
+            {/* 3-D book skeleton */}
+            <div className="relative w-full max-w-sm">
+              {/* Ground shadow */}
+              <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-[80%] h-6 skeleton-wave rounded-full blur-xl opacity-50" />
+              <div className="relative mx-auto w-full">
+                <div
+                  className="relative aspect-[3/4] rounded-sm overflow-hidden skeleton-wave"
+                  style={{
+                    transform: 'perspective(1200px) rotateY(-15deg)',
+                    boxShadow: '14px 14px 38px rgba(0,0,0,0.15), -5px 0 14px rgba(0,0,0,0.08)',
+                  }}
+                >
+                  <div className="skeleton-overlay" />
+                  {/* Spine shadow */}
+                  <div className="absolute left-0 top-0 h-full w-5 bg-gradient-to-r from-black/15 via-black/05 to-transparent" />
+                  {/* Edge highlight */}
+                  <div className="absolute right-0 top-0 h-full w-2 bg-gradient-to-l from-white/30 to-transparent" />
+
+                  {/* Badge placeholder (discount) */}
+                  <div className="absolute top-4 left-4 h-7 w-20 skeleton-wave-orange rounded-full" />
+                  {/* Wishlist & share icon placeholders */}
+                  <div className="absolute top-4 right-4 w-11 h-11 rounded-full skeleton-wave" />
+                  <div className="absolute top-[4.5rem] right-4 w-11 h-11 rounded-full skeleton-wave" />
+                </div>
+                {/* Pages effect */}
+                <div className="absolute -right-1 sm:-right-2 top-2 h-[calc(100%-16px)] w-2 sm:w-3 rounded-r-sm bg-[#f5f0ea] shadow" />
+                <div className="absolute -right-2 sm:-right-4 top-4 h-[calc(100%-32px)] w-2 sm:w-3 rounded-r-sm bg-[#ede8e0] shadow" />
+                <div className="absolute -right-3 sm:-right-6 top-6 h-[calc(100%-48px)] w-2 sm:w-3 rounded-r-sm bg-[#e5dfd6]" />
+              </div>
+            </div>
+
+            {/* Thumbnails row */}
+            <div className="flex gap-3 w-full max-w-sm">
               {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="w-20 h-20 rounded-lg" />
+                <div key={i} className="w-20 h-20 skeleton-wave rounded-lg flex-shrink-0" />
               ))}
             </div>
           </div>
-          {/* Details Skeleton */}
-          <div className="space-y-6">
-            <Skeleton className="h-12 w-3/4" />
-            <Skeleton className="h-6 w-1/2" />
-            <Skeleton className="h-8 w-1/3" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-5/6" />
-            <div className="flex gap-4">
-              <Skeleton className="h-12 flex-1 rounded-xl" />
-              <Skeleton className="h-12 flex-1 rounded-xl" />
+
+          {/* Right – details column (3 cols) */}
+          <div className="lg:col-span-3 space-y-5">
+            {/* Bestseller badge */}
+            <div className="h-6 w-28 skeleton-wave-orange rounded-full" />
+
+            {/* Title */}
+            <div className="space-y-2">
+              <div className="h-10 skeleton-wave rounded w-5/6" />
+              <div className="h-10 skeleton-wave rounded w-3/4" />
+            </div>
+
+            {/* Author */}
+            <div className="h-5 skeleton-wave rounded w-2/5" />
+
+            {/* Stars */}
+            <div className="flex items-center gap-1.5">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="w-5 h-5 skeleton-wave rounded" />
+              ))}
+              <div className="h-4 skeleton-wave rounded w-8 ml-1" />
+              <div className="h-4 skeleton-wave rounded w-20 ml-1" />
+            </div>
+
+            {/* Price row */}
+            <div className="flex items-baseline gap-3">
+              <div className="h-10 w-32 skeleton-wave-orange rounded" />
+              <div className="h-6 w-20 skeleton-wave rounded" />
+              <div className="h-6 w-24 skeleton-wave rounded-full" />
+            </div>
+
+            {/* Stock indicator */}
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-green-300 animate-pulse" />
+              <div className="h-4 skeleton-wave rounded w-36" />
+            </div>
+
+            {/* Stock bar */}
+            <div className="w-full h-1.5 skeleton-wave rounded-full" />
+
+            {/* Delivery */}
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 skeleton-wave rounded" />
+              <div className="h-4 skeleton-wave rounded w-52" />
+            </div>
+
+            {/* Quantity selector */}
+            <div className="flex items-center gap-4">
+              <div className="h-5 skeleton-wave rounded w-20" />
+              <div className="h-10 w-32 skeleton-wave rounded-full" />
+            </div>
+
+            {/* CTA buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <div className="flex-1 h-14 skeleton-wave-orange rounded-xl" />
+              <div className="flex-1 h-14 skeleton-wave rounded-xl" />
+            </div>
+
+            {/* Trust badges row */}
+            <div className="pt-4 border-t border-[#f3dccc] grid grid-cols-3 gap-2">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="text-center space-y-1.5 p-2">
+                  <div className="w-7 h-7 skeleton-wave rounded-full mx-auto" />
+                  <div className="h-3 skeleton-wave rounded w-3/4 mx-auto" />
+                </div>
+              ))}
             </div>
           </div>
         </div>
+
+        {/* ── Info section ──────────────────────────────────────── */}
+        <div className="mt-14 pt-8 border-t border-[#f3dccc]">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* About section */}
+            <div className="md:col-span-2 space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 skeleton-wave-orange rounded" />
+                <div className="h-7 skeleton-wave rounded w-40" />
+              </div>
+              <div className="space-y-2">
+                {['100%', '83%', '80%', '83%', '75%'].map((w, i) => (
+                  <div key={i} className="h-4 skeleton-wave rounded" style={{ width: w }} />
+                ))}
+              </div>
+            </div>
+            {/* Details column */}
+            <div className="space-y-4">
+              <div className="h-7 skeleton-wave rounded w-24" />
+              <div className="space-y-3">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="w-5 h-5 skeleton-wave rounded" />
+                    <div className="h-4 skeleton-wave rounded flex-1" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* About Author */}
+          <div className="mt-10 pt-8 border-t border-[#f3dccc]">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-6 h-6 skeleton-wave-orange rounded" />
+              <div className="h-7 skeleton-wave rounded w-44" />
+            </div>
+            <div className="bg-[#faf6f1] rounded-2xl p-6 space-y-2">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-4 skeleton-wave rounded" style={{ width: `${95 - i * 8}%` }} />
+              ))}
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );

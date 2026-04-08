@@ -64,69 +64,68 @@ export default function CartPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-stone-50 to-white py-12">
         <div className="container-shell">
-          {/* Header Skeleton */}
-          <div className="mb-8 animate-fade-in-up">
-            <div className="h-10 w-64 bg-stone-200 rounded-lg mb-2 animate-pulse"></div>
-            <div className="h-5 w-40 bg-stone-200 rounded animate-pulse"></div>
+          {/* Header */}
+          <div className="mb-8">
+            <div className="h-10 w-56 skeleton-wave rounded-xl mb-2" />
+            <div className="h-5 w-36 skeleton-wave rounded" />
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items Skeleton */}
+            {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {[...Array(3)].map((_, i) => (
-                <div 
-                  key={i} 
-                  className="bg-white rounded-2xl border-2 border-stone-200 p-5 animate-fade-in-up"
-                  style={{ animationDelay: `${i * 100}ms` }}
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl border-2 border-[#f0e4d6] p-5"
+                  style={{ animationDelay: `${i * 100}ms`, boxShadow: '0 4px 16px rgba(217,118,66,0.05)' }}
                 >
                   <div className="flex gap-5">
-                    {/* Image Skeleton */}
-                    <div className="w-24 h-32 bg-stone-200 rounded-lg animate-pulse shrink-0"></div>
-                    
-                    {/* Content Skeleton */}
+                    {/* 3D Book image skeleton */}
+                    <div
+                      className="w-24 h-32 skeleton-wave rounded-lg shrink-0 overflow-hidden relative"
+                      style={{ transform: 'perspective(600px) rotateY(-6deg)', boxShadow: '5px 5px 16px rgba(0,0,0,0.1)' }}
+                    >
+                      <div className="skeleton-overlay rounded-lg" />
+                    </div>
                     <div className="flex-1 space-y-3">
-                      <div className="h-6 w-3/4 bg-stone-200 rounded animate-pulse"></div>
-                      <div className="h-4 w-1/3 bg-stone-200 rounded animate-pulse"></div>
-                      <div className="h-7 w-24 bg-stone-200 rounded animate-pulse"></div>
-                      
+                      <div className="h-6 skeleton-wave rounded w-3/4" />
+                      <div className="h-4 skeleton-wave rounded w-1/3" />
+                      <div className="h-7 w-24 skeleton-wave-orange rounded" />
                       <div className="flex items-center gap-4 pt-2">
-                        <div className="h-10 w-32 bg-stone-200 rounded-lg animate-pulse"></div>
-                        <div className="h-5 w-32 bg-stone-200 rounded animate-pulse"></div>
-                        <div className="h-9 w-24 bg-stone-200 rounded-lg animate-pulse ml-auto"></div>
+                        <div className="h-10 w-32 skeleton-wave rounded-lg" />
+                        <div className="h-5 w-32 skeleton-wave rounded" />
+                        <div className="h-9 w-24 skeleton-wave rounded-lg ml-auto" />
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            
-            {/* Order Summary Skeleton */}
+
+            {/* Order Summary */}
             <div>
-              <div 
-                className="bg-white rounded-2xl border-2 border-stone-200 p-6 sticky top-24 animate-fade-in-up"
-                style={{ animationDelay: '200ms' }}
+              <div
+                className="bg-white rounded-2xl border-2 border-[#f0e4d6] p-6 sticky top-24"
+                style={{ boxShadow: '0 4px 20px rgba(217,118,66,0.06)' }}
               >
-                <div className="h-8 w-48 bg-stone-200 rounded-lg mb-6 animate-pulse"></div>
-                
+                <div className="h-8 w-44 skeleton-wave rounded-lg mb-6" />
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
-                    <div className="h-5 w-32 bg-stone-200 rounded animate-pulse"></div>
-                    <div className="h-5 w-20 bg-stone-200 rounded animate-pulse"></div>
+                    <div className="h-5 w-32 skeleton-wave rounded" />
+                    <div className="h-5 w-20 skeleton-wave rounded" />
                   </div>
                   <div className="flex justify-between">
-                    <div className="h-5 w-24 bg-stone-200 rounded animate-pulse"></div>
-                    <div className="h-5 w-16 bg-stone-200 rounded animate-pulse"></div>
+                    <div className="h-5 w-24 skeleton-wave rounded" />
+                    <div className="h-5 w-16 skeleton-wave rounded" />
                   </div>
-                  <div className="border-t-2 border-stone-200 pt-4 flex justify-between">
-                    <div className="h-7 w-20 bg-stone-200 rounded animate-pulse"></div>
-                    <div className="h-8 w-28 bg-stone-200 rounded animate-pulse"></div>
+                  <div className="border-t-2 border-[#f5ece3] pt-4 flex justify-between">
+                    <div className="h-7 w-20 skeleton-wave rounded" />
+                    <div className="h-8 w-28 skeleton-wave-orange rounded" />
                   </div>
                 </div>
-                
-                <div className="h-12 w-full bg-gradient-to-r from-orange-200 to-amber-200 rounded-lg animate-pulse"></div>
-                
+                <div className="h-12 w-full skeleton-wave-orange rounded-xl" />
                 <div className="mt-4 text-center">
-                  <div className="h-4 w-40 bg-stone-200 rounded animate-pulse mx-auto"></div>
+                  <div className="h-4 w-40 skeleton-wave rounded mx-auto" />
                 </div>
               </div>
             </div>
@@ -140,13 +139,16 @@ export default function CartPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-stone-50 to-white flex items-center justify-center py-20">
         <div className="text-center max-w-md mx-auto px-4">
-          <div className="mb-6 inline-flex items-center justify-center w-24 h-24 rounded-full bg-stone-100">
-            <ShoppingBag className="w-12 h-12 text-stone-400" />
+          <div
+            className="mb-6 inline-flex items-center justify-center w-24 h-24 rounded-full bg-[#fef3ed]"
+            style={{ boxShadow: '0 0 0 8px rgba(217,118,66,0.08)' }}
+          >
+            <ShoppingBag className="w-12 h-12 text-[#d97642]" />
           </div>
           <h2 className="text-3xl font-bold text-stone-900 mb-3">Your cart is empty</h2>
           <p className="text-stone-600 mb-8 font-light">Discover amazing books and start your reading journey</p>
           <Link to="/books">
-            <Button className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-8 py-6 h-auto text-base font-semibold shadow-md hover:shadow-lg transition-all duration-300">
+            <Button className="bg-gradient-to-r from-[#d97642] to-[#e08550] hover:from-[#c26535] hover:to-[#d97642] text-white px-8 py-6 h-auto text-base font-semibold shadow-md hover:shadow-lg transition-all duration-300 rounded-xl">
               Browse Books
             </Button>
           </Link>

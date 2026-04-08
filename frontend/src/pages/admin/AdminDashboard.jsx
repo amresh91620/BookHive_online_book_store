@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAdminStats, useAdminOrders, useAdminReviews } from "@/hooks/api/useAdmin";
 import { useBooksList } from "@/hooks/api/useBooks";
-import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { AdminSkeleton } from "@/components/admin/AdminSkeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,19 +20,7 @@ export default function AdminDashboard() {
   const isLoading = statsLoading || ordersLoading;
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
-          <div className="h-12 w-64 bg-stone-200 rounded-lg animate-pulse"></div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-32 bg-white rounded-2xl border-2 border-stone-200 animate-pulse"></div>
-            ))}
-          </div>
-          <div className="h-64 bg-white rounded-2xl border-2 border-stone-200 animate-pulse"></div>
-        </div>
-      </div>
-    );
+    return <AdminSkeleton type="dashboard" />;
   }
 
   const statCards = [
@@ -156,7 +144,7 @@ export default function AdminDashboard() {
   const topCustomers = getTopCustomers();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 animate-fade-in-up">

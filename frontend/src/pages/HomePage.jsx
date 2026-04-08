@@ -6,6 +6,7 @@ import { useBlogsList } from "@/hooks/api/useBlogs";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import BookCard from "@/components/common/BookCard";
 import BookSkeleton from "@/components/common/BookSkeleton";
+import BlogSkeleton from "@/components/common/BlogSkeleton";
 import HeroCarousel from "@/components/home/HeroCarousel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -58,32 +59,30 @@ export default function HomePage() {
       <HeroCarousel />
 
       {/* Category Marquee */}
-      <div className="bg-white border-y border-gray-200 overflow-hidden shadow-sm">
+      <div className="bg-white border-y border-[#f0e4d6] overflow-hidden shadow-sm">
         <div className="py-3 whitespace-nowrap animate-marquee">
-          <span className="inline-flex items-center gap-6 font-semibold text-sm">
+          <span className="inline-flex items-center gap-5 font-semibold text-sm">
             {categoriesLoading ? (
-              // Loading skeleton
               <>
                 {[...Array(10)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-6">
-                    <div className="h-8 w-24 bg-gray-200 rounded-full animate-pulse" />
-                    <span className="text-gray-300">•</span>
+                  <div key={i} className="flex items-center gap-5">
+                    <div className="h-8 w-24 skeleton-wave rounded-full" />
+                    <span className="text-[#f0e4d6]">•</span>
                   </div>
                 ))}
               </>
             ) : (
-              // Actual categories from database (duplicated for continuous scroll)
               <>
                 {[...categories, ...categories].map((category, index) => (
-                  <div key={index} className="flex items-center gap-6">
-                    <Link 
-                      to={`/books?category=${encodeURIComponent(category)}`} 
-                      className="flex items-center gap-2 px-4 py-1.5 bg-gray-200 text-gray-900 rounded-full hover:bg-gray-300 transition-colors whitespace-nowrap"
+                  <div key={index} className="flex items-center gap-5">
+                    <Link
+                      to={`/books?category=${encodeURIComponent(category)}`}
+                      className="flex items-center gap-2 px-4 py-1.5 bg-[#fef3ed] text-[#c26535] border border-[#f3dccc] rounded-full hover:bg-[#d97642] hover:text-white hover:border-[#d97642] transition-all duration-200 whitespace-nowrap font-medium text-xs tracking-wide"
                     >
                       {category}
                     </Link>
                     {index < (categories.length * 2 - 1) && (
-                      <span className="text-gray-300">•</span>
+                      <span className="text-[#f0e4d6]">•</span>
                     )}
                   </div>
                 ))}
@@ -160,31 +159,22 @@ export default function HomePage() {
       {blogsLoading ? (
         <section className="bg-[#f7f5ef]/80 py-16 sm:py-20 lg:py-24">
           <div className="container-shell">
-            <div className="flex flex-col items-center mb-14 animate-fade-in-up">
-              <div className="h-12 w-72 bg-gradient-to-r from-stone-200 to-stone-100 rounded-lg animate-pulse mb-4"></div>
-              <div className="h-5 w-96 max-w-full bg-gradient-to-r from-stone-150 to-stone-100 rounded-lg animate-pulse"></div>
+            {/* Header skeleton */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-14">
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 skeleton-wave-orange rounded" />
+                  <div className="h-10 w-56 skeleton-wave rounded-lg" />
+                </div>
+                <div className="h-5 w-80 skeleton-wave rounded" />
+              </div>
+              <div className="h-10 w-32 skeleton-wave rounded-full mt-4 sm:mt-0" />
             </div>
+            {/* Blog card skeletons */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[...Array(3)].map((_, i) => (
-                <div 
-                  key={i} 
-                  className="animate-fade-in-up" 
-                  style={{ animationDelay: `${i * 0.15}s` }}
-                >
-                  <div className="h-[420px] bg-white rounded-2xl shadow-soft overflow-hidden">
-                    <div className="h-56 bg-gradient-to-br from-stone-200 via-stone-100 to-stone-200 animate-pulse relative">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer"></div>
-                    </div>
-                    <div className="p-6 space-y-4">
-                      <div className="h-6 bg-gradient-to-r from-stone-200 to-stone-100 rounded-md w-full"></div>
-                      <div className="h-6 bg-gradient-to-r from-stone-200 to-stone-100 rounded-md w-3/4"></div>
-                      <div className="space-y-2 pt-2">
-                        <div className="h-4 bg-gradient-to-r from-stone-150 to-stone-100 rounded w-full"></div>
-                        <div className="h-4 bg-gradient-to-r from-stone-150 to-stone-100 rounded w-5/6"></div>
-                        <div className="h-4 bg-gradient-to-r from-stone-150 to-stone-100 rounded w-4/6"></div>
-                      </div>
-                    </div>
-                  </div>
+                <div key={i} className="animate-fade-in-up" style={{ animationDelay: `${i * 0.12}s` }}>
+                  <BlogSkeleton />
                 </div>
               ))}
             </div>
@@ -266,6 +256,31 @@ export default function HomePage() {
                     </CardContent>
                   </Card>
                 </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* New Arrivals — skeleton while loading */}
+      {isLoading && (
+        <section className="relative overflow-hidden bg-[#f7f5ef]/60 py-16 sm:py-20 lg:py-24">
+          <div className="container-shell relative">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 skeleton-wave-orange rounded" />
+                  <div className="h-10 w-48 skeleton-wave rounded-lg" />
+                </div>
+                <div className="h-5 w-72 skeleton-wave rounded" />
+              </div>
+              <div className="h-10 w-32 skeleton-wave rounded-full" />
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="animate-fade-in-up" style={{ animationDelay: `${i * 0.08}s` }}>
+                  <BookSkeleton />
+                </div>
               ))}
             </div>
           </div>

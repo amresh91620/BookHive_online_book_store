@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useBooksList, useDeleteBook } from "@/hooks/api/useBooks";
-import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { AdminSkeleton } from "@/components/admin/AdminSkeleton";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
-import { Pencil, Trash2, Plus, Search } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, BookOpen, Package } from "lucide-react";
 import { formatPrice } from "@/utils/format";
 import toast from "react-hot-toast";
 
@@ -76,16 +75,19 @@ export default function AdminBooksPage() {
   };
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-fade-in-up">
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent">
             Manage Books
           </h1>
-          <p className="text-stone-600 mt-2">Total: {total} books</p>
+          <p className="text-stone-500 mt-1.5 text-sm font-medium">
+            {total} books in your inventory
+          </p>
         </div>
         <Link to="/admin/books/add">
           <Button className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
@@ -99,13 +101,13 @@ export default function AdminBooksPage() {
       <div className="mb-6 animate-slide-in-right stagger-1">
         <form onSubmit={handleSearch}>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5" />
+            <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
             <Input
               type="text"
               placeholder="Search books by title or author..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 border-2 border-stone-200 focus:border-amber-500 transition-colors bg-white/80 backdrop-blur-sm"
+              className="pl-10 border-2 border-stone-200 focus:border-amber-500 transition-colors bg-white/80 backdrop-blur-sm rounded-xl h-11"
             />
           </div>
         </form>
@@ -113,55 +115,85 @@ export default function AdminBooksPage() {
 
       {/* Books Table/Cards */}
       {isLoading ? (
-        <LoadingSkeleton type="table" count={1} />
+        <AdminSkeleton type="table" />
+      ) : books.length === 0 ? (
+        <div className="admin-table-wrapper p-12 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center">
+            <BookOpen className="w-8 h-8 text-amber-400" />
+          </div>
+          <p className="text-stone-500 font-semibold text-lg mb-1">No books found</p>
+          <p className="text-stone-400 text-sm">
+            {searchQuery ? "Try adjusting your search term" : "Add your first book to get started"}
+          </p>
+        </div>
       ) : (
         <>
           {/* Desktop Table */}
-          <Card className="hidden md:block border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-scale-up stagger-2 bg-white/80 backdrop-blur-sm">
+          <div className="hidden md:block admin-table-wrapper animate-scale-up stagger-2">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-stone-50 to-amber-50/50 border-b-2 border-stone-200">
+                <thead className="admin-thead">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">Book</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">Author</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">Price</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">Stock</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-right text-xs font-semibold text-stone-700 uppercase tracking-wider">Actions</th>
+                    <th style={{width: '44px'}}>#</th>
+                    <th>Book</th>
+                    <th>Author</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th style={{textAlign: 'right'}}>Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {books.map((book) => (
-                    <tr key={book._id} className="hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-stone-50 transition-all duration-200">
-                      <td className="px-6 py-4">
+                <tbody className="admin-tbody">
+                  {books.map((book, idx) => (
+                    <tr key={book._id}>
+                      <td className="admin-td">
+                        <span className="admin-row-num">{startIndex + idx + 1}</span>
+                      </td>
+                      <td className="admin-td">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-16 flex-shrink-0">
-                            <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover rounded shadow-md" loading="lazy" onError={(e) => { e.target.src = 'https://via.placeholder.com/120x160?text=No+Image'; }} />
-                          </div>
+                          <img
+                            src={book.coverImage}
+                            alt={book.title}
+                            className="admin-thumb"
+                            loading="lazy"
+                            onError={(e) => { e.target.src = 'https://via.placeholder.com/120x160?text=No+Image'; }}
+                          />
                           <div className="min-w-0">
-                            <div className="font-semibold text-stone-900 truncate">{book.title}</div>
-                            <div className="text-xs text-stone-400 truncate">{book.categories}</div>
+                            <div className="admin-cell-primary truncate max-w-[220px]">{book.title}</div>
+                            <div className="admin-cell-secondary truncate">{book.categories}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-stone-900">{book.author}</td>
-                      <td className="px-6 py-4 text-sm font-semibold text-amber-700">{formatPrice(book.price)}</td>
-                      <td className="px-6 py-4 text-sm text-stone-900">{book.stock}</td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full shadow-sm ${book.stock > 0 ? "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800" : "bg-gradient-to-r from-red-100 to-rose-100 text-red-800"}`}>
+                      <td className="admin-td">
+                        <span className="text-sm text-stone-700 font-medium">{book.author}</span>
+                      </td>
+                      <td className="admin-td">
+                        <span className="admin-price">{formatPrice(book.price)}</span>
+                      </td>
+                      <td className="admin-td">
+                        <div className="flex items-center gap-2">
+                          <Package className="w-3.5 h-3.5 text-stone-400" />
+                          <span className={`text-sm font-semibold ${book.stock < 10 ? 'text-amber-600' : 'text-stone-700'}`}>
+                            {book.stock}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="admin-td">
+                        <span className={`admin-status ${book.stock > 0 ? 'success' : 'danger'}`}>
+                          <span className="dot" />
                           {book.stock > 0 ? "In Stock" : "Out of Stock"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2">
+                      <td className="admin-td">
+                        <div className="admin-actions justify-end">
                           <Link to={`/admin/books/edit/${book._id}`} state={{ from: getCurrentUrl() }}>
-                            <Button variant="ghost" size="sm" className="hover:bg-amber-100 hover:text-amber-700 transition-colors">
+                            <button className="admin-action-btn edit" title="Edit">
                               <Pencil className="w-4 h-4" />
-                            </Button>
+                            </button>
                           </Link>
-                          <Button variant="ghost" size="sm" onClick={() => handleDelete(book._id)} className="hover:bg-red-100 hover:text-red-700 transition-colors">
+                          <button className="admin-action-btn delete" onClick={() => handleDelete(book._id)} title="Delete">
                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -169,38 +201,48 @@ export default function AdminBooksPage() {
                 </tbody>
               </table>
             </div>
-          </Card>
+            {/* Table Footer */}
+            <div className="admin-table-footer flex items-center justify-between">
+              <span>Showing {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, total)} of {total} books</span>
+              <span className="text-xs text-stone-400">Page {currentPage} of {totalPages || 1}</span>
+            </div>
+          </div>
 
           {/* Mobile Cards */}
-          <div className="md:hidden space-y-4 animate-scale-up stagger-2">
-            {books.map((book) => (
-              <Card key={book._id} className="p-4 border-2 border-stone-200 shadow-lg bg-white/80 backdrop-blur-sm">
-                <div className="flex gap-4">
-                  <div className="w-20 h-28 flex-shrink-0">
-                    <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover rounded shadow-md" loading="lazy" onError={(e) => { e.target.src = 'https://via.placeholder.com/120x160?text=No+Image'; }} />
-                  </div>
+          <div className="md:hidden space-y-3 animate-scale-up stagger-2">
+            {books.map((book, idx) => (
+              <div key={book._id} className="admin-mobile-card">
+                <div className="flex gap-3">
+                  <img
+                    src={book.coverImage}
+                    alt={book.title}
+                    className="w-16 h-22 object-cover rounded-lg border-2 border-stone-200 shadow-sm flex-shrink-0"
+                    loading="lazy"
+                    onError={(e) => { e.target.src = 'https://via.placeholder.com/120x160?text=No+Image'; }}
+                  />
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-stone-900 mb-1 line-clamp-2">{book.title}</h3>
-                    <p className="text-sm text-stone-600 mb-2">{book.author}</p>
+                    <h3 className="font-bold text-stone-900 mb-0.5 line-clamp-2 text-sm">{book.title}</h3>
+                    <p className="text-xs text-stone-500 mb-2">{book.author}</p>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg font-bold text-amber-700">{formatPrice(book.price)}</span>
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${book.stock > 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                        {book.stock > 0 ? `${book.stock} in stock` : "Out of Stock"}
+                      <span className="admin-price text-base">{formatPrice(book.price)}</span>
+                      <span className={`admin-status text-xs ${book.stock > 0 ? 'success' : 'danger'}`}>
+                        <span className="dot" />
+                        {book.stock > 0 ? `${book.stock} left` : "Out"}
                       </span>
-                    </div>
-                    <div className="flex gap-2 mt-3">
-                      <Link to={`/admin/books/edit/${book._id}`} state={{ from: getCurrentUrl() }} className="flex-1">
-                        <Button variant="outline" size="sm" className="w-full border-2 hover:border-amber-500">
-                          <Pencil className="w-4 h-4 mr-1" /> Edit
-                        </Button>
-                      </Link>
-                      <Button variant="outline" size="sm" onClick={() => handleDelete(book._id)} className="border-2 hover:border-red-500 hover:text-red-700">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
                     </div>
                   </div>
                 </div>
-              </Card>
+                <div className="flex gap-2 mt-3 pt-3 border-t border-stone-100">
+                  <Link to={`/admin/books/edit/${book._id}`} state={{ from: getCurrentUrl() }} className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full border-2 border-stone-200 hover:border-amber-500 text-xs h-9">
+                      <Pencil className="w-3.5 h-3.5 mr-1.5" /> Edit
+                    </Button>
+                  </Link>
+                  <Button variant="outline" size="sm" onClick={() => handleDelete(book._id)} className="border-2 border-stone-200 hover:border-red-400 hover:text-red-600 text-xs h-9 px-3">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </div>
             ))}
           </div>
         </>
@@ -219,4 +261,3 @@ export default function AdminBooksPage() {
     </div>
   );
 }
-

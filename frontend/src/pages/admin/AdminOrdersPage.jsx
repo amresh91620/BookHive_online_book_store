@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useAdminOrders, useUpdateAdminOrderStatus } from "@/hooks/api/useAdmin";
-import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { AdminSkeleton } from "@/components/admin/AdminSkeleton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/ui/pagination";
-import { Search, Eye, Download } from "lucide-react";
+import { Search, Eye, Download, ShoppingCart, ChevronDown } from "lucide-react";
 import { formatPrice, shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
@@ -34,15 +34,20 @@ export default function AdminOrdersPage() {
     );
   };
 
-  const getStatusColor = (status) => {
-    const colors = {
-      Pending: "secondary",
-      Processing: "default",
-      Shipped: "default",
+  const getStatusStyle = (status) => {
+    const map = {
+      Pending: "warning",
+      Processing: "info",
+      Shipped: "info",
       Delivered: "success",
-      Cancelled: "destructive",
+      Cancelled: "danger",
     };
-    return colors[status] || "secondary";
+    return map[status] || "default";
+  };
+
+  const getPaymentStyle = (status) => {
+    const map = { paid: "success", pending: "warning", failed: "danger" };
+    return map[status] || "default";
   };
 
   const filteredOrders = orders.filter((order) => {
@@ -92,7 +97,6 @@ export default function AdminOrdersPage() {
     }
 
     try {
-      // Update orders one by one with proper error handling
       let successCount = 0;
       let failCount = 0;
 
@@ -163,14 +167,16 @@ export default function AdminOrdersPage() {
   const statuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-fade-in-up">
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent">
             Manage Orders
           </h1>
-          <p className="text-stone-600 mt-2">Total: {filteredOrders.length} orders</p>
+          <p className="text-stone-500 mt-1.5 text-sm font-medium">
+            {filteredOrders.length} orders {filterStatus !== "all" ? `(${filterStatus})` : "total"}
+          </p>
         </div>
         <Button 
           onClick={handleExport}
@@ -182,272 +188,256 @@ export default function AdminOrdersPage() {
         </Button>
       </div>
 
-        {/* Bulk Actions */}
-        {selectedOrders.length > 0 && (
-          <Card className="mb-6 p-4 border-2 border-amber-300 bg-amber-50/50">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="font-semibold text-stone-900">
-                {selectedOrders.length} selected
-              </span>
-              <div className="flex gap-2 flex-wrap">
-                {statuses.map(status => (
-                  <Button
-                    key={status}
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleBulkStatusUpdate(status)}
-                    className="border-2"
-                  >
-                    Set {status}
-                  </Button>
-                ))}
-              </div>
+      {/* Bulk Actions */}
+      {selectedOrders.length > 0 && (
+        <Card className="mb-6 p-4 border-2 border-amber-300 bg-amber-50/50 animate-fade-in">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="font-semibold text-stone-900">
+              {selectedOrders.length} selected
+            </span>
+            <div className="flex gap-2 flex-wrap">
+              {statuses.map(status => (
+                <Button
+                  key={status}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleBulkStatusUpdate(status)}
+                  className="border-2 text-xs"
+                >
+                  Set {status}
+                </Button>
+              ))}
             </div>
-          </Card>
-        )}
+          </div>
+        </Card>
+      )}
 
-        {/* Filters */}
-        <div className="mb-6 flex flex-col md:flex-row gap-4 animate-slide-in-right stagger-1">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5" />
-            <Input
-              type="text"
-              placeholder="Search orders..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 border-2 border-stone-200 focus:border-amber-500 transition-colors bg-white/80 backdrop-blur-sm"
-            />
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <Button
-              variant={filterStatus === "all" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setFilterStatus("all")}
-              className={filterStatus === "all" ? "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800" : "border-2 hover:border-amber-500"}
-            >
-              All
-            </Button>
-            {statuses.map((status) => (
-              <Button
-                key={status}
-                variant={filterStatus === status ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterStatus(status)}
-                className={filterStatus === status ? "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800" : "border-2 hover:border-amber-500"}
-              >
-                {status}
-              </Button>
-            ))}
-          </div>
+      {/* Filters */}
+      <div className="mb-6 flex flex-col md:flex-row gap-4 animate-slide-in-right stagger-1">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
+          <Input
+            type="text"
+            placeholder="Search by order number, customer..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 border-2 border-stone-200 focus:border-amber-500 transition-colors bg-white/80 backdrop-blur-sm rounded-xl h-11"
+          />
         </div>
+        <div className="flex gap-1.5 flex-wrap">
+          <button
+            onClick={() => setFilterStatus("all")}
+            className={`admin-filter-pill px-3.5 py-2 rounded-lg text-xs font-semibold border-2 transition-all ${
+              filterStatus === "all"
+                ? "bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-600 shadow-md"
+                : "bg-white text-stone-600 border-stone-200 hover:border-amber-400"
+            }`}
+          >
+            All
+          </button>
+          {statuses.map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status)}
+              className={`admin-filter-pill px-3.5 py-2 rounded-lg text-xs font-semibold border-2 transition-all ${
+                filterStatus === status
+                  ? "bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-600 shadow-md"
+                  : "bg-white text-stone-600 border-stone-200 hover:border-amber-400"
+              }`}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+      </div>
 
-        {/* Orders Table/Cards */}
-        {isLoading ? (
-          <LoadingSkeleton type="table" count={1} />
-        ) : filteredOrders.length === 0 ? (
-          <Card className="p-12 text-center border-2 border-stone-200 bg-gradient-to-br from-stone-50 to-amber-50/30">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-stone-100 mb-4">
-              <Search className="w-10 h-10 text-stone-400" />
-            </div>
-            <p className="text-stone-500 font-medium text-lg mb-2">No orders found</p>
-            <p className="text-stone-400 text-sm">
-              {searchQuery || filterStatus !== "all" 
-                ? "Try adjusting your search or filters" 
-                : "Orders will appear here once customers place them"}
-            </p>
-          </Card>
-        ) : (
-          <>
-            {/* Desktop Table */}
-            <Card className="hidden md:block border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-scale-up stagger-2 bg-white/80 backdrop-blur-sm">
-              <div className="overflow-x-auto">
+      {/* Orders Table/Cards */}
+      {isLoading ? (
+        <AdminSkeleton type="table" />
+      ) : filteredOrders.length === 0 ? (
+        <div className="admin-table-wrapper p-12 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center">
+            <ShoppingCart className="w-8 h-8 text-amber-400" />
+          </div>
+          <p className="text-stone-500 font-semibold text-lg mb-1">No orders found</p>
+          <p className="text-stone-400 text-sm">
+            {searchQuery || filterStatus !== "all" 
+              ? "Try adjusting your search or filters" 
+              : "Orders will appear here once customers place them"}
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Desktop Table */}
+          <div className="hidden md:block admin-table-wrapper animate-scale-up stagger-2">
+            <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-stone-50 to-amber-50/50 border-b-2 border-stone-200">
+                <thead className="admin-thead">
                   <tr>
-                    <th className="px-4 py-4 text-left">
+                    <th style={{width: '40px', paddingLeft: '16px'}}>
                       <input
                         type="checkbox"
                         checked={selectedOrders.length === paginatedOrders.length && paginatedOrders.length > 0}
                         onChange={handleSelectAll}
-                        className="w-4 h-4 rounded border-stone-300"
+                        className="w-4 h-4 rounded border-stone-300 accent-amber-600"
                       />
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      Order
-                    </th>
-                    <th className="hidden md:table-cell px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      Customer
-                    </th>
-                    <th className="hidden lg:table-cell px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="hidden sm:table-cell px-4 sm:px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      Total
-                    </th>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="hidden lg:table-cell px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      Payment
-                    </th>
-                    <th className="px-4 sm:px-6 py-4 text-right text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      Actions
-                    </th>
+                    <th>Order</th>
+                    <th className="hidden lg:table-cell">Customer</th>
+                    <th className="hidden xl:table-cell">Date</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th className="hidden lg:table-cell">Payment</th>
+                    <th style={{textAlign: 'right'}}>Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100">
+                <tbody className="admin-tbody">
                   {paginatedOrders.map((order) => (
-                    <tr 
-                      key={order._id} 
-                      className="hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-stone-50 transition-all duration-200"
-                    >
-                      <td className="px-4 py-4">
+                    <tr key={order._id}>
+                      <td className="admin-td" style={{paddingLeft: '16px'}}>
                         <input
                           type="checkbox"
                           checked={selectedOrders.includes(order._id)}
                           onChange={() => handleSelectOrder(order._id)}
-                          className="w-4 h-4 rounded border-stone-300"
+                          className="w-4 h-4 rounded border-stone-300 accent-amber-600"
                         />
                       </td>
-                      <td className="px-4 sm:px-6 py-4">
-                        <div className="font-semibold text-stone-900">#{order.orderNumber}</div>
-                        <div className="text-sm text-stone-500">{order.items.length} items</div>
-                        <div className="md:hidden text-xs text-stone-400 mt-1">{order.user?.name}</div>
+                      <td className="admin-td">
+                        <div>
+                          <div className="admin-cell-primary">#{order.orderNumber}</div>
+                          <div className="admin-cell-secondary">{order.items.length} items</div>
+                          <div className="lg:hidden admin-cell-secondary">{order.user?.name}</div>
+                        </div>
                       </td>
-                      <td className="hidden md:table-cell px-6 py-4">
-                        <div className="text-sm text-stone-900 font-medium">{order.user?.name}</div>
-                        <div className="text-sm text-stone-500">{order.user?.email}</div>
+                      <td className="admin-td hidden lg:table-cell">
+                        <div>
+                          <div className="text-sm text-stone-800 font-medium">{order.user?.name}</div>
+                          <div className="admin-cell-secondary">{order.user?.email}</div>
+                        </div>
                       </td>
-                      <td className="hidden lg:table-cell px-6 py-4 text-sm text-stone-900">
-                        {shortDate(order.createdAt)}
+                      <td className="admin-td hidden xl:table-cell">
+                        <span className="text-sm text-stone-500">{shortDate(order.createdAt)}</span>
                       </td>
-                      <td className="hidden sm:table-cell px-4 sm:px-6 py-4 text-sm font-bold text-amber-700">
-                        {formatPrice(order.total)}
+                      <td className="admin-td">
+                        <span className="admin-price">{formatPrice(order.total)}</span>
                       </td>
-                      <td className="px-4 sm:px-6 py-4">
+                      <td className="admin-td">
                         <div className="flex flex-col gap-2">
-                          <Badge variant={getStatusColor(order.status)} className="w-fit shadow-sm">
+                          <span className={`admin-status ${getStatusStyle(order.status)}`}>
+                            <span className="dot" />
                             {order.status}
-                          </Badge>
+                          </span>
                           {order.status !== "Cancelled" && order.status !== "Delivered" && (
-                            <select
-                              value={order.status}
-                              onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
-                              className="text-xs border-2 border-stone-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white"
-                            >
-                              {statuses.filter(status => {
-                                if (order.status === "Pending") {
-                                  return ["Pending", "Processing", "Cancelled"].includes(status);
-                                }
-                                if (order.status === "Processing") {
-                                  return ["Processing", "Shipped", "Cancelled"].includes(status);
-                                }
-                                if (order.status === "Shipped") {
-                                  return ["Shipped", "Delivered"].includes(status);
-                                }
-                                return true;
-                              }).map((status) => (
-                                <option key={status} value={status}>
-                                  {status}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="relative">
+                              <select
+                                value={order.status}
+                                onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
+                                className="text-xs border border-stone-200 rounded-lg pl-2 pr-6 py-1 focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white appearance-none cursor-pointer w-full"
+                              >
+                                {statuses.filter(status => {
+                                  if (order.status === "Pending") return ["Pending", "Processing", "Cancelled"].includes(status);
+                                  if (order.status === "Processing") return ["Processing", "Shipped", "Cancelled"].includes(status);
+                                  if (order.status === "Shipped") return ["Shipped", "Delivered"].includes(status);
+                                  return true;
+                                }).map((status) => (
+                                  <option key={status} value={status}>{status}</option>
+                                ))}
+                              </select>
+                              <ChevronDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
+                            </div>
                           )}
                         </div>
                       </td>
-                      <td className="hidden lg:table-cell px-6 py-4">
-                        <Badge
-                          variant={
-                            order.paymentStatus === "paid"
-                              ? "success"
-                              : order.paymentStatus === "pending"
-                              ? "secondary"
-                              : "destructive"
-                          }
-                          className="shadow-sm"
-                        >
+                      <td className="admin-td hidden lg:table-cell">
+                        <span className={`admin-status ${getPaymentStyle(order.paymentStatus)}`}>
+                          <span className="dot" />
                           {order.paymentStatus}
-                        </Badge>
+                        </span>
                       </td>
-                      <td className="px-4 sm:px-6 py-4 text-right">
-                        <Link to={`/admin/orders/${order._id}`}>
-                          <Button variant="ghost" size="sm" className="hover:bg-amber-100 hover:text-amber-700 transition-colors">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </Link>
+                      <td className="admin-td">
+                        <div className="admin-actions justify-end">
+                          <Link to={`/admin/orders/${order._id}`}>
+                            <button className="admin-action-btn view" title="View Details">
+                              <Eye className="w-4 h-4" />
+                            </button>
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </Card>
+            {/* Table Footer */}
+            <div className="admin-table-footer flex items-center justify-between">
+              <span>Showing {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, filteredOrders.length)} of {filteredOrders.length} orders</span>
+              <span className="text-xs text-stone-400">Page {currentPage} of {totalPages || 1}</span>
+            </div>
+          </div>
 
           {/* Mobile Cards */}
-          <div className="md:hidden space-y-4 animate-scale-up stagger-2">
+          <div className="md:hidden space-y-3 animate-scale-up stagger-2">
             {paginatedOrders.map((order) => (
-              <Card key={order._id} className="p-4 border-2 border-stone-200 shadow-lg bg-white/80 backdrop-blur-sm">
+              <div key={order._id} className="admin-mobile-card">
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <h3 className="font-bold text-stone-900">#{order.orderNumber}</h3>
-                    <p className="text-sm text-stone-600">{order.user?.name}</p>
-                    <p className="text-xs text-stone-500">{order.user?.email}</p>
+                    <p className="text-sm text-stone-500">{order.user?.name}</p>
+                    <p className="text-xs text-stone-400">{shortDate(order.createdAt)}</p>
                   </div>
                   <Link to={`/admin/orders/${order._id}`}>
-                    <Button variant="ghost" size="sm" className="hover:bg-amber-100">
+                    <button className="admin-action-btn view">
                       <Eye className="w-4 h-4" />
-                    </Button>
+                    </button>
                   </Link>
                 </div>
-                <div className="space-y-2 mb-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-stone-600">Items:</span>
-                    <span className="font-semibold">{order.items.length}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-stone-600">Total:</span>
-                    <span className="font-bold text-amber-700">{formatPrice(order.total)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-stone-600">Date:</span>
-                    <span>{shortDate(order.createdAt)}</span>
-                  </div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="admin-price text-lg">{formatPrice(order.total)}</span>
+                  <span className="text-xs text-stone-400">{order.items.length} items</span>
                 </div>
                 <div className="flex gap-2 mb-3">
-                  <Badge variant={getStatusColor(order.status)} className="shadow-sm">{order.status}</Badge>
-                  <Badge variant={order.paymentStatus === "paid" ? "success" : order.paymentStatus === "pending" ? "secondary" : "destructive"} className="shadow-sm">
-                    {order.paymentStatus}
-                  </Badge>
+                  <span className={`admin-status text-xs ${getStatusStyle(order.status)}`}>
+                    <span className="dot" />{order.status}
+                  </span>
+                  <span className={`admin-status text-xs ${getPaymentStyle(order.paymentStatus)}`}>
+                    <span className="dot" />{order.paymentStatus}
+                  </span>
                 </div>
                 {order.status !== "Cancelled" && order.status !== "Delivered" && (
-                  <select value={order.status} onChange={(e) => handleStatusUpdate(order._id, e.target.value)} className="w-full text-sm border-2 border-stone-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white">
-                    {statuses.filter(status => {
-                      if (order.status === "Pending") return ["Pending", "Processing", "Cancelled"].includes(status);
-                      if (order.status === "Processing") return ["Processing", "Shipped", "Cancelled"].includes(status);
-                      if (order.status === "Shipped") return ["Shipped", "Delivered"].includes(status);
-                      return true;
-                    }).map((status) => (
-                      <option key={status} value={status}>{status}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={order.status}
+                      onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
+                      className="w-full text-sm border-2 border-stone-200 rounded-lg px-3 py-2 pr-8 focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white appearance-none"
+                    >
+                      {statuses.filter(status => {
+                        if (order.status === "Pending") return ["Pending", "Processing", "Cancelled"].includes(status);
+                        if (order.status === "Processing") return ["Processing", "Shipped", "Cancelled"].includes(status);
+                        if (order.status === "Shipped") return ["Shipped", "Delivered"].includes(status);
+                        return true;
+                      }).map((status) => (
+                        <option key={status} value={status}>{status}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
+                  </div>
                 )}
-              </Card>
+              </div>
             ))}
           </div>
         </>
-        )}
+      )}
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-6 animate-fade-in-up">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
-        )}
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 animate-fade-in-up">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   );
 }
-

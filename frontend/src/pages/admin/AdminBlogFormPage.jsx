@@ -85,7 +85,7 @@ export default function AdminBlogFormPage() {
   const isPending = createBlog.isPending || updateBlog.isPending;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
       <div className="max-w-5xl mx-auto">
         <Button variant="ghost" onClick={() => navigate("/admin/blogs")} className="mb-6 hover:bg-amber-100 transition-colors animate-fade-in-up">
           <ArrowLeft className="w-4 h-4 mr-2" />Back to Blogs

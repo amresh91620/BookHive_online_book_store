@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import api from "@/services/api";
 import { endpoints } from "@/services/endpoints";
-import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { AdminSkeleton } from "@/components/admin/AdminSkeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -122,14 +122,8 @@ export default function AdminOrderDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="h-10 w-32 bg-gray-200 rounded mb-6 animate-pulse"></div>
-          <div className="space-y-6">
-            <LoadingSkeleton type="detail" count={1} />
-            <LoadingSkeleton type="list" count={3} />
-          </div>
-        </div>
+      <div className="admin-page p-4 sm:p-6 lg:p-8">
+        <AdminSkeleton type="order-detail" />
       </div>
     );
   }
@@ -146,7 +140,7 @@ export default function AdminOrderDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         <Button variant="ghost" onClick={() => navigate("/admin/orders")} className="mb-6 hover:bg-amber-100 transition-colors animate-fade-in-up">
           <ArrowLeft className="w-4 h-4 mr-2" />

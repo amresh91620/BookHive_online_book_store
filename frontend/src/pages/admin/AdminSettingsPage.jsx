@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/services/api";
+import { AdminSkeleton } from "@/components/admin/AdminSkeleton";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminSettingsPage() {
@@ -119,19 +120,15 @@ export default function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="h-8 w-48 bg-gray-200 rounded mb-6 animate-pulse"></div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-64 bg-white rounded-lg border animate-pulse"></div>
-          ))}
-        </div>
+      <div className="admin-page p-4 sm:p-6 lg:p-8">
+        <AdminSkeleton type="settings" />
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -173,7 +170,7 @@ export default function AdminSettingsPage() {
             <CardDescription>Configure tax calculation for orders</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-[#f7f5ef] rounded-lg">
               <div>
                 <p className="font-medium text-gray-900">Enable Tax</p>
                 <p className="text-sm text-gray-600">Apply tax to all orders</p>
@@ -186,7 +183,7 @@ export default function AdminSettingsPage() {
                   onChange={handleChange}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#d97642]"></div>
+                <div className="w-11 h-6 bg-stone-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#d97642]"></div>
               </label>
             </div>
 
@@ -244,7 +241,7 @@ export default function AdminSettingsPage() {
             <CardDescription>Configure delivery charges and free shipping</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-[#f7f5ef] rounded-lg">
               <div>
                 <p className="font-medium text-gray-900">Enable Delivery Charges</p>
                 <p className="text-sm text-gray-600">Charge for delivery</p>
@@ -257,7 +254,7 @@ export default function AdminSettingsPage() {
                   onChange={handleChange}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#d97642]"></div>
+                <div className="w-11 h-6 bg-stone-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#d97642]"></div>
               </label>
             </div>
 
@@ -309,7 +306,7 @@ export default function AdminSettingsPage() {
             <CardDescription>Enable or disable payment options</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-[#f7f5ef] rounded-lg">
               <div>
                 <p className="font-medium text-gray-900">Cash on Delivery (COD)</p>
                 <p className="text-sm text-gray-600">Pay when you receive</p>
@@ -322,11 +319,11 @@ export default function AdminSettingsPage() {
                   onChange={handleChange}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#d97642]"></div>
+                <div className="w-11 h-6 bg-stone-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#d97642]"></div>
               </label>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-[#f7f5ef] rounded-lg">
               <div>
                 <p className="font-medium text-gray-900">Online Payment</p>
                 <p className="text-sm text-gray-600">UPI, Cards, Net Banking</p>
@@ -339,7 +336,7 @@ export default function AdminSettingsPage() {
                   onChange={handleChange}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#d97642]"></div>
+                <div className="w-11 h-6 bg-stone-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#d97642]"></div>
               </label>
             </div>
 
@@ -416,7 +413,7 @@ export default function AdminSettingsPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="p-4 bg-[#f7f5ef] rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Tax</p>
               <p className="text-2xl font-bold text-gray-900">
                 {formData.taxEnabled ? `${(formData.taxRate * 100).toFixed(2)}%` : "Disabled"}
@@ -426,7 +423,7 @@ export default function AdminSettingsPage() {
               </Badge>
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="p-4 bg-[#f7f5ef] rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Delivery</p>
               <p className="text-2xl font-bold text-gray-900">
                 {formData.deliveryEnabled ? `₹${formData.deliveryCharge}` : "Free"}
@@ -436,7 +433,7 @@ export default function AdminSettingsPage() {
               </Badge>
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="p-4 bg-[#f7f5ef] rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Payment Methods</p>
               <div className="flex gap-2 mt-2">
                 {formData.codEnabled && (
@@ -453,6 +450,7 @@ export default function AdminSettingsPage() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

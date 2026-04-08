@@ -3,7 +3,7 @@ import { useAdminBlogComments, useAdminDeleteComment } from "@/hooks/api/useBlog
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { AdminSkeleton } from "@/components/admin/AdminSkeleton";
 import { Trash2, MessageSquare, ThumbsUp, ThumbsDown, Search } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -35,14 +35,14 @@ export default function AdminCommentsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
-        <LoadingSkeleton type="card" count={3} />
+      <div className="admin-page p-4 sm:p-6 lg:p-8">
+        <AdminSkeleton type="table" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
       <Card className="border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up bg-white/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -104,7 +104,7 @@ export default function AdminCommentsPage() {
                       if (!comment.user) return null;
                       
                       return (
-                        <tr key={comment._id} className="hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-stone-50 transition-all duration-200">
+                        <tr key={comment._id} className="admin-table-row">
                           <td className="px-6 py-4">
                             <div>
                               <p className="font-semibold text-sm text-stone-900">{comment.user.name || 'Unknown User'}</p>

@@ -208,16 +208,17 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#f7f5ef] py-8">
       <div className="container-shell">
         {/* Profile Header */}
-        <Card
+        <div
           ref={headerRef}
-          className={`mb-8 transition-all duration-700 ${
+          className={`mb-8 bg-white rounded-2xl border border-[#f0e4d6] p-6 transition-all duration-700 ${
             headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
+          style={{ boxShadow: '0 4px 20px rgba(217,118,66,0.06)' }}
         >
-          <CardContent className="pt-6">
+          <div className="pt-6">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
               <Avatar className="w-24 h-24">
                 <AvatarFallback className="bg-amber-600 text-white text-3xl">
@@ -255,8 +256,8 @@ export default function ProfilePage() {
                 </Link>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar Navigation */}

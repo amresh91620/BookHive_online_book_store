@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useAdminUsers, useToggleUserBlock } from "@/hooks/api/useAdmin";
-import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { AdminSkeleton } from "@/components/admin/AdminSkeleton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/ui/pagination";
-import { Search, Ban, CheckCircle, Download } from "lucide-react";
+import { Search, Ban, CheckCircle, Download, Users, Shield } from "lucide-react";
 import { shortDate } from "@/utils/format";
 import toast from "react-hot-toast";
 
@@ -140,15 +140,32 @@ export default function AdminUsersPage() {
     }
   };
 
+  const avatarColors = [
+    "from-blue-400 to-blue-600",
+    "from-green-400 to-green-600",
+    "from-purple-400 to-purple-600",
+    "from-pink-400 to-pink-600",
+    "from-amber-400 to-amber-600",
+    "from-cyan-400 to-cyan-600",
+    "from-rose-400 to-rose-600",
+  ];
+
+  const getAvatarColor = (name) => {
+    const idx = (name || "A").charCodeAt(0) % avatarColors.length;
+    return avatarColors[idx];
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-fade-in-up">
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent">
             Manage Users
           </h1>
-          <p className="text-stone-600 mt-2">Total: {filteredUsers.length} users</p>
+          <p className="text-stone-500 mt-1.5 text-sm font-medium">
+            {filteredUsers.length} registered users
+          </p>
         </div>
         <Button 
           onClick={handleExport}
@@ -160,197 +177,195 @@ export default function AdminUsersPage() {
         </Button>
       </div>
 
-        {/* Bulk Actions */}
-        {selectedUsers.length > 0 && (
-          <Card className="mb-6 p-4 border-2 border-amber-300 bg-amber-50/50">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="font-semibold text-stone-900">
-                {selectedUsers.length} selected
-              </span>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => handleBulkBlock(true)}
-                >
-                  <Ban className="w-4 h-4 mr-1" />
-                  Block All
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleBulkBlock(false)}
-                  className="border-2 border-green-600 text-green-700 hover:bg-green-50"
-                >
-                  <CheckCircle className="w-4 h-4 mr-1" />
-                  Unblock All
-                </Button>
-              </div>
+      {/* Bulk Actions */}
+      {selectedUsers.length > 0 && (
+        <Card className="mb-6 p-4 border-2 border-amber-300 bg-amber-50/50 animate-fade-in">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="font-semibold text-stone-900">
+              {selectedUsers.length} selected
+            </span>
+            <div className="flex gap-2">
+              <Button size="sm" variant="destructive" onClick={() => handleBulkBlock(true)}>
+                <Ban className="w-4 h-4 mr-1" /> Block All
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => handleBulkBlock(false)} className="border-2 border-green-600 text-green-700 hover:bg-green-50">
+                <CheckCircle className="w-4 h-4 mr-1" /> Unblock All
+              </Button>
             </div>
-          </Card>
-        )}
-
-        {/* Search */}
-        <div className="mb-6 animate-slide-in-right stagger-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5" />
-            <Input
-              type="text"
-              placeholder="Search users..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 border-2 border-stone-200 focus:border-amber-500 transition-colors bg-white/80 backdrop-blur-sm"
-            />
           </div>
-        </div>
+        </Card>
+      )}
 
-        {/* Users Table/Cards */}
-        {isLoading ? (
-          <LoadingSkeleton type="table" count={1} />
-        ) : (
-          <>
-            {/* Desktop Table */}
-            <Card className="hidden md:block border-2 border-stone-200 shadow-lg hover:shadow-xl transition-all duration-300 animate-scale-up stagger-2 bg-white/80 backdrop-blur-sm">
-              <div className="overflow-x-auto">
+      {/* Search */}
+      <div className="mb-6 animate-slide-in-right stagger-1">
+        <div className="relative">
+          <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
+          <Input
+            type="text"
+            placeholder="Search users by name or email..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 border-2 border-stone-200 focus:border-amber-500 transition-colors bg-white/80 backdrop-blur-sm rounded-xl h-11"
+          />
+        </div>
+      </div>
+
+      {/* Users Table/Cards */}
+      {isLoading ? (
+        <AdminSkeleton type="table" />
+      ) : filteredUsers.length === 0 ? (
+        <div className="admin-table-wrapper p-12 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center">
+            <Users className="w-8 h-8 text-amber-400" />
+          </div>
+          <p className="text-stone-500 font-semibold text-lg mb-1">No users found</p>
+          <p className="text-stone-400 text-sm">Try adjusting your search</p>
+        </div>
+      ) : (
+        <>
+          {/* Desktop Table */}
+          <div className="hidden md:block admin-table-wrapper animate-scale-up stagger-2">
+            <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-stone-50 to-amber-50/50 border-b-2 border-stone-200">
+                <thead className="admin-thead">
                   <tr>
-                    <th className="px-4 py-4 text-left">
+                    <th style={{width: '40px', paddingLeft: '16px'}}>
                       <input
                         type="checkbox"
                         checked={selectedUsers.length === paginatedUsers.filter(u => u.role !== "admin").length && paginatedUsers.filter(u => u.role !== "admin").length > 0}
                         onChange={handleSelectAll}
-                        className="w-4 h-4 rounded border-stone-300"
+                        className="w-4 h-4 rounded border-stone-300 accent-amber-600"
                       />
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      User
-                    </th>
-                    <th className="hidden md:table-cell px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      Email
-                    </th>
-                    <th className="hidden lg:table-cell px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      Role
-                    </th>
-                    <th className="hidden lg:table-cell px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      Joined
-                    </th>
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-4 sm:px-6 py-4 text-right text-xs font-semibold text-stone-700 uppercase tracking-wider">
-                      Actions
-                    </th>
+                    <th style={{width: '44px'}}>#</th>
+                    <th>User</th>
+                    <th className="hidden lg:table-cell">Email</th>
+                    <th className="hidden lg:table-cell">Role</th>
+                    <th className="hidden xl:table-cell">Joined</th>
+                    <th>Status</th>
+                    <th style={{textAlign: 'right'}}>Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {paginatedUsers.map((user) => (
-                    <tr 
-                      key={user._id} 
-                      className="hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-stone-50 transition-all duration-200"
-                    >
-                      <td className="px-4 py-4">
+                <tbody className="admin-tbody">
+                  {paginatedUsers.map((user, idx) => (
+                    <tr key={user._id}>
+                      <td className="admin-td" style={{paddingLeft: '16px'}}>
                         {user.role !== "admin" && (
                           <input
                             type="checkbox"
                             checked={selectedUsers.includes(user._id)}
                             onChange={() => handleSelectUser(user._id)}
-                            className="w-4 h-4 rounded border-stone-300"
+                            className="w-4 h-4 rounded border-stone-300 accent-amber-600"
                           />
                         )}
                       </td>
-                      <td className="px-4 sm:px-6 py-4">
+                      <td className="admin-td">
+                        <span className="admin-row-num">{startIndex + idx + 1}</span>
+                      </td>
+                      <td className="admin-td">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center shadow-md">
-                            <span className="text-amber-700 font-bold text-lg">
-                              {user.name.charAt(0).toUpperCase()}
-                            </span>
+                          <div className={`admin-avatar bg-gradient-to-br ${getAvatarColor(user.name)} text-white shadow-sm`}>
+                            {user.name.charAt(0).toUpperCase()}
                           </div>
                           <div className="min-w-0">
-                            <div className="font-semibold text-stone-900 truncate">{user.name}</div>
-                            {user.phone && (
-                              <div className="text-sm text-stone-500 truncate">{user.phone}</div>
-                            )}
-                            <div className="md:hidden text-xs text-stone-400 truncate">{user.email}</div>
+                            <div className="admin-cell-primary truncate">{user.name}</div>
+                            {user.phone && <div className="admin-cell-secondary">{user.phone}</div>}
+                            <div className="lg:hidden admin-cell-secondary truncate">{user.email}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="hidden md:table-cell px-6 py-4 text-sm text-stone-900">{user.email}</td>
-                      <td className="hidden lg:table-cell px-6 py-4">
-                        <Badge 
-                          variant={user.role === "admin" ? "default" : "secondary"}
-                          className={user.role === "admin" ? "bg-gradient-to-r from-amber-600 to-amber-700 shadow-sm" : "shadow-sm"}
-                        >
-                          {user.role}
-                        </Badge>
+                      <td className="admin-td hidden lg:table-cell">
+                        <span className="text-sm text-stone-600 truncate">{user.email}</span>
                       </td>
-                      <td className="hidden lg:table-cell px-6 py-4 text-sm text-stone-900">
-                        {shortDate(user.createdAt)}
-                      </td>
-                      <td className="px-4 sm:px-6 py-4">
-                        <Badge 
-                          variant={user.isBlocked ? "destructive" : "success"}
-                          className="shadow-sm"
-                        >
-                          {user.isBlocked ? "Blocked" : "Active"}
-                        </Badge>
-                      </td>
-                      <td className="px-4 sm:px-6 py-4 text-right">
-                        {user.role !== "admin" && (
-                          <Button
-                            variant={user.isBlocked ? "outline" : "destructive"}
-                            size="sm"
-                            onClick={() => handleToggleBlock(user._id, user.isBlocked)}
-                            className={user.isBlocked ? "border-2 hover:bg-green-50 hover:text-green-700 hover:border-green-500 transition-all" : "hover:scale-105 transition-transform"}
-                          >
-                            {user.isBlocked ? (
-                              <>
-                                <CheckCircle className="w-4 h-4 mr-1" />
-                                <span className="hidden sm:inline">Unblock</span>
-                              </>
-                            ) : (
-                              <>
-                                <Ban className="w-4 h-4 mr-1" />
-                                <span className="hidden sm:inline">Block</span>
-                              </>
-                            )}
-                          </Button>
+                      <td className="admin-td hidden lg:table-cell">
+                        {user.role === "admin" ? (
+                          <span className="admin-status info">
+                            <Shield className="w-3 h-3" />
+                            Admin
+                          </span>
+                        ) : (
+                          <span className="admin-status default">
+                            <span className="dot" />
+                            User
+                          </span>
                         )}
+                      </td>
+                      <td className="admin-td hidden xl:table-cell">
+                        <span className="text-sm text-stone-500">{shortDate(user.createdAt)}</span>
+                      </td>
+                      <td className="admin-td">
+                        <span className={`admin-status ${user.isBlocked ? 'danger' : 'success'}`}>
+                          <span className="dot" />
+                          {user.isBlocked ? "Blocked" : "Active"}
+                        </span>
+                      </td>
+                      <td className="admin-td">
+                        <div className="admin-actions justify-end">
+                          {user.role !== "admin" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleToggleBlock(user._id, user.isBlocked)}
+                              className={`text-xs h-8 px-3 rounded-lg transition-all ${
+                                user.isBlocked
+                                  ? "text-green-700 hover:bg-green-50 hover:text-green-800"
+                                  : "text-red-600 hover:bg-red-50 hover:text-red-700"
+                              }`}
+                            >
+                              {user.isBlocked ? (
+                                <><CheckCircle className="w-3.5 h-3.5 mr-1" /><span className="hidden sm:inline">Unblock</span></>
+                              ) : (
+                                <><Ban className="w-3.5 h-3.5 mr-1" /><span className="hidden sm:inline">Block</span></>
+                              )}
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </Card>
+            {/* Table Footer */}
+            <div className="admin-table-footer flex items-center justify-between">
+              <span>Showing {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, filteredUsers.length)} of {filteredUsers.length} users</span>
+              <span className="text-xs text-stone-400">Page {currentPage} of {totalPages || 1}</span>
+            </div>
+          </div>
 
           {/* Mobile Cards */}
-          <div className="md:hidden space-y-4 animate-scale-up stagger-2">
+          <div className="md:hidden space-y-3 animate-scale-up stagger-2">
             {paginatedUsers.map((user) => (
-              <Card key={user._id} className="p-4 border-2 border-stone-200 shadow-lg bg-white/80 backdrop-blur-sm">
+              <div key={user._id} className="admin-mobile-card">
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center shadow-md flex-shrink-0">
-                    <span className="text-amber-700 font-bold text-lg">{user.name.charAt(0).toUpperCase()}</span>
+                  <div className={`admin-avatar bg-gradient-to-br ${getAvatarColor(user.name)} text-white shadow-md text-lg w-12 h-12`}>
+                    {user.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-stone-900 truncate">{user.name}</h3>
-                    <p className="text-sm text-stone-600 truncate">{user.email}</p>
-                    {user.phone && <p className="text-xs text-stone-500">{user.phone}</p>}
+                    <p className="text-sm text-stone-500 truncate">{user.email}</p>
+                    {user.phone && <p className="text-xs text-stone-400">{user.phone}</p>}
                   </div>
                 </div>
                 <div className="flex gap-2 mb-3">
-                  <Badge variant={user.role === "admin" ? "default" : "secondary"} className={user.role === "admin" ? "bg-gradient-to-r from-amber-600 to-amber-700 shadow-sm" : "shadow-sm"}>
-                    {user.role}
-                  </Badge>
-                  <Badge variant={user.isBlocked ? "destructive" : "success"} className="shadow-sm">
+                  {user.role === "admin" ? (
+                    <span className="admin-status info text-xs"><Shield className="w-3 h-3" /> Admin</span>
+                  ) : (
+                    <span className="admin-status default text-xs"><span className="dot" /> User</span>
+                  )}
+                  <span className={`admin-status text-xs ${user.isBlocked ? 'danger' : 'success'}`}>
+                    <span className="dot" />
                     {user.isBlocked ? "Blocked" : "Active"}
-                  </Badge>
+                  </span>
                 </div>
-                <div className="text-sm text-stone-600 mb-3">
-                  Joined: {shortDate(user.createdAt)}
-                </div>
+                <div className="text-xs text-stone-400 mb-3">Joined: {shortDate(user.createdAt)}</div>
                 {user.role !== "admin" && (
-                  <Button variant={user.isBlocked ? "outline" : "destructive"} size="sm" onClick={() => handleToggleBlock(user._id, user.isBlocked)} className={user.isBlocked ? "w-full border-2 hover:bg-green-50 hover:text-green-700 hover:border-green-500" : "w-full"}>
+                  <Button
+                    variant={user.isBlocked ? "outline" : "destructive"}
+                    size="sm"
+                    onClick={() => handleToggleBlock(user._id, user.isBlocked)}
+                    className={`w-full text-xs h-9 ${user.isBlocked ? "border-2 border-green-500 text-green-700 hover:bg-green-50" : ""}`}
+                  >
                     {user.isBlocked ? (
                       <><CheckCircle className="w-4 h-4 mr-2" />Unblock User</>
                     ) : (
@@ -358,23 +373,22 @@ export default function AdminUsersPage() {
                     )}
                   </Button>
                 )}
-              </Card>
+              </div>
             ))}
           </div>
         </>
-        )}
+      )}
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-6 animate-fade-in-up">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
-        )}
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 animate-fade-in-up">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   );
 }
-

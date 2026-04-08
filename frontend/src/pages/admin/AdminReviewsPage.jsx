@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAdminReviews, useDeleteAdminReview } from "@/hooks/api/useAdmin";
-import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { AdminSkeleton } from "@/components/admin/AdminSkeleton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -137,7 +137,7 @@ export default function AdminReviewsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-fade-in-up">
         <div>
@@ -217,7 +217,7 @@ export default function AdminReviewsPage() {
 
       {/* Reviews List */}
       {isLoading ? (
-        <LoadingSkeleton type="list" count={5} />
+        <AdminSkeleton type="review-list" count={5} />
       ) : filteredReviews.length === 0 ? (
         <Card className="p-12 text-center border-2 border-stone-200 bg-gradient-to-br from-stone-50 to-amber-50/30 animate-scale-up stagger-2">
           <Star className="w-16 h-16 text-stone-300 mx-auto mb-4" />

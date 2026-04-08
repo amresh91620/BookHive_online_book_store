@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, MapPin, CreditCard, Wallet, Info } from "lucide-react";
+import { Plus, MapPin, CreditCard, Wallet, Info, ShoppingBag } from "lucide-react";
 import { formatPrice } from "@/utils/format";
 import toast from "react-hot-toast";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -230,18 +230,29 @@ export default function CheckoutPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
-          <p className="text-gray-600 mb-6">Add some books to checkout</p>
-          <Button onClick={() => navigate("/books")}>Browse Books</Button>
+      <div className="min-h-screen bg-[#f7f5ef] flex items-center justify-center px-4">
+        <div className="text-center max-w-sm">
+          <div
+            className="w-24 h-24 rounded-full bg-[#fef3ed] flex items-center justify-center mx-auto mb-6"
+            style={{ boxShadow: '0 0 0 8px rgba(217,118,66,0.08)' }}
+          >
+            <ShoppingBag className="w-12 h-12 text-[#d97642]" />
+          </div>
+          <h2 className="text-2xl font-bold text-stone-900 mb-2">Your cart is empty</h2>
+          <p className="text-stone-600 mb-6 font-light">Add some books to checkout</p>
+          <Button
+            onClick={() => navigate("/books")}
+            className="bg-gradient-to-r from-[#d97642] to-[#e08550] hover:from-[#c26535] hover:to-[#d97642] text-white px-8 h-12 rounded-xl font-semibold"
+          >
+            Browse Books
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#f7f5ef] py-8">
       <div className="container-shell">
         <h1
           ref={headerRef}

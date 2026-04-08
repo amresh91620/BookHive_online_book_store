@@ -79,79 +79,93 @@ export default function OrderDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-[#f7f5ef] py-8">
         <div className="container-shell">
-          {/* Back Button Skeleton */}
-          <div className="h-10 w-36 bg-gray-200 rounded-lg mb-6 animate-pulse"></div>
-          
+          {/* Back button skeleton */}
+          <div className="h-10 w-36 skeleton-wave rounded-lg mb-6" />
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Content Skeleton */}
+            {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Order Header Card */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6 animate-fade-in-up">
+              <div className="bg-white rounded-2xl border border-[#f0e4d6] p-6" style={{ boxShadow: '0 4px 20px rgba(217,118,66,0.05)' }}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="space-y-2">
-                    <div className="h-7 w-48 bg-gray-200 rounded animate-pulse"></div>
-                    <div className="h-5 w-32 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-7 w-52 skeleton-wave rounded" />
+                    <div className="h-4 w-36 skeleton-wave rounded" />
                   </div>
-                  <div className="h-7 w-28 bg-gray-200 rounded-full animate-pulse"></div>
+                  <div className="h-7 w-28 skeleton-wave-orange rounded-full" />
                 </div>
-                <div className="h-4 w-40 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 w-44 skeleton-wave rounded" />
               </div>
-              
+
               {/* Order Items Card */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-                <div className="h-6 w-32 bg-gray-200 rounded mb-4 animate-pulse"></div>
-                <div className="space-y-4">
-                  {[...Array(2)].map((_, i) => (
-                    <div key={i} className="flex gap-4 pb-4 border-b border-gray-100 last:border-0">
-                      <div className="w-16 h-20 bg-gray-200 rounded animate-pulse flex-shrink-0"></div>
+              <div className="bg-white rounded-2xl border border-[#f0e4d6] p-6" style={{ boxShadow: '0 4px 20px rgba(217,118,66,0.05)' }}>
+                <div className="h-6 w-32 skeleton-wave rounded mb-5" />
+                <div className="space-y-5">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="flex gap-4 pb-5 border-b border-[#f5ece3] last:border-0">
+                      <div
+                        className="w-16 h-22 skeleton-wave rounded-lg flex-shrink-0 overflow-hidden relative"
+                        style={{ transform: 'perspective(500px) rotateY(-5deg)', boxShadow: '4px 4px 12px rgba(0,0,0,0.09)' }}
+                      >
+                        <div className="skeleton-overlay" />
+                      </div>
                       <div className="flex-1 space-y-2">
-                        <div className="h-5 w-3/4 bg-gray-200 rounded animate-pulse"></div>
-                        <div className="h-4 w-1/3 bg-gray-200 rounded animate-pulse"></div>
-                        <div className="h-5 w-24 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-5 skeleton-wave rounded w-3/4" />
+                        <div className="h-4 skeleton-wave rounded w-1/3" />
+                        <div className="h-5 w-24 skeleton-wave-orange rounded" />
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-              
+
               {/* Shipping Address Card */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-                <div className="h-6 w-40 bg-gray-200 rounded mb-4 animate-pulse"></div>
+              <div className="bg-white rounded-2xl border border-[#f0e4d6] p-6" style={{ boxShadow: '0 4px 20px rgba(217,118,66,0.05)' }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-5 h-5 skeleton-wave-orange rounded" />
+                  <div className="h-6 w-40 skeleton-wave rounded" />
+                </div>
                 <div className="space-y-2">
-                  <div className="h-5 w-48 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-5 w-48 skeleton-wave rounded" />
+                  <div className="h-4 skeleton-wave rounded w-full" />
+                  <div className="h-4 skeleton-wave rounded w-3/4" />
                 </div>
               </div>
             </div>
-            
-            {/* Sidebar Skeleton */}
+
+            {/* Sidebar */}
             <div className="space-y-6">
-              {/* Order Summary Card */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-                <div className="h-6 w-36 bg-gray-200 rounded mb-4 animate-pulse"></div>
+              {/* Summary Card */}
+              <div className="bg-white rounded-2xl border border-[#f0e4d6] p-6" style={{ boxShadow: '0 4px 20px rgba(217,118,66,0.05)' }}>
+                <div className="h-6 w-36 skeleton-wave rounded mb-5" />
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
-                    <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-20 skeleton-wave rounded" />
+                    <div className="h-4 w-16 skeleton-wave rounded" />
                   </div>
                   <div className="flex justify-between">
-                    <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-                    <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-24 skeleton-wave rounded" />
+                    <div className="h-4 w-16 skeleton-wave rounded" />
                   </div>
-                  <div className="flex justify-between pt-3 border-t">
-                    <div className="h-6 w-16 bg-gray-200 rounded animate-pulse"></div>
-                    <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="flex justify-between pt-3 border-t border-[#f5ece3]">
+                    <div className="h-6 w-16 skeleton-wave rounded" />
+                    <div className="h-6 w-24 skeleton-wave-orange rounded" />
                   </div>
                 </div>
               </div>
-              
-              {/* Payment Method Card */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-                <div className="h-6 w-40 bg-gray-200 rounded mb-4 animate-pulse"></div>
-                <div className="h-5 w-32 bg-gray-200 rounded animate-pulse"></div>
+
+              {/* Payment Card */}
+              <div className="bg-white rounded-2xl border border-[#f0e4d6] p-6" style={{ boxShadow: '0 4px 20px rgba(217,118,66,0.05)' }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-5 h-5 skeleton-wave-orange rounded" />
+                  <div className="h-6 w-44 skeleton-wave rounded" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-4 skeleton-wave rounded w-full" />
+                  <div className="h-4 skeleton-wave rounded w-2/3" />
+                </div>
               </div>
             </div>
           </div>
@@ -172,7 +186,7 @@ export default function OrderDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#f7f5ef] py-8">
       <div className="container-shell">
         <Button variant="ghost" onClick={() => navigate("/orders")} className="mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />

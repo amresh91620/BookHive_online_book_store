@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useBlogsList, useDeleteBlog } from "@/hooks/api/useBlogs";
-import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { AdminSkeleton } from "@/components/admin/AdminSkeleton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -40,7 +40,7 @@ export default function AdminBlogsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-fade-in-up">
         <div>
@@ -69,7 +69,7 @@ export default function AdminBlogsPage() {
       </div>
 
       {isLoading ? (
-        <LoadingSkeleton type="table" count={1} />
+        <AdminSkeleton type="table" />
       ) : (
         <>
           {/* Desktop Table */}
@@ -92,7 +92,7 @@ export default function AdminBlogsPage() {
                 ) : blogs.map((blog) => (
                   <tr 
                     key={blog._id} 
-                    className="hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-stone-50 transition-all duration-200"
+                    className="admin-table-row"
                   >
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex items-center gap-3">

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAdminMessages, useDeleteAdminMessage } from "@/hooks/api/useAdmin";
-import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { AdminSkeleton } from "@/components/admin/AdminSkeleton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -120,7 +120,7 @@ export default function AdminMessagesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-fade-in-up">
         <div>
@@ -174,7 +174,7 @@ export default function AdminMessagesPage() {
 
       {/* Messages List */}
       {isLoading ? (
-        <LoadingSkeleton type="list" count={5} />
+        <AdminSkeleton type="message-list" count={5} />
       ) : filteredMessages.length === 0 ? (
         <Card className="p-12 text-center border-2 border-stone-200 bg-gradient-to-br from-stone-50 to-amber-50/30 animate-scale-up stagger-2">
           <Mail className="w-16 h-16 text-stone-300 mx-auto mb-4" />

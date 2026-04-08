@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useActivityLogs, useActivityStats } from "@/hooks/api/useActivityLogs";
-import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { AdminSkeleton } from "@/components/admin/AdminSkeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,7 +86,7 @@ export default function AdminActivityLogsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="admin-page p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="mb-8 animate-fade-in-up">
         <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-stone-900 via-amber-900 to-stone-800 bg-clip-text text-transparent">
@@ -189,7 +189,7 @@ export default function AdminActivityLogsPage() {
 
       {/* Activity Logs List */}
       {isLoading ? (
-        <LoadingSkeleton type="list" count={10} />
+        <AdminSkeleton type="activity-log" count={10} />
       ) : filteredLogs.length === 0 ? (
         <Card className="p-12 text-center border-2 border-stone-200 bg-gradient-to-br from-stone-50 to-amber-50/30">
           <Activity className="w-16 h-16 text-stone-300 mx-auto mb-4" />
@@ -223,7 +223,7 @@ export default function AdminActivityLogsPage() {
                         </span>
                         <Badge
                           className={`${
-                            ACTION_COLORS[log.action] || "bg-gray-100 text-gray-800"
+                            ACTION_COLORS[log.action] || "bg-[#f5ece3] text-stone-800"
                           } shadow-sm`}
                         >
                           {formatAction(log.action)}

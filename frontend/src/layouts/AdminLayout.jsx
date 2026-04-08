@@ -62,42 +62,46 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Top Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div className="min-h-screen bg-[#faf9f7]">
+      {/* Top Header — glassmorphism */}
+      <header className="admin-header sticky top-0 z-40">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="sm"
-              className="lg:hidden"
+              className="lg:hidden hover:bg-amber-50"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
-            <Link to="/admin" className="flex items-center gap-2">
-              <BookOpen className="w-6 h-6 text-amber-600" />
-              <span className="font-bold text-xl text-gray-900">BookHive Admin</span>
+            <Link to="/admin" className="flex items-center gap-2.5 group">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300">
+                <BookOpen className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-bold text-xl text-stone-900 tracking-tight">
+                BookHive <span className="text-amber-600 font-extrabold">Admin</span>
+              </span>
             </Link>
           </div>
 
           <div className="flex items-center gap-3">
             <Link to="/">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="border-stone-200 hover:border-amber-400 hover:bg-amber-50 transition-all duration-200">
                 <Home className="w-4 h-4 mr-2" />
                 Visit Store
               </Button>
             </Link>
             <Separator orientation="vertical" className="h-6" />
-            <div className="flex items-center gap-2">
-              <Avatar className="w-8 h-8">
-                <AvatarFallback className="bg-amber-600 text-white">
+            <div className="flex items-center gap-2.5">
+              <Avatar className="w-8 h-8 ring-2 ring-amber-200 ring-offset-1">
+                <AvatarFallback className="bg-gradient-to-br from-amber-500 to-amber-700 text-white font-semibold text-sm">
                   {user?.name?.charAt(0).toUpperCase() || "A"}
                 </AvatarFallback>
               </Avatar>
               <div className="hidden md:block">
-                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                <p className="text-xs text-gray-500">Administrator</p>
+                <p className="text-sm font-semibold text-stone-900 leading-tight">{user?.name}</p>
+                <p className="text-xs text-stone-500 font-medium">Administrator</p>
               </div>
             </div>
           </div>
@@ -105,15 +109,15 @@ export default function AdminLayout() {
       </header>
 
       <div className="flex">
-        {/* Sidebar */}
+        {/* Sidebar — glassmorphism + accent bars */}
         <aside
           className={`
             fixed lg:sticky top-[57px] left-0 z-30 h-[calc(100vh-57px)]
-            w-64 bg-white border-r border-gray-200 transition-transform duration-300
+            w-64 admin-sidebar border-r border-stone-200/80 transition-transform duration-300
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
           `}
         >
-          <nav className="p-4 space-y-2">
+          <nav className="p-3 space-y-1 mt-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
@@ -125,20 +129,26 @@ export default function AdminLayout() {
                   to={item.path}
                   onClick={() => setSidebarOpen(false)}
                   className={`
-                    flex items-center gap-3 px-4 py-3 rounded-lg transition-colors relative
+                    admin-nav-link flex items-center gap-3 px-4 py-2.5 rounded-xl
                     ${
                       active
-                        ? "bg-amber-50 text-amber-700 font-medium"
-                        : "text-gray-700 hover:bg-gray-50"
+                        ? "active bg-gradient-to-r from-amber-50 to-amber-100/60 text-amber-800 font-semibold shadow-sm"
+                        : "text-stone-600 hover:bg-stone-50 hover:text-stone-900"
                     }
                   `}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="flex-1">{item.label}</span>
+                  <div className={`p-1.5 rounded-lg transition-colors duration-200 ${
+                    active 
+                      ? "bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-sm" 
+                      : "bg-stone-100 text-stone-500 group-hover:bg-stone-200"
+                  }`}>
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <span className="flex-1 text-sm">{item.label}</span>
                   {showBadge && (
                     <Badge 
                       variant="destructive" 
-                      className="ml-auto min-w-[20px] h-5 flex items-center justify-center px-1.5"
+                      className="ml-auto min-w-[20px] h-5 flex items-center justify-center px-1.5 text-xs font-bold animate-pulse"
                     >
                       {pendingOrdersCount}
                     </Badge>
@@ -147,14 +157,16 @@ export default function AdminLayout() {
               );
             })}
 
-            <Separator className="my-4" />
+            <Separator className="my-3" />
 
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors w-full"
+              className="admin-nav-link flex items-center gap-3 px-4 py-2.5 rounded-xl text-red-500 hover:bg-red-50 hover:text-red-700 w-full"
             >
-              <LogOut className="w-5 h-5" />
-              <span>Logout</span>
+              <div className="p-1.5 rounded-lg bg-red-50 text-red-500">
+                <LogOut className="w-4 h-4" />
+              </div>
+              <span className="text-sm font-medium">Logout</span>
             </button>
           </nav>
         </aside>
@@ -162,7 +174,7 @@ export default function AdminLayout() {
         {/* Overlay for mobile */}
         {sidebarOpen && (
           <div
-            className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-20 lg:hidden transition-opacity"
             onClick={() => setSidebarOpen(false)}
           />
         )}
